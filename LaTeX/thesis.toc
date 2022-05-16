@@ -1,0 +1,14 @@
+\babel@toc {english}{}
+\contentsline {section}{\numberline {1}Introduction}{2}{}%
+\contentsline {section}{\numberline {2}Neural Networks}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Notation}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Training}{5}{}%
+\contentsline {section}{\numberline {3}Kernel Gradient Descent}{11}{}%
+\contentsline {subsection}{\numberline {3.1}Functional Derivatives}{11}{}%
+\contentsline {subsection}{\numberline {3.2}Kernel Gradient}{16}{}%
+\contentsline {subsection}{\numberline {3.3}Kernel Approximation}{21}{}%
+\contentsline {subsection}{\numberline {3.4}Neural Tangent Kernel}{23}{}%
+\contentsline {section}{\numberline {4}Dynamic Linear Dimensionality Reduction}{26}{}%
+\contentsline {section}{\numberline {5}Numerical Experiments}{27}{}%
+\contentsline {section}{\numberline {6}Conclusion}{28}{}%
+\contentsline {section}{\numberline {7}Appendix}{29}{}%

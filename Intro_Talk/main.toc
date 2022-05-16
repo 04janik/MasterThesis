@@ -1,0 +1,12 @@
+\beamer@sectionintoc {1}{Paper}{2}{0}{1}
+\beamer@sectionintoc {2}{Motivation: Deep neural networks depend on million of parameters causing severe problems}{3}{0}{2}
+\beamer@sectionintoc {3}{Motivation: The number of independent optimization variables may be smaller than the number of parameters}{4}{0}{3}
+\beamer@sectionintoc {4}{Motivation: Pioneering work achieved 90\% accuracy in smaller spaces}{5}{0}{4}
+\beamer@sectionintoc {5}{Approach in the paper}{6}{0}{5}
+\beamer@sectionintoc {6}{Agenda}{7}{0}{6}
+\beamer@sectionintoc {7}{Dynamic Linear Dimensionality Reduction}{9}{0}{7}
+\beamer@sectionintoc {8}{Agenda}{16}{0}{8}
+\beamer@sectionintoc {9}{DLDR-based Quasi-Newton Algorithm}{17}{0}{9}
+\beamer@sectionintoc {10}{Agenda}{19}{0}{10}
+\beamer@sectionintoc {11}{Numerical Experiments}{20}{0}{11}
+\beamer@sectionintoc {13}{Ideas for further exploration}{26}{0}{12}
