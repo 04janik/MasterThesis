@@ -32,7 +32,9 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\E}{\mathds{E}}
 
-\usepackage{graphicx, scrextend}
+\usepackage{graphicx, scrextend, algorithmic, xcolor}
+
+\usepackage[ruled]{algorithm}
 
 \setlength{\parindent}{0em} 
 
@@ -146,18 +148,19 @@ Let $f: \R^n \to \R$ be differentiable. The gradient of $f$ is defined as
 
 Due to the complexity of the error function, in general there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent.
 
-\begin{algorithm}[\textbf{Gradient Descent}] \ \\
-\textbf{------------------------------------------------------------------------------------------------------} \\
+\begin{algorithm}
+\caption{Gradient Descent} \ \\
 Let $f: \R^n \to \R$ be differentiable. Gradient descent proceeds as follows: \\
 
 1) Initialize $k=0$, choose $\epsilon \geq 0 \in \R$ and pick some random $x_0 \in \R^n$. \\
 
-2) WHILE $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ DO:\\
+2) \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
 
-\quad 3) Choose a stepsize $\alpha_k > 0 \in \R$. \\
+\quad 3) Choose a step size $\alpha_k > 0 \in \R$. \\
 
 \quad 4) Set $x_{k+1} = x_k - \alpha_k \cdot \nabla f(x_k)$ and $k = k+1$. \\
-\textbf{------------------------------------------------------------------------------------------------------}
+
+5) \textbf{end while} \\
 \end {algorithm}
 
 We will see, that in the case where $f$ is bounded from below and $\nabla f$ is Lipschitz continuous, we can guarantee the  converges of gradient descent to a stationary point.
@@ -220,7 +223,7 @@ This completes the proof, since $x,y$ were chosen arbitrary.
 \end{proof}
 
 \begin{theorem} \label{thm:descent}
-Let $f: \R^n \to \R$ be differentiable with a global minimizer $x_* \in \R^n$, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L>0$, then gradient descent with $\epsilon = 0$ and constant stepsize $\alpha_k = 1/L$ produces a sequence $(x_k)_{k \in \N_0} \in \R^n$, such that 
+Let $f: \R^n \to \R$ be differentiable with a global minimizer $x_* \in \R^n$, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L>0$, then gradient descent with $\epsilon = 0$ and constant step size $\alpha_k = 1/L$ produces a sequence $(x_k)_{k \in \N_0} \in \R^n$, such that 
 \[ \forall n \in \N : \min_{0 \leq k \leq n} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L \big ( f(x_0) - f(x_*) \big )}{n+1}. \]
 \end{theorem}
 
@@ -234,7 +237,7 @@ f(x_{k+1})
 &= f(x_k) - \frac{1}{L} \big \| \nabla f(x_k) \big \|_2^2 + \frac{1}{2L} \big \| \nabla f(x_k) \big \|_2^2 \\\
 &= f(x_k) - \frac{1}{2L} \big \| \nabla f(x_k) \big \|_2^2.
 \end{split} \]
-Hence the gradient descent algorithm with constant stepsize $\alpha_k = 1/L$ guarantees to make progress unless $\nabla f(x_k) \neq 0$. The previous expression is equivalent to
+Hence the gradient descent algorithm with constant step size $\alpha_k = 1/L$ guarantees to make progress unless $\nabla f(x_k) \neq 0$. The previous expression is equivalent to
 \[ \big \| \nabla f(x_k) \big \|_2^2 \leq 2L \big ( f(x_k) - f(x_{k+1}) \big ). \]
 Summing up both sides from $k=0$ to some $n \in \N$ and taking the average results in
 \[ \frac{1}{n+1} \sum_{k=0}^{n} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L}{n+1} \sum_{k=0}^{n} f(x_k) - f(x_{k+1}) = \frac{2L}{n+1} \big ( f(x_0) - f(x_{n+1}) \big ). \]
@@ -243,7 +246,7 @@ Using $f(x_*) \leq f(x_k)$ for every $k \in \N$, we conclude
 This completes the proof, since $n$ was chosen arbitrary.
 \end{proof}
 
-Note that in practice it is inefficient to use a constant stepsize of $1/L$. Nevertheless it is useful for theoretical analysis to guarantee convergence. \\
+Note that in practice it is inefficient to use a constant step size of $1/L$. Nevertheless it is useful for theoretical analysis to guarantee convergence. \\
 
 Theorem \ref{thm:descent} states, that in the limit as $n \to \infty$, gradient descent converges to a stationary point $\hat{x} \in \R^n$ with $\nabla f(\hat{x}) = 0$. Since we have seen in the proof, that $f(x_k)$ is monotonically decreasing in $k$, gradient descent converges to the next stationary point in direction of descent, which is either a local minimum, a global minimum or a saddle point. \\
 
@@ -297,28 +300,67 @@ Using $\nabla f(x) = 0$ we conclude
 This completes the proof, since the backwards direction is trivial.
 \end{proof}
 
-Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. \\
+Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. Unfortunately this does not apply to the error function used for neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:kernel}. \\
 
-Unfortunately the error function $E$ for neural network training is in general highly non-convex and we have to deal with local minima and saddle points. Section \ref{sec:kernel} we will introduce an approach to prevent this problem. \\
+Recalling the definition of the empirical error function 
+ \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \L \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
+we realize, that the computation effort needed to compute the gradients, depends on the number of training samples $m$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. \\
 
-\textbf{TO DO:} Training is computationally and time expensive... therefore we need better optimizer than gradient descent. \\
+Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing the exact gradient. Doing so, stochastic gradient descent makes a trade-off between the accuracy and the time needed for gradient computation. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $I_k \subset \{ 1, \dots, m \}$ of size $| I_k | = b \in \N$ and uses
+\[ \nabla E(w_k,I_k) := \frac{1}{b} \sum_{i \in I_k}^{}  \L \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
+as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates.
+\pagebreak
 
-\begin{algorithm}[\textbf{Stochastic Gradient Descent}] \ \\
-\textbf{------------------------------------------------------------------------------------------------------} \\
-TO DO - SGD \\
-\textbf{------------------------------------------------------------------------------------------------------} 
+\begin{algorithm}
+\caption{Stochastic Gradient Descent (SGD)} \ \\
+Let $E: \R^n \to \R$ be a differentiable empirical error function. SGD proceeds as follows: \\
+
+1) Choose a batch size $b \in \N$, a number of epochs $K \in \N$ and pick some random $w_0 \in \R^n$. \\
+
+2) \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
+
+\quad 3) Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
+
+\quad 4) Choose a step size $\alpha_k > 0 \in \R$. \\
+
+\quad 5) Set $w_{k+1} = w_k - \alpha_k \cdot \nabla E(w_k,I_k)$. \\
+
+6) \textbf{end for} \\
 \end{algorithm}
 
-\begin{algorithm}[\textbf{Adaptive Moment Estimation}] \ \\
-\textbf{------------------------------------------------------------------------------------------------------} \\
-TO DO - ADAM \\
-\textbf{------------------------------------------------------------------------------------------------------} 
-\end{algorithm}
+In here, an epoch describes one iteration on a number of samples that equals the size of the whole training dataset. A theoretical convergence analysis of stochastic gradient descent can be found in [?], but would exceed the scope of this theory. \\
 
-\begin{algorithm}[\textbf{Broyden–Fletcher–Goldfarb–Shanno}] \ \\
-\textbf{------------------------------------------------------------------------------------------------------} \\
-TO DO - BFGS \\
-\textbf{------------------------------------------------------------------------------------------------------} 
+Until now we have not discussed how to choose the step sizes $\alpha_k$. To simplify things, in practice one usually chooses a step size $\alpha > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the SGD algorithm by including past gradients for the current parameter update is the following.
+
+\begin{algorithm}
+\caption{Adaptive Moment Estimation (Adam)} \ \\
+\textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$.  \\
+\textcolor{white}{$\Big |$}2: Requires constant step size $\alpha > 0 \in \R$, batch size $b \in \N$ and number of epochs $K \in \N$. \\
+\textcolor{white}{$\Big |$}3: Requires momentum factors $\beta_1, \beta_2 \in [0,1)$ and a scalar $\epsilon > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}4: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}5: \quad Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
+\textcolor{white}{$\Big |$}6: \quad Set $m_{k} = \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,I_k)$ and $\hat{m}_k = \frac{m_k}{1-\beta_1^k}$. \\
+\textcolor{white}{$\Big |$}7: \quad Set $v_{k} = \beta_2 v_{k-1} + (s-\beta_2) \cdot \nabla E(w_k,I_k)^2$ and $\hat{v}_k = \frac{v_k}{1-\beta_2^k}$. \\
+\textcolor{white}{$\Big |$}8: \quad Set $w_{k+1} = w_k - \alpha \cdot \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \epsilon}$. \\
+\textcolor{white}{$\Big |$}9: \textbf{end for} \\
+\end{algorithm}
+\pagebreak
+
+In here, all operations on vectors are performed element-wise. The scalar $\epsilon$ is used to prevent division by zero. The default setup proposed by the authors is to choose $\epsilon = 10^{-8}$, $\beta_1 = 0.9$ and $\beta_2 = 0.999$. We will always apply this default setting when working with Adam. \\
+
+The three optimization methods introduced so far, all have in common, that they perform parameter updates on first order information only. This is due to the fact, that Hessian matrix computation for deep neural networks is infeasible due to the large number of parameters. However, later on we will see one can train neural networks in tiny subspaces, such that second order methods are applicable. One optimization algorithm, that includes second order information is the following.
+
+\begin{algorithm}
+\caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS)} \ \\
+\textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0 \in \R$. \\
+\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$, $B_0 \leftarrow I_n$. \\
+\textcolor{white}{$\Big |$}3: \textbf{while} $ \| \nabla f(x_k) \|_2 > \epsilon $ \textbf{do}: \\
+\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}5: \quad Update $x_{k+1} \leftarrow x_k - \alpha_k B_k \nabla f(x_{k})$. \\
+\textcolor{white}{$\Big |$}6: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
+\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k^Ts_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k^T$. \\
+\textcolor{white}{$\Big |$}8: \quad Update $B_{k+1} \leftarrow V_k^TB_{k}V_k + \rho_k s_k s_k^T$ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}9: \textbf{end while}
 \end{algorithm}
 
 \pagebreak
@@ -498,7 +540,7 @@ exists. The functional gradient of $\mu$ at $f_0$ is defined as
 
 Based on these definitions, we can iteratively minimize functionals $\mu: \F \to \R$ in a similar manner to the gradient descent method.
 
-\begin{algorithm}[\textbf{Functional Gradient Descent}] \ \\
+\begin{algorithm}
 \textbf{------------------------------------------------------------------------------------------------------} \\
 Let $\mu: \F \to \R$ be differentiable. Functional gradient descent proceeds as follows: \\
 
@@ -506,7 +548,7 @@ Let $\mu: \F \to \R$ be differentiable. Functional gradient descent proceeds as 
 
 2) WHILE $ \big \| \nabla \mu |_{f_k} \big \|_{\D_x} > \epsilon $ DO:\\
 
-\quad 3) Choose a stepsize $\alpha_k > 0 \in \R$. \\
+\quad 3) Choose a step size $\alpha_k > 0 \in \R$. \\
 
 \quad 4) Set $f_{k+1} = f_k - \alpha_k \cdot \nabla \mu |_{f_k}$ and $k = k+1$. \\
 \textbf{------------------------------------------------------------------------------------------------------} 
@@ -622,7 +664,7 @@ Let $f_0 \in \F$, $\mu : \F \to \R$ be a differentiable functional with $\partia
 
 Using this definition, we can formulate the kernel gradient descent method.
 
-\begin{algorithm}[\textbf{Kernel Gradient Descent}] \ \\
+\begin{algorithm}
 \textbf{------------------------------------------------------------------------------------------------------} \\
 Let $K$ be a kernel and $\mu: \F \to \R$ be a differentiable functional with $\partial_f\mu|_{f_0} \in \F^*$. Kernel gradient descent with respect to the kernel $K$ proceeds as follows: \\
 
@@ -630,7 +672,7 @@ Let $K$ be a kernel and $\mu: \F \to \R$ be a differentiable functional with $\p
 
 2) WHILE $ \big \| \nabla_K \mu|_{f_k} \big \|_{\D_x} > \epsilon $ DO:\\
 
-\quad 3) Choose a stepsize $\alpha_k > 0 \in \R$. \\
+\quad 3) Choose a step size $\alpha_k > 0 \in \R$. \\
 
 \quad 4) Set $f_{k+1} = f_k - \alpha_k \cdot \nabla_K \mu|_{f_k}$ and $k = k+1$. \\
 \textbf{------------------------------------------------------------------------------------------------------}
@@ -985,7 +1027,7 @@ f(x_{k+1})
 &= f(x_k) - \frac{1}{L} \big \| \nabla f(x_k) \big \|_2^2 + \frac{1}{2L} \big \| \nabla f(x_k) \big \|_2^2 \\\
 &= f(x_k) - \frac{1}{2L} \big \| \nabla f(x_k) \big \|_2^2.
 \end{split} \end{equation}
-Hence the gradient descent algorithm with constant stepsize $\alpha_k = 1/L$ guarantees to make progress unless $\nabla f(x_k) \neq 0$. On top of this we can infer by the convexity of $f$, that
+Hence the gradient descent algorithm with constant step size $\alpha_k = 1/L$ guarantees to make progress unless $\nabla f(x_k) \neq 0$. On top of this we can infer by the convexity of $f$, that
 \[ f(x_k) - f(x_*) \leq \big \langle \nabla f(x_k), x_k - x_* \big \rangle. \]
 Using the Cauchy-Schwarz inequality and the monotonicity of $\big \| x_{k} - x_* \big \|_2^2$ by (1) yields
 \[ f(x_k) - f(x_*) \leq \big \langle \nabla f(x_k), x_k - x_* \big \rangle  \leq \big \| \nabla f(x_k) \big \|_2 \cdot \big \| x_k - x_* \big \|_2 \leq \big \| \nabla f(x_k) \big \|_2 \cdot \big \| x_0 - x_* \big \|_2, \]
