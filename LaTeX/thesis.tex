@@ -146,24 +146,19 @@ Let $f: \R^n \to \R$ be differentiable. The gradient of $f$ is defined as
 \[ \nabla f : \R^n \to \R^n : x = (x_1, \dots, x_n) \mapsto \bigg [ \frac{\partial}{\partial x_1} f(x), \cdots, \frac{\partial}{\partial x_n} f(x) \bigg ]^T. \]
 \end{definition}
 
-Due to the complexity of the error function, in general there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent.
+Due to the complexity of the error function, in general there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first raised by Cauchy in \cite{GD}.
 
 \begin{algorithm}
 \caption{Gradient Descent} \ \\
-Let $f: \R^n \to \R$ be differentiable. Gradient descent proceeds as follows: \\
-
-1) Initialize $k=0$, choose $\epsilon \geq 0 \in \R$ and pick some random $x_0 \in \R^n$. \\
-
-2) \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
-
-\quad 3) Choose a step size $\alpha_k > 0 \in \R$. \\
-
-\quad 4) Set $x_{k+1} = x_k - \alpha_k \cdot \nabla f(x_k)$ and $k = k+1$. \\
-
-5) \textbf{end while} \\
+\textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and $\epsilon \geq 0 \in \R$. \\
+\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
+\textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
+\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \alpha_k \cdot \nabla f(x_k)$ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}6: \textbf{end while}
 \end {algorithm}
 
-We will see, that in the case where $f$ is bounded from below and $\nabla f$ is Lipschitz continuous, we can guarantee the  converges of gradient descent to a stationary point.
+We will see, that in the case where $f$ is bounded from below and $\nabla f$ is Lipschitz continuous, we can guarantee the  convergence of gradient descent to a stationary point.
 
 \begin{definition}
 Let $(\X,d_{\X})$ and $(\Y, d_{\Y})$ be two metric spaces. A function $f: \X \to \Y$ is called Lipschitz continuous, if there exists $L \geq 0$, such that
@@ -185,7 +180,7 @@ Let $\X$ be a subset of some real vector space and $f: \X \to \R$ be bounded fro
 \[ \forall x \in \X : f(x_*) \leq f(x). \]
 \end{definition}
 
-To prove convergence of the gradient descent algorithm for bounded $f$ with Lipschitz continuous gradient, we need an intermediate result, that is formulated in the following lemma.
+To prove convergence of the gradient descent algorithm for bounded $f$ with Lipschitz continuous gradient, we need the following intermediate result from [?].
 
 \begin{lemma} \label{lem:descent}
 Let $f: \R^n \to \R$ be differentiable, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L>0$, then
@@ -246,7 +241,7 @@ Using $f(x_*) \leq f(x_k)$ for every $k \in \N$, we conclude
 This completes the proof, since $n$ was chosen arbitrary.
 \end{proof}
 
-Note that in practice it is inefficient to use a constant step size of $1/L$. Nevertheless it is useful for theoretical analysis to guarantee convergence. \\
+The theorem can be found in [?]. Note that in practice it is inefficient to use a constant step size of $1/L$. Nevertheless it is useful for theoretical analysis to guarantee convergence. \\
 
 Theorem \ref{thm:descent} states, that in the limit as $n \to \infty$, gradient descent converges to a stationary point $\hat{x} \in \R^n$ with $\nabla f(\hat{x}) = 0$. Since we have seen in the proof, that $f(x_k)$ is monotonically decreasing in $k$, gradient descent converges to the next stationary point in direction of descent, which is either a local minimum, a global minimum or a saddle point. \\
 
@@ -300,37 +295,49 @@ Using $\nabla f(x) = 0$ we conclude
 This completes the proof, since the backwards direction is trivial.
 \end{proof}
 
-Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. Unfortunately this does not apply to the error function used for neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:kernel}. \\
+Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. Unfortunately this does not apply to the empirical error function used for training neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:kernel}. \\
 
-Recalling the definition of the empirical error function 
+The gradient descent method is based on the first order Taylor expansion. Intuitively, inclusion of second order information should speed up the minimization process. This idea lead to the famous Newton's method, which requires the objective function to be twice differentiable. Furthermore we have to compute the Hessian matrix, leading to way more computation effort needed in comparison to gradient descent. In order to limit this additional effort, one can approximate the inverse Hessian matrix instead of computing it exactly. One popular method, that pursues this approach is the following from \cite{BFGS}.
+
+\begin{algorithm}
+\caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS)} \ \\
+\textcolor{white}{$\Big |$}1: Requires twice-differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0 \in \R$. \\
+\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$, $B_0 \leftarrow I_n$. \\
+\textcolor{white}{$\Big |$}3: \textbf{while} $ \| \nabla f(x_k) \|_2 > \epsilon $ \textbf{do}: \\
+\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \alpha_k B_k \nabla f(x_{k})$. \\
+\textcolor{white}{$\Big |$}6: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
+\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k^Ts_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k^T$. \\
+\textcolor{white}{$\Big |$}8: \quad Set $B_{k+1} \leftarrow V_k^TB_{k}V_k + \rho_k s_k s_k^T$ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}9: \textbf{end while}
+\end{algorithm}
+
+With the initialization $B_0 = I_n$, the method starts with a simple gradient descent update and then iteratively minimizes the objective function by inverse Hessian matrix approximations. \\
+
+Unfortunately, Hessian matrix computation or Hessian matrix approximation is infeasible for deep neural networks due to the large number of parameters. However, later on we will introduce an approach to train neural networks in tiny subspaces, such that second order methods become applicable. \\
+
+At this stage we are restricted to training neural networks via gradient descent on the empirical error function. Recalling its definition
  \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \L \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
-we realize, that the computation effort needed to compute the gradients, depends on the number of training samples $m$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. \\
+we realize, that the computation effort needed to compute the gradient, depends on the number of training samples $m$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will use two of them. \\
 
-Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing the exact gradient. Doing so, stochastic gradient descent makes a trade-off between the accuracy and the time needed for gradient computation. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $I_k \subset \{ 1, \dots, m \}$ of size $| I_k | = b \in \N$ and uses
+Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $I_k \subset \{ 1, \dots, m \}$ of size $| I_k | = b \in \N$ and uses
 \[ \nabla E(w_k,I_k) := \frac{1}{b} \sum_{i \in I_k}^{}  \L \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
-as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates.
-\pagebreak
+as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates. Formally stochastic gradient descent proceeds as follows.
 
 \begin{algorithm}
 \caption{Stochastic Gradient Descent (SGD)} \ \\
-Let $E: \R^n \to \R$ be a differentiable empirical error function. SGD proceeds as follows: \\
-
-1) Choose a batch size $b \in \N$, a number of epochs $K \in \N$ and pick some random $w_0 \in \R^n$. \\
-
-2) \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
-
-\quad 3) Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
-
-\quad 4) Choose a step size $\alpha_k > 0 \in \R$. \\
-
-\quad 5) Set $w_{k+1} = w_k - \alpha_k \cdot \nabla E(w_k,I_k)$. \\
-
-6) \textbf{end for} \\
+\textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
+\textcolor{white}{$\Big |$}2: Requires a batch size $b \in \N$ and a number of epochs $K \in \N$. \\
+\textcolor{white}{$\Big |$}3: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}4: \quad Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
+\textcolor{white}{$\Big |$}5: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}6: \quad Set $w_{k+1} \leftarrow w_k - \alpha_k \cdot \nabla E(w_k,I_k)$. \\
+\textcolor{white}{$\Big |$}7: \textbf{end for}
 \end{algorithm}
 
-In here, an epoch describes one iteration on a number of samples that equals the size of the whole training dataset. A theoretical convergence analysis of stochastic gradient descent can be found in [?], but would exceed the scope of this theory. \\
+In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training dataset. Thus on average each individual training sample will contribute $K$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this theory. \\
 
-Until now we have not discussed how to choose the step sizes $\alpha_k$. To simplify things, in practice one usually chooses a step size $\alpha > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the SGD algorithm by including past gradients for the current parameter update is the following.
+So far we have not discussed how to choose the step sizes $\alpha_k$. To simplify things, in practice one usually chooses a step size $\alpha > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the stochastic gradient descent algorithm by including past gradients for the current parameter update called adaptive moment estimation and was first raised in \cite{Adam}. \\
 
 \begin{algorithm}
 \caption{Adaptive Moment Estimation (Adam)} \ \\
@@ -339,29 +346,18 @@ Until now we have not discussed how to choose the step sizes $\alpha_k$. To simp
 \textcolor{white}{$\Big |$}3: Requires momentum factors $\beta_1, \beta_2 \in [0,1)$ and a scalar $\epsilon > 0 \in \R$. \\
 \textcolor{white}{$\Big |$}4: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
 \textcolor{white}{$\Big |$}5: \quad Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
-\textcolor{white}{$\Big |$}6: \quad Set $m_{k} = \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,I_k)$ and $\hat{m}_k = \frac{m_k}{1-\beta_1^k}$. \\
-\textcolor{white}{$\Big |$}7: \quad Set $v_{k} = \beta_2 v_{k-1} + (s-\beta_2) \cdot \nabla E(w_k,I_k)^2$ and $\hat{v}_k = \frac{v_k}{1-\beta_2^k}$. \\
-\textcolor{white}{$\Big |$}8: \quad Set $w_{k+1} = w_k - \alpha \cdot \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \epsilon}$. \\
-\textcolor{white}{$\Big |$}9: \textbf{end for} \\
+\textcolor{white}{$\Big |$}6: \quad Set $m_{k} \leftarrow \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,I_k)$ and let $\hat{m}_k = \frac{m_k}{1-\beta_1^k}$. \\
+\textcolor{white}{$\Big |$}7: \quad Set $v_{k} \leftarrow \beta_2 v_{k-1} + (s-\beta_2) \cdot \nabla E(w_k,I_k)^2$ and let $\hat{v}_k = \frac{v_k}{1-\beta_2^k}$. \\
+\textcolor{white}{$\Big |$}8: \quad Set $w_{k+1} \leftarrow w_k - \alpha \cdot \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \epsilon}$. \\
+\textcolor{white}{$\Big |$}9: \textbf{end for}
 \end{algorithm}
-\pagebreak
 
 In here, all operations on vectors are performed element-wise. The scalar $\epsilon$ is used to prevent division by zero. The default setup proposed by the authors is to choose $\epsilon = 10^{-8}$, $\beta_1 = 0.9$ and $\beta_2 = 0.999$. We will always apply this default setting when working with Adam. \\
 
-The three optimization methods introduced so far, all have in common, that they perform parameter updates on first order information only. This is due to the fact, that Hessian matrix computation for deep neural networks is infeasible due to the large number of parameters. However, later on we will see one can train neural networks in tiny subspaces, such that second order methods are applicable. One optimization algorithm, that includes second order information is the following.
+This completes the necessary basics on notation and training of neural networks. Next we will investigate certain approaches on how to improve the training of neural networks in order prevent the curse of non-convexity and reduce the computation and time effort needed.  \\
 
-\begin{algorithm}
-\caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS)} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0 \in \R$. \\
-\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$, $B_0 \leftarrow I_n$. \\
-\textcolor{white}{$\Big |$}3: \textbf{while} $ \| \nabla f(x_k) \|_2 > \epsilon $ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
-\textcolor{white}{$\Big |$}5: \quad Update $x_{k+1} \leftarrow x_k - \alpha_k B_k \nabla f(x_{k})$. \\
-\textcolor{white}{$\Big |$}6: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
-\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k^Ts_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k^T$. \\
-\textcolor{white}{$\Big |$}8: \quad Update $B_{k+1} \leftarrow V_k^TB_{k}V_k + \rho_k s_k s_k^T$ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}9: \textbf{end while}
-\end{algorithm}
+\textbf{To Do:} Cite 2.8 and 2.9 \\
+\textbf{Optional:} Backpropagation
 
 \pagebreak
 \section{Kernel Gradient Descent} \label{sec:kernel}
@@ -1052,6 +1048,14 @@ This completes the proof.
 \begin{thebibliography}{999}
 
 \bibitem{Paper} Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, Xiaolin Huang. Low Dimensional Landscape Hypothesis is True: DNNs can be Trained in Tiny Subspaces. arXiv preprint arXiv:2103.11154, 2021.
+
+\bibitem{GD} Augustin Cauchy. M\'{e}thode g\'{e}n\'{e}rale pour la r\'{e}solution des systemes d'\'{e}quations simultan\'{e}es. Comptes rendus de l'Acad\'{e}mie des sciences, volume 25, pages 536-538, 1847.
+
+\bibitem{BFGS} Richard H. Byrd, Jorge Nocedal, Robert B. Schnabel. Representations of Quasi-Newton Matrices and their Use in Limited Memory Methods. Mathematical Programming, volume 60(1), pages 129-156, 1994 
+
+\bibitem{SGD} L\'{e}on Bottou, Frank E. Curtis, Jorge Nocedal. Optimization Methods for Large-Scale Machine Learning. SIAM Review, volume 60(2), pages 223-311, 2018.
+
+\bibitem{Adam} Diederik P. Kingma, Jimmy Lei Ba. Adam: A Method for Stochastic Optimization. International Conference on Learning Representations (ICLR), 2015.
 
 \bibitem{NTK} Arthur Jacot, Franck Gabriel, Cl\'{e}ment Holger. Neural Tangent Kernel: Convergence and Generalization in Neural Networks. Advances in Neural Information Processing Systems, volume 31, pages 8571-8580, 2018.
 
