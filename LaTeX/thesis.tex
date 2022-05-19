@@ -121,20 +121,20 @@ In the following, the terms neural network and neural network architecture will 
 Training a neural network refers to finding the optimal weights, given a fixed neural network architecture $\tilde{f} : \R^d \times \R^n \to \R^p$. In other words, finding a function $f \in \tilde{\F}$, where
 \[ \tilde{\F} = \Big \{ f : \R^d \to \R^p : x \mapsto \tilde{f}(x,w) \mid w \in \R^n \Big \} \]
 denotes the set of all neural networks with given architecture. In order to define a sense of optimality, we need a mechanism measuring the quality of network outputs. This is done by a loss function
-\[ \L : \R^p \times \R^p \to \R : \big ( f(x,w),y \big ) \mapsto \L \big ( f(x,w),y \big ) ,\]
+\[ \ell : \R^p \times \R^p \to \R : \big ( f(x,w),y \big ) \mapsto \ell \big ( f(x,w),y \big ) ,\]
 that should be chosen in such a way, that for some input $x \in \R^d$ with target output $y \in \R^p$ it associates some cost with the error between the prediction $f(x,w)$ and the true label $y$. \\
 
 Under the assumption, that in reality there exists a probability distribution $\D$ on $\R^d \times \R^p$, describing the correlation between inputs $x \in \R^d$ and target values $y \in \R^p$, we call a weight vector $w_* \in \R^n$ to be optimal, if
 \[ \forall w \in \R^n : R(w_*) \leq R(w), \]
 where $R(w)$ denotes the so called risk or generalization error 
-\[ R : \R^n \to \R : w \mapsto \E_{(x,y) \sim \D } \Big [ \L \big (f(x,w),y \big ) \Big ]. \]
+\[ R : \R^n \to \R : w \mapsto \E_{(x,y) \sim \D } \Big [ \ell \big (f(x,w),y \big ) \Big ]. \]
 
 For later use we will denote the marginal distribution of the inputs as $\D_x$. At this point it should be noted, that in general the underlying probability distribution $\D$ is unknown. Hence we can not evaluate the expectation in previous expression. \\
 
 For this reason, the training of neural networks requires labeled training data
 \[ \Big \{ (x_i,y_i) \in \R^d \times \R^p \mid i=1, \dots, m \Big \} \]
 for some $m \in \N$. Instead of working with the generalization error, the training data enables us to minimize the empirical error function
- \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \L \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
+ \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
 where $\lambda \in \R$ is some regularization parameter used to control the complexity of $w$. \\
  
 Intuitively minimization of the empirical error should lead to a minimization of the generalization error as well. Currently, a lot of research is being done on how these measures relate to each other. Nevertheless this thesis will focus on how to minimize the empirical error given labeled training data. \\
@@ -317,11 +317,11 @@ With the initialization $B_0 = I_n$, the method starts with a simple gradient de
 Unfortunately, Hessian matrix computation or Hessian matrix approximation is infeasible for deep neural networks due to the large number of parameters. However, later on we will introduce an approach to train neural networks in tiny subspaces, such that second order methods become applicable. \\
 
 At this stage we are restricted to training neural networks via gradient descent on the empirical error function. Recalling its definition
- \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \L \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
+ \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
 we realize, that the computation effort needed to compute the gradient, depends on the number of training samples $m$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will use two of them. \\
 
 Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $I_k \subset \{ 1, \dots, m \}$ of size $| I_k | = b \in \N$ and uses
-\[ \nabla E(w_k,I_k) := \frac{1}{b} \sum_{i \in I_k}^{}  \L \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
+\[ \nabla E(w_k,I_k) := \frac{1}{b} \sum_{i \in I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
 as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates. Formally stochastic gradient descent proceeds as follows.
 
 \begin{algorithm}
@@ -366,14 +366,14 @@ The goal of this section is to introduce and investigate the neural tangent kern
 \subsection{Functional Derivatives}
 
 As seen in section \ref{sec:Training}, the training of neural networks via parameter optimization is usually accomplished by minimizing the empirical error
-\[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \L \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2 \]
+\[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2 \]
 on labeled training data $(x_i,y_i) \in \R^d \times \R^p$ for $i=1, \dots, m$. Due to the non-convexity of the error function $E$ it is in general hard to find a global minimum. However, we will see, that this problem can be prevented by moving from the parameter space $\R^n$ to the function space
 \[ \F:= \Big \{ f: \R^d \to \R^p \Big \}. \]
 That is we are no longer optimizing the specific parameters of the unknown target function but rather the function itself. This requires the definition of a cost
-\[ C: \F \to \R : f \mapsto \frac{1}{m} \sum_{i=1}^{m} \L \big ( f(x_i),y_i \big), \]
+\[ C: \F \to \R : f \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i),y_i \big), \]
 associating some cost to each element of the function space $\F$.  In this notion, we can write
 \[ E = C \circ (w \mapsto f(x,w)). \]
-In contrast to the weight optimization approach, the choice of a convex loss function $\L$ provides a convex cost $C$, since by lemma \ref{lem:convexity} the sum of convex functions is convex again. We will introduce the functional gradient descent method, that enables us to minimize $C$ in the function space $\F$ and is an analog to the gradient descent method in the parameter space $\R^n$. Since $C$ is convex in the function space, convergence to a global minimum will be guaranteed in contrast to the non-convex parameter optimization problem. \\
+In contrast to the weight optimization approach, the choice of a convex loss function $\ell$ provides a convex cost $C$, since by lemma \ref{lem:convexity} the sum of convex functions is convex again. We will introduce the functional gradient descent method, that enables us to minimize $C$ in the function space $\F$ and is an analog to the gradient descent method in the parameter space $\R^n$. Since $C$ is convex in the function space, convergence to a global minimum will be guaranteed in contrast to the non-convex parameter optimization problem. \\
 
 Note that this approach is great for theoretical analysis due to the advantage of convexity. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. Nevertheless we can use the analysis of functional gradient descent to get a better understanding of gradient descent in the function space. \\
 
@@ -827,8 +827,8 @@ The training of neural networks behaves quite similar to the kernel gradient des
 \[ F: \R^n \to \tilde{\F} : w \mapsto f(x,w), \]
  which is no longer linear due to the nested construction of neural networks. Therefore, the partial derivatives $\partial_{w_k}F$ are no longer independent of the parameters $w$, which motivates the definition of a new kernel, specifically related to neural networks.
 
-\begin{definition}
-Given $n$ random functions $f^{(k)} : \R^d \to \R^p$ for $k=1,\dots,n$ drawn i.i.d. according to some distribution $\D_{\tilde{\F}}$ on $\tilde{\F}$, the neural tangent kernel is defined as
+\begin{definition} \label{def:ntk}
+The neural tangent kernel is defined as
 \[ \Theta_w := \sum_{k=1}^{n} \partial_{w_k} F(w) \otimes \partial_{w_k} F(w). \]
 \end{definition}
 
@@ -895,6 +895,14 @@ Theorem 3.7 from \cite{Stieltjes}
 \textbf{TO DO ---------------------------------------------------------------------------------}
 \end{proof}
 
+\begin{theorem} \label{thm:linear}
+Theorem 2.1 from \cite{Linear}
+\end{theorem}
+
+\begin{proof}
+\textbf{TO DO ---------------------------------------------------------------------------------}
+\end{proof}
+
 \pagebreak
 \textbf{TO DO - Section 3.2} \\
 \textbf{LEONARDO:} Why is $\partial_{f} C |_{f_0}$ linear and continuous? \\
@@ -925,6 +933,125 @@ libgen.rs for sources \\
 
 \pagebreak
 \section{Dynamic Linear Dimensionality Reduction}
+
+This section is dedicated to the theoretical considerations on how to efficiently reduce the computation effort needed, to train deep neural networks. If not otherwise specified, the following results stem from \cite{Paper}. The authors approach is based on the hypothesis, that deep neural networks can be trained in low-dimensional subspaces. They argue, that the parameter optimization trajectory could be embedded in a tiny subspace. We will start by motivating this hypothesis based on the previous seen properties of the neural tangent kernel. Afterwards we will introduce an efficient method for the subspace extraction, that enables us to train the network in a tiny subspace. Finally we can construct a second order optimization method training the parameters in the lower-dimensional space.
+
+\subsection{Approach}
+
+In the following we will denote the parameter training sequence by $(w_k)_{k=0, \dots, K}$ after $K \in \N$ iterations. This sequence naturally arises during any of the proposed optimization methods in section \ref{sec:Training}. The low-dimensional landscape hypothesis from \cite{Paper} assumes that, there exists a low-dimensional affine set which approximately contains the optimization trajectory. This can be simply illustrated by the following example.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.45\linewidth]{images/trajectory.png}
+\caption{Low-dimensional parameter trajectory}
+\label{fig:trajectory}
+\end{figure}  
+
+Figure \ref{fig:trajectory} visualizes a three dimensional space containing the three optimizable parameters $w(1), w(2), w(3)$. However, the training trajectory $(w_k)_{k=0, \dots, 3}$ could be embedded in a two-dimensional hyperplane, spanned by the orthogonal vectors $e_1$ and $e_2$. Note that none of the optimizable variables could be left out to reduce the dimension, but rather one has to construct new independent variables to obtain the lower-dimensional subspace that approximately contains the optimization trajectory. \\
+
+In the following we will investigate this hypothesis from a theoretical background and conduct several experiments indicating that deep neural networks can be well trained in tiny subspaces of approximately dimension 50. This enables us to efficiently use second order information in the training process and improves robustness against label noise. 
+
+\subsection{Theory}
+
+At first we need some background knowledge on the singular value decomposition (SVD) and low-rank approximations. The following result is denoted and proven as theorem 2.5.2 in \cite{SVD}.
+
+\begin{theorem}[Singular Value Decomposition] \label{thm:svd}
+For every matrix $A \in \R^{m \times n}$ there exist orthogonal matrices $U \in \R^{m \times m}$ and $V \in \R^{n \times n}$ and a diagonal matrix 
+\[ \Sigma := \text{diag}(\sigma_1, \dots, \sigma_p) \in \R^{m \times n} \]
+with $p=\text{min} \{ m,n \}$ and singular values $\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_p \geq 0$, such that
+\[ A = U \Sigma V^T. \]
+\end{theorem}
+
+The SVD decomposes any real valued matrix in a product of three special matrices. This representation yields the singular values which, like eigenvalues, characterize important properties of a matrix. For the further course we need the following definition.
+
+\begin{definition}
+The columns of the matrix $U = [u_1, \dots, u_m]$ are referred to as left singular vectors and the columns of the matrix $V = [v_1, \dots, v_n]$ are referred to as right singular vectors.
+\end{definition}
+
+Theorem \ref{thm:svd} shows that the sequence of singular values is unique, since they are sorted in descending order. However, the matrices $U$ and $V$ do not have to be unique. For example, the corresponding singular vectors can be interchanged if there are two identical singular values. Therefore, a matrix can have several singular value decompositions. \\
+
+The SVD is an excellent tool to find low-rank approximations of a matrix $A \in \R^{m \times n}$, that is to find a matrix $B \in \R^{m \times n}$ with $\text{rank}(B) < \text{rank}(A)$ such that $\|A -B\|$ is small for some given matrix norm. We can generate such a low-rank approximation by simply reducing the number of singular values in the singular value decomposition.
+
+\begin{definition}
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V^T$. For $k < r = \text{rank}(A)$ we define an approximation of $A$ as
+\[ A^k := \sum_{i=1}^{k} u_i \sigma_i v_i^T = \tilde{U} \tilde{\Sigma} \tilde{V}^T, \]
+where $\tilde{U} := [u_1, \dots, u_k]$, $\tilde{V} := [v_1, \dots, v_k]$ and $\tilde{\Sigma} := \text{diag}(\sigma_1, \dots, \sigma_k)$.
+\end{definition}
+
+In terms of the spectral norm $\| \cdot \|_2$, the matrix $A^k$ is the best possible rank-$k$ approximation. The underlying theorem is the following, which is denoted and proven as theorem 2.5.3 in \cite{SVD}.
+
+\begin{theorem}[Eckart-Young-Mirsky]
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U \Sigma V^T$. For every $k < r = \text{rank}(A)$ it holds, that
+\[ \min_{\text{rank}(B)=k} \big \| A-B \big \|_2 = \big \| A - A^k \big \|_2 = \sigma_{k+1}. \]
+\end{theorem}
+
+This concludes the necessary background knowledge on singular value decomposition and low-rank approximations, which will be useful for the subspace extraction. \\
+
+Next, we investigate a single output neural network architecture 
+\[ f: \R^d \times \R^n \to \R : (x,w) \mapsto f(x,w). \]
+As seen in section \ref{sec:Training} the neural network architecture $f$ induces a function space
+\[ \F := \Big \{ f_w : \R^d \to \R : x \mapsto f(x,w) \mid w \in \R^n \Big \}. \]
+In order to train the neural network we let
+\[ \X = \big \{ (x_i,y_i) \mid i=1, \dots, m \big \} \subset \R^d \times \R \] 
+denote a training set of size $m \in \N$. Recall that training of $f$ refers to finding the optimal parameter vector $w$, which is accomplished by minimizing the empirical error function
+\[ E : \R^n \to \R : w \mapsto \sum_{i=1}^{m} \ell \big (f(x_i,w), y_i \big ). \]
+Note that in comparison to the formulation given in section \ref{sec:Training}, we removed the constant factor $1/m$ in front of the sum, which has no influence on the minimum. Furthermore we assumed $\lambda = 0$, that is we do not penalize the complexity of $w$. \\
+
+Under the assumption, that all activation functions in $f$ are differentiable, thus $f$ is differentiable itself, the choice of a differentiable loss function $\ell$ enables us to minimize $E$ via gradient descent. In order to analyze this optimization process we define the cost functionals
+\[ \L_i: \F \to \R : f_w \mapsto \ell(f_w(x_i),y_i) \]
+for $i=1, \dots,m$, such that the empirical error $E$ can be written as
+\[ E(w) = \sum_{i=1}^{m} \ell \big (f(x_i,w), y_i \big ) = \sum_{i=1}^{m} \ell \big (f_w(x_i), y_i \big ) = \sum_{i=1}^{m} \L_i(f_w). \]
+To investigate the parameter evolution during gradient descent on $E$ we will use the concept of gradient flows.
+
+\begin{definition} \label{def:flow}
+The gradient flow according to $E$ is a time dependent function
+\[ w: [0, \infty) \to \R^n : t \mapsto w_t, \]
+that suffices the ordinary differential equation
+\[ \partial_t w_t = - \nabla E(w_t). \]
+\end{definition}
+
+Since gradient descent performs parameter updates with regard to the update rule
+\[ w_{k+1} \leftarrow w_k - \alpha \cdot \nabla E(w_k), \]
+we can let $\alpha \to 0$, to derive the equation
+\[ \lim_{\alpha \to 0} \frac{w_{k+1} - w_k}{\alpha} = - \nabla E(w_k). \]
+Thus, the gradient flow $w$ covers the parameter dynamics during gradient descent on $E$.
+
+\begin{lemma} \label{lem:flow}
+In the case of a single output neural network architecture, the gradient flow according to $E$ suffices the ordinary differential equation
+\[ \partial_tw_t = - \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
+where 
+\[ \nabla_w f(\X, w_t)^T := \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
+denotes the gradients of $f$ at $w_t$ on the training data set $\X$ and 
+\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} := \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]^T \in \R^m \]
+denotes the functional gradients of the costs $\L_i$ at $f_{w_t}$ evaluated on $x_i$ for $i=1,\dots,m$.
+\end{lemma}
+
+\begin{proof}
+By definition \ref{def:flow} we need to show, that
+\[ \partial_t w_t = - \nabla E(w_t) = - \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
+For arbitrary $w \in \R^n$ we can apply the chain rule to derive the gradient
+\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w \ell \big ( f(x_i,w), y_i \big ) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i). \]
+Using the definitions from the lemma, this is equivalent to
+\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i) = \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
+This completes the proof, since $w$ was chosen arbitrary.
+\end{proof}
+
+In the infinite width limit, we can apply theorem \ref{thm:linear} to approximate the neural network architecture $f$ as a linear model
+\[ f^\textit{lin}(x, w_t) \approx f(x, w_0) + \nabla_wf(\X,w_0)(w_t-w_0). \]
+This is nothing else than a first order Taylor expansion. However, the key observation is, that in the infinite width limit, the error term converges to zero. Based on this, the differential equation in lemma \ref{lem:flow} can be rewritten as
+\[ \partial_tw_t = -\nabla_wf(\X,w_0)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
+where the first factor is a constant matrix and the second factor changes over time $t$. \\
+
+At this stage we can explain the main idea of how to reduce the dimensionality of the parameter space. If $\nabla_wf(\X,w_0)$ can be approximated by a low-rank matrix, the training trajectory $(w_k)_{k=0, \dots, K}$ would only depend on this low-rank constant matrix and the functional gradient of $C$, which will enable us to effectively reduce the dimensionality. To clarify this, we apply singular value decomposition on $\nabla_wf(\X,w_0)$ and derive
+\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0^T, \]
+where $U_0 \in \R^{m \times m}$ and $V_0 \in \R^{n \times n}$ are orthogonal and $\Sigma_0 = \text{diag}(\sigma_1, \dots, \sigma_m)$ is positive semi-definite. Using the notation
+\[ \tilde{f}: \R^n \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]^T, \]
+we can apply definition \ref{def:ntk} to derive the neural tangent kernel
+\[ \Theta_{w_0} = \sum_{k=1}^{n} \partial_{w_k} \tilde{f}(w_0) \otimes \partial_{w_k} \tilde{f}(w_0) = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)^T = U_0 \Sigma_0 \Sigma_0^T U_0^T. \]
+ \\
+\textbf{Last problem:} Chain rule for functionals.
+
+\subsection{Methodology}
 
 \pagebreak
 \section{Numerical Experiments}
@@ -1047,19 +1174,23 @@ This completes the proof.
 \pagebreak
 \begin{thebibliography}{999}
 
-\bibitem{Paper} Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, Xiaolin Huang. Low Dimensional Landscape Hypothesis is True: DNNs can be Trained in Tiny Subspaces. arXiv preprint arXiv:2103.11154, 2021.
+\bibitem{Paper} Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, Xiaolin Huang. \textit{Low Dimensional Landscape Hypothesis is True: DNNs can be Trained in Tiny Subspaces}. arXiv preprint arXiv:2103.11154, 2021.
 
-\bibitem{GD} Augustin Cauchy. M\'{e}thode g\'{e}n\'{e}rale pour la r\'{e}solution des systemes d'\'{e}quations simultan\'{e}es. Comptes rendus de l'Acad\'{e}mie des sciences, volume 25, pages 536-538, 1847.
+\bibitem{GD} Augustin Cauchy. \textit{M\'{e}thode g\'{e}n\'{e}rale pour la r\'{e}solution des systemes d'\'{e}quations simultan\'{e}es}. Comptes rendus de l'Acad\'{e}mie des sciences, volume 25, pages 536-538, 1847.
 
-\bibitem{BFGS} Richard H. Byrd, Jorge Nocedal, Robert B. Schnabel. Representations of Quasi-Newton Matrices and their Use in Limited Memory Methods. Mathematical Programming, volume 60(1), pages 129-156, 1994 
+\bibitem{BFGS} Richard H. Byrd, Jorge Nocedal, Robert B. Schnabel. \textit{Representations of Quasi-Newton Matrices and their Use in Limited Memory Methods}. Mathematical Programming, volume 60(1), pages 129-156, 1994 
 
-\bibitem{SGD} L\'{e}on Bottou, Frank E. Curtis, Jorge Nocedal. Optimization Methods for Large-Scale Machine Learning. SIAM Review, volume 60(2), pages 223-311, 2018.
+\bibitem{SGD} L\'{e}on Bottou, Frank E. Curtis, Jorge Nocedal. \textit{Optimization Methods for Large-Scale Machine Learning}. SIAM Review, volume 60(2), pages 223-311, 2018.
 
-\bibitem{Adam} Diederik P. Kingma, Jimmy Lei Ba. Adam: A Method for Stochastic Optimization. International Conference on Learning Representations (ICLR), 2015.
+\bibitem{Adam} Diederik P. Kingma, Jimmy Lei Ba. \textit{Adam: A Method for Stochastic Optimization}. International Conference on Learning Representations (ICLR), 2015.
 
-\bibitem{NTK} Arthur Jacot, Franck Gabriel, Cl\'{e}ment Holger. Neural Tangent Kernel: Convergence and Generalization in Neural Networks. Advances in Neural Information Processing Systems, volume 31, pages 8571-8580, 2018.
+\bibitem{NTK} Arthur Jacot, Franck Gabriel, Cl\'{e}ment Holger. \textit{Neural Tangent Kernel: Convergence and Generalization in Neural Networks}. Advances in Neural Information Processing Systems, volume 31, pages 8571-8580, 2018.
 
-\bibitem{Stieltjes} Zhou Fan, Zhichao Wang. Spectra of the Conjugate Kernel and Neural Tangent Kernel for Linear-Width Neural Networks. Advances in Neural Information Processing Systems, volume 33, pages 7710-7721, 2020.
+\bibitem{Stieltjes} Zhou Fan, Zhichao Wang. \textit{Spectra of the Conjugate Kernel and Neural Tangent Kernel for Linear-Width Neural Networks}. Advances in Neural Information Processing Systems, volume 33, pages 7710-7721, 2020.
+
+\bibitem{Linear} Jaehoon Lee, Lechao Xiao, Samuel S. Schoenholz, Yasaman Bahri, Roman Novak, Jascha Sohl-Dickstein, Jeffrey Pennington. \textit{Wide Neural Networks of Any Depth Evolve as Linear Models Under Gradient Descent}. Journal of Statistical Mechanics: Theory and Experiment. 2020(12):124002, 2020.
+
+\bibitem{SVD} Gene H. Golub, Charles F. Van Loan. \textit{Matrix Computations}. Third edition, 1996.
 
 \end{thebibliography}
 
