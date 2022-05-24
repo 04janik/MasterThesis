@@ -32,7 +32,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\E}{\mathds{E}}
 
-\usepackage{graphicx, scrextend, algorithmic, xcolor}
+\usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx}
 
 \usepackage[ruled]{algorithm}
 
@@ -188,7 +188,7 @@ Let $f: \R^n \to \R$ be differentiable, such that the gradient $\nabla f$ is Lip
 \end{lemma}
 
 \begin{proof}
-Let $x,y \in \R^n$, define $z_{\lambda} := x + \lambda (y - x)$ for $\lambda \in \R$ and consider the function
+Let $x,y \in \R^n$, define $z_{\lambda} \coloneq x + \lambda (y - x)$ for $\lambda \in \R$ and consider the function
 \[ \phi : \R^n \mapsto \R : \lambda \mapsto f(z_{\lambda}) = f \big (x + \lambda (y-x) \big ). \]
 Since $f$ is differentiable we can apply the chain rule to derive
 \[ \phi' : \R^n \mapsto \R : \lambda \mapsto (y-x)^T \cdot \nabla f \big ( x + \lambda (y-x) \big ). \]
@@ -321,7 +321,7 @@ At this stage we are restricted to training neural networks via gradient descent
 we realize, that the computation effort needed to compute the gradient, depends on the number of training samples $m$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will use two of them. \\
 
 Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $I_k \subset \{ 1, \dots, m \}$ of size $| I_k | = b \in \N$ and uses
-\[ \nabla E(w_k,I_k) := \frac{1}{b} \sum_{i \in I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
+\[ \nabla E(w_k,I_k) \coloneq \frac{1}{b} \sum_{i \in I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
 as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates. Formally stochastic gradient descent proceeds as follows.
 
 \begin{algorithm}
@@ -368,7 +368,7 @@ The goal of this section is to introduce and investigate the neural tangent kern
 As seen in section \ref{sec:Training}, the training of neural networks via parameter optimization is usually accomplished by minimizing the empirical error
 \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2 \]
 on labeled training data $(x_i,y_i) \in \R^d \times \R^p$ for $i=1, \dots, m$. Due to the non-convexity of the error function $E$ it is in general hard to find a global minimum. However, we will see, that this problem can be prevented by moving from the parameter space $\R^n$ to the function space
-\[ \F:= \Big \{ f: \R^d \to \R^p \Big \}. \]
+\[ \F \coloneq \Big \{ f: \R^d \to \R^p \Big \}. \]
 That is we are no longer optimizing the specific parameters of the unknown target function but rather the function itself. This requires the definition of a cost
 \[ C: \F \to \R : f \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i),y_i \big), \]
 associating some cost to each element of the function space $\F$.  In this notion, we can write
@@ -381,7 +381,7 @@ Let us start with a slight reformulation of well known results from functional a
 
 \begin{definition}
 Given a real vector space $\mathcal{V}$, we define the dual space
-\[ \mathcal{V}^* := \Big \{ \mu : \mathcal{V} \to \R \mid \mu \text{ linear and continuous} \Big \}. \]
+\[ \mathcal{V}^* \coloneq \Big \{ \mu : \mathcal{V} \to \R \mid \mu \text{ linear and continuous} \Big \}. \]
 The elements of $\mathcal{V}^*$ are referred to as linear functionals.
 \end{definition}
 
@@ -391,7 +391,7 @@ Until now it is unclear how all of the elements in $\F^*$ arise. We will see tha
 Given a fixed probability distribution $\D_x$ on the input space $\R^d$, one can equip the function space $\F$ with the seminorm
 \[ \| \cdot \|_{\D_x} : \F \to \R : f \mapsto \sqrt{\langle f , f \rangle_{\D_x}} \] 
 in terms of the symmetric positive semidefinite bilinear form
-\[ \langle \cdot,\cdot \rangle_{\D_x} : \F \times \F \to \R : (f,g) \mapsto \langle f,g \rangle_{\D_x} := \E_{x \sim \D_x} \Big [ f(x)^Tg(x) \Big ].\]
+\[ \langle \cdot,\cdot \rangle_{\D_x} : \F \times \F \to \R : (f,g) \mapsto \langle f,g \rangle_{\D_x} \coloneq \E_{x \sim \D_x} \Big [ f(x)^Tg(x) \Big ].\]
 \end{lemma}
 
 \begin{proof}
@@ -505,11 +505,11 @@ The linearity follows directly from the linearity of $\langle \cdot, \cdot \rang
 
 Case $\mu=0$: We can choose $d=0$, with $\mu = 0 = J(d)$. \\
 
-Case $\mu \neq 0$: Due to the linearity of $\mu$ we can normalize and find some $e \in \F$ with $\mu[e] = 1$. Let $N:=\mu^{-1}(0)$ denote the kernel of $\mu$, which is non-empty, closed and convex since $\mu$ is linear and continuous. Thus by Lemma \ref{lem:projection} there exists some $p_e \in N$, such that $p_e$ is an orthogonal projection of $e$ on $N$. Define $f := e - p_e$, then $f \notin N$ since
+Case $\mu \neq 0$: Due to the linearity of $\mu$ we can normalize and find some $e \in \F$ with $\mu[e] = 1$. Let $N \coloneq \mu^{-1}(0)$ denote the kernel of $\mu$, which is non-empty, closed and convex since $\mu$ is linear and continuous. Thus by Lemma \ref{lem:projection} there exists some $p_e \in N$, such that $p_e$ is an orthogonal projection of $e$ on $N$. Define $f \coloneq e - p_e$, then $f \notin N$ since
 \[ \mu[f] = \mu[e] - \mu[p_e] = \mu[e] = 1. \]
 Based on the linearity of $\mu$, we can derive for arbitrary $g \in \F$, that
 \[ \mu \big [g- \mu[g]f \big] = \mu[g] - \mu[g] \mu[f] = \mu[g] - \mu[g] \cdot 1 = 0 , \]
-which implies $h := g - \mu[g]f \in N$. Thus $\langle f , h \rangle_{\D_x} = 0$ by corollary \ref{cor:projection} and we conclude
+which implies $h \coloneq g - \mu[g]f \in N$. Thus $\langle f , h \rangle_{\D_x} = 0$ by corollary \ref{cor:projection} and we conclude
 \[ \langle f, g \rangle_{\D_x} = \langle f , h \rangle_{\D_x} + \langle f , \mu[g]f \rangle_{\D_x} = 0 + \mu[g] \cdot \langle f , f \rangle_{\D_x} = \mu[g] \cdot \| f \|_{\D_x}^2. \]
 Now we can assume that $\| f \|_{\D_x}^2 \neq 0$. Otherwise we would have $\langle f, g \rangle_{\D_x} = 0$ for every $g \in \F$ and therefore $f = 0$ which is a contradiction to $f \notin N$. Rearranging terms results in
 \[ \mu[g] = \big \langle f / \| f \|_{\D_x}^2 , g \big \rangle_{\D_x} = J \big (f / \| f \|_{\D_x}^2 \big)[g]. \]
@@ -576,7 +576,7 @@ Based on the marginal distribution $\D_x$, kernels induce symmetric bilinear for
 
 \begin{lemma} \label{lem:form}
 A kernel $K: \R^d \times \R^d \to \R^{p \times p}$ induces the symmetric bilinear form
-\[ \langle \cdot, \cdot \rangle_K : \F \times \F \to \R : (f,g) \mapsto \langle f , g \rangle _K := \E_{x,x' \sim \D_x} \Big [ f(x)^T K(x,x') g(x') \Big ], \]
+\[ \langle \cdot, \cdot \rangle_K : \F \times \F \to \R : (f,g) \mapsto \langle f , g \rangle _K \coloneq \E_{x,x' \sim \D_x} \Big [ f(x)^T K(x,x') g(x') \Big ], \]
 where $x, x' \in \R^d$ are drawn independently according to $\D_x$. 
 \end{lemma}
 
@@ -750,22 +750,22 @@ The lemma guarantees the convergence of $C$ to a critical point, as $\partial_tC
 This subsection illustrates the relationship between gradient descent in the parameter space and kernel gradient descent in the function space under the assumption, that the objective function depends linear on its parameters. The example given in here, will be generalized later on, leading to the definition of the neural tangent kernel. \\
 
 To start things off, we let $\D_{\F}$ be any probability distribution on the function space $\F$ and construct a kernel $K$, such that for $x,x' \in \R^d$ the image $K(x,x')$ is a $p \times p$ matrix defined by
-\[ K_{i,j}(x,x') := \E_{f \sim \D_{\F}} \Big [ f_i(x) \cdot f_j(x) \Big ], \quad i,j=1,\dots,p. \]
+\[ K_{i,j}(x,x') \coloneq \E_{f \sim \D_{\F}} \Big [ f_i(x) \cdot f_j(x) \Big ], \quad i,j=1,\dots,p. \]
 We will see, that this kernel can be approximated by random functions. For this we choose some $n \in \N$ and draw $n$ random functions $f^{(k)} : \R^d \to \R^p$ for $k=1,\dots,n$ independently from the distribution $\D_{\F}$. Using these, we can define the linear map
-\[ F^\textit{lin}: \R^n \to \F : w \mapsto f_w := \frac{1}{\sqrt{n}} \sum_{k=1}^{n}w_kf^{(k)}, \]
+\[ F^\textit{lin}: \R^n \to \F : w \mapsto f_w \coloneq \frac{1}{\sqrt{n}} \sum_{k=1}^{n}w_kf^{(k)}, \]
 whose partial derivatives for $k=1,\dots,n$ are given by
 \[ \partial_{w_{k}}F^\textit{lin} : \R^n \to \F: w \mapsto \frac{1}{\sqrt{n}}f^{(k)}. \]
 
 Based on $F^\textit{lin}$ we can define another kernel, that will be used for the approximation of $K$.
 
 \begin{definition}
-For $x \in \R^p$ we define the symmetric matrix $x \otimes x := M \in \R^{p \times p}$, where
-\[ M_{i,j} := x_i \cdot x_j, \quad  i,j=1,\dots,p. \]
+For $x \in \R^p$ we define the symmetric matrix $x \otimes x \coloneq M \in \R^{p \times p}$, where
+\[ M_{i,j} \coloneq x_i \cdot x_j, \quad  i,j=1,\dots,p. \]
 \end{definition}
 
 \begin{definition}
 Given $n$ random functions $f^{(k)} : \R^d \to \R^p$ for $k=1,\dots,n$ drawn i.i.d. according to some distribution $\D_{\F}$ on the function space $\F$, the tangent kernel is defined as
-\[ \tilde{K} := \sum_{k=1}^{n} \partial_{w_k} F^\textit{lin}(w) \otimes \partial_{w_k} F^\textit{lin}(w) = \frac{1}{n} \sum_{k=1}^{n} f^{(k)} \otimes f^{(k)}. \]
+\[ \tilde{K} \coloneq \sum_{k=1}^{n} \partial_{w_k} F^\textit{lin}(w) \otimes \partial_{w_k} F^\textit{lin}(w) = \frac{1}{n} \sum_{k=1}^{n} f^{(k)} \otimes f^{(k)}. \]
 \end{definition}
 
 In other words, $\tilde{K}$ maps a tuple $(x,x') \in \R^d \times \R^d$ to the matrix $\tilde{K} \in \R^{p \times p}$ with entries 
@@ -829,7 +829,7 @@ The training of neural networks behaves quite similar to the kernel gradient des
 
 \begin{definition} \label{def:ntk}
 The neural tangent kernel is defined as
-\[ \Theta_w := \sum_{k=1}^{n} \partial_{w_k} F(w) \otimes \partial_{w_k} F(w). \]
+\[ \Theta_w \coloneq \sum_{k=1}^{n} \partial_{w_k} F(w) \otimes \partial_{w_k} F(w). \]
 \end{definition}
 
 Thus, in contrast to the tangent kernel, which is constant during training since it is independent on the parameters $w$, the neural tangent kernel is random at initialization and varies during training. Therefore the relationship between gradient descent in the parameter space and kernel gradient descent with respect to the neural tangent kernel is more complex. \\
@@ -868,7 +868,7 @@ The scalar kernel $\Theta_{\infty} : \R^{d_0} \times \R^{d_0} \to \R$ is defined
 \Theta_{\infty}^{(l+1)}(x,x') &= \Theta_{\infty}^{(l)}(x,x') \dot{\Sigma}^{(l+1)}(x,x') + \Sigma^{(l+1)}(x,x'),
 \end{split} \]
 where 
-\[ \dot{\Sigma}^{(l+1)}(x,x') := \E_{f \sim \mathcal{N}(0, \Sigma^{(l)})} \Big [ \sigma' \big ( f(x) \big ) \sigma' \big ( f(x') \big) \Big ], \]
+\[ \dot{\Sigma}^{(l+1)}(x,x') \coloneq \E_{f \sim \mathcal{N}(0, \Sigma^{(l)})} \Big [ \sigma' \big ( f(x) \big ) \sigma' \big ( f(x') \big) \Big ], \]
 taking the expectation with respect to a centered Gaussian process $f$ of covariance $\Sigma^{(l)}$.
 \end{theorem}
 
@@ -957,8 +957,8 @@ At first we need some background knowledge on the singular value decomposition (
 
 \begin{theorem}[Singular Value Decomposition] \label{thm:svd}
 For every matrix $A \in \R^{m \times n}$ there exist orthogonal matrices $U \in \R^{m \times m}$ and $V \in \R^{n \times n}$ and a diagonal matrix 
-\[ \Sigma := \text{diag}(\sigma_1, \dots, \sigma_p) \in \R^{m \times n} \]
-with $p=\text{min} \{ m,n \}$ and singular values $\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_p \geq 0$, such that
+\[ \Sigma \coloneq \text{diag}(\sigma_1, \dots, \sigma_p) \in \R^{m \times n} \]
+with $p \coloneq \text{min} \{ m,n \}$ and singular values $\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_p \geq 0$, such that
 \[ A = U \Sigma V^T. \]
 \end{theorem}
 
@@ -970,27 +970,51 @@ The columns of the matrix $U = [u_1, \dots, u_m]$ are referred to as left singul
 
 Theorem \ref{thm:svd} shows that the sequence of singular values is unique, since they are sorted in descending order. However, the matrices $U$ and $V$ do not have to be unique. For example, the corresponding singular vectors can be interchanged if there are two identical singular values. Therefore, a matrix can have several singular value decompositions. \\
 
+As a simple implication of theorem \ref{thm:svd} we denote the following corollary.
+
+\begin{corollary}
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V^T$, such that $p \coloneq \text{min}\{m,n\}$ and $\sigma_1 \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0$ for $r \leq p$.
+\begin{itemize}
+\item[1.] Denoting the columns of $U$ and $V$ with $u_i$ and $v_i$, we have
+\[ A v_i = \sigma_i u_i, \quad A^T u_i = \sigma_i v_i, \quad i=1,\dots,p.\]
+\item[2.] The squares of the singular values $\sigma_1^2, \dots, \sigma_r^2$ are the eigenvalues of $A^TA$ to the corresponding eigenvectors $v_1, \dots, v_r$.
+\end{itemize}
+\end{corollary}
+
+\begin{proof}
+\ 
+\begin{itemize}
+\item[1.] Using $A=U \Sigma V^T$ and the orthogonality of $V$ we derive
+\[ Av_i = U \Sigma V^T v_i = U \Sigma e_i = U \sigma_i e_i = \sigma_i u_i \]
+for $i=1, \dots, p$. Analogously we conclude the second statement
+\[ A^T u_i = V \Sigma U^T u_i = V \Sigma e_i = V \sigma_i e_i = \sigma_i v_i. \]
+\item[2.] Since $A^TA$ is symmetric, its spectral decomposition is given by
+\[ A^TA = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T = V \Sigma^T \Sigma V^{-1}. \]
+Using $\Sigma^T \Sigma = \text{diag}(\sigma_1^2, \dots, \sigma_r^2)$ we conclude the corollary. \qedhere
+\end{itemize}
+\end{proof}
+
 The SVD is an excellent tool to find low-rank approximations of a matrix $A \in \R^{m \times n}$, that is to find a matrix $B \in \R^{m \times n}$ with $\text{rank}(B) < \text{rank}(A)$ such that $\|A -B\|$ is small for some given matrix norm. We can generate such a low-rank approximation by simply reducing the number of singular values in the singular value decomposition.
 
 \begin{definition}
 Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V^T$. For $k < r = \text{rank}(A)$ we define an approximation of $A$ as
-\[ A^k := \sum_{i=1}^{k} u_i \sigma_i v_i^T = \tilde{U} \tilde{\Sigma} \tilde{V}^T, \]
-where $\tilde{U} := [u_1, \dots, u_k]$, $\tilde{V} := [v_1, \dots, v_k]$ and $\tilde{\Sigma} := \text{diag}(\sigma_1, \dots, \sigma_k)$.
+\[ A^k \coloneq \sum_{i=1}^{k} u_i \sigma_i v_i^T = \tilde{U} \tilde{\Sigma} \tilde{V}^T, \]
+where $\tilde{U} \coloneq [u_1, \dots, u_k]$, $\tilde{V} \coloneq [v_1, \dots, v_k]$ and $\tilde{\Sigma} \coloneq \text{diag}(\sigma_1, \dots, \sigma_k)$.
 \end{definition}
 
 In terms of the spectral norm $\| \cdot \|_2$, the matrix $A^k$ is the best possible rank-$k$ approximation. The underlying theorem is the following, which is denoted and proven as theorem 2.5.3 in \cite{SVD}.
 
-\begin{theorem}[Eckart-Young-Mirsky]
+\begin{theorem}[Eckart-Young-Mirsky] \label{thm:eym}
 Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U \Sigma V^T$. For every $k < r = \text{rank}(A)$ it holds, that
 \[ \min_{\text{rank}(B)=k} \big \| A-B \big \|_2 = \big \| A - A^k \big \|_2 = \sigma_{k+1}. \]
 \end{theorem}
 
-This concludes the necessary background knowledge on singular value decomposition and low-rank approximations, which will be useful for the subspace extraction. \\
+This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will be useful for the subspace extraction. \\
 
 Next, we investigate a single output neural network architecture 
 \[ f: \R^d \times \R^n \to \R : (x,w) \mapsto f(x,w). \]
 As seen in section \ref{sec:Training} the neural network architecture $f$ induces a function space
-\[ \F := \Big \{ f_w : \R^d \to \R : x \mapsto f(x,w) \mid w \in \R^n \Big \}. \]
+\[ \F \coloneq \Big \{ f_w : \R^d \to \R : x \mapsto f(x,w) \mid w \in \R^n \Big \}. \]
 In order to train the neural network we let
 \[ \X = \big \{ (x_i,y_i) \mid i=1, \dots, m \big \} \subset \R^d \times \R \] 
 denote a training set of size $m \in \N$. Recall that training of $f$ refers to finding the optimal parameter vector $w$, which is accomplished by minimizing the empirical error function
@@ -1020,9 +1044,9 @@ Thus, the gradient flow $w$ covers the parameter dynamics during gradient descen
 In the case of a single output neural network architecture, the gradient flow according to $E$ suffices the ordinary differential equation
 \[ \partial_tw_t = - \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
 where 
-\[ \nabla_w f(\X, w_t)^T := \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
+\[ \nabla_w f(\X, w_t)^T \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
 denotes the gradients of $f$ at $w_t$ on the training data set $\X$ and 
-\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} := \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]^T \in \R^m \]
+\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} \coloneq \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]^T \in \R^m \]
 denotes the functional gradients of the costs $\L_i$ at $f_{w_t}$ evaluated on $x_i$ for $i=1,\dots,m$.
 \end{lemma}
 
@@ -1048,10 +1072,38 @@ where $U_0 \in \R^{m \times m}$ and $V_0 \in \R^{n \times n}$ are orthogonal and
 \[ \tilde{f}: \R^n \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]^T, \]
 we can apply definition \ref{def:ntk} to derive the neural tangent kernel
 \[ \Theta_{w_0} = \sum_{k=1}^{n} \partial_{w_k} \tilde{f}(w_0) \otimes \partial_{w_k} \tilde{f}(w_0) = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)^T = U_0 \Sigma_0 \Sigma_0^T U_0^T. \]
- \\
-\textbf{Last problem:} Chain rule for functionals.
+This is nothing else than the spectral decomposition of $\Theta_0$. By theorem \ref{thm:stieltjes} $\cdots$ . Thus by theorem \ref{thm:eym} we can approximate $\Sigma_0$ by a low-rank matrix $\tilde{\Sigma}_0 = \text{diag}(\sigma_1, \dots, \sigma_d)$, such that
+\[ \Sigma_0 \approx \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0^T, \]
+where $\tilde{U}_0 \in \R^{m \times d}$ contains the first $d$ columns of an $m-$dimensional identity matrix and $\tilde{V}_0 \in \R^{n \times d}$ contains the first $d$ columns of an $n-$dimensional identity matrix. Using this approximation we can derive
+\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0^T \approx U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0^T V_0^T. \]
+Thus, the dynamics of gradient flow are approximately governed by
+\[ \partial_t w_t \approx -\nabla_wf(\X,w_0)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \approx - V_0 \tilde{V}_0 \Big ( \tilde{\Sigma}_0 \tilde{U}_0^T U_0^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \Big ) \]
+The clasped part yields the projected gradient in the $d-$dimensional subspace and the variables $V_0 \tilde{V}_0$ establish a projection from the lower-dimensional space back to the $n-$dimensional parameter space. \\
 
+This concludes the theoretical motivation of the subspace extraction. Based on this approach we could effectively train neural networks in the lower-dimensional subspace. However, the previous discussion holds only in the infinite width limit for training in the lazy regime. The rest of this thesis is dedicated to numerical experiments indicating that deep neural networks indeed can be trained in low-dimensional subspaces, although the theoretical conditions do not hold in practice. \\
+
+\textbf{Problem:} Chain rule for functionals. \\
+\textbf{Problem:} Reference and existence of gradient flow
+
+\pagebreak
 \subsection{Methodology}
+
+The key issue of dimensionality reduction consist of finding a suitable dimension $d \in \N$ and a $d-$dimensional subspace that approximately covers the optimization trajectory. For this we need to sample $t \in \N$ parameter vectors along the optimization trajectory, which can be achieved by training the network with one of the proposed algorithms in section \ref{sec:Training}. \\
+
+Next we centralize these samples as $\bar{w} \coloneq\sum_{i=1}^{t} w_i$ and need to find the d-dimensional subspace, that covers the space $W$, spanned by these centralized samples, namely
+\[ W \coloneq \big \langle w_1 - \bar{w}, \dots, w_t - \bar{w} \big \rangle. \]
+
+\begin{algorithm}
+\caption{Dynamic Linear Dimensionality Reduction (DLDR)} \ \\
+\textcolor{white}{$\Big |$}1: Sample parameter trajectory $\{ w_1, \dots, w_t\}$ along the training. \\
+\textcolor{white}{$\Big |$}2: Compute the mean $\bar{w} \coloneq\sum_{i=1}^{t} w_i$. \\
+\textcolor{white}{$\Big |$}3: Centralize the samples as $W = [w_1-\bar{w}, \dots, w_t - \bar{w}]$. \\
+\textcolor{white}{$\Big |$}4: Perform spectral decomposition such that $W^TW = V \Sigma^2 V^{-1}$.  \\
+\textcolor{white}{$\Big |$}5: Choose suitable subspace dimension $d \in \N$. \\
+\textcolor{white}{$\Big |$}6: Obtain the $d$ largest eigenvalues $ \big [\sigma_1^2, \dots, \sigma_d^2 \big ]$ with eigenvectors $ \big [v_1, \dots, v_d \big ]$. \\
+\textcolor{white}{$\Big |$}7: Determine the singular vectors $u_i = 1/\sigma_iWv_i$ for $i=1, \dots, d$. \\
+\textcolor{white}{$\Big |$}8: Return the orthonormal basis $ \big [u_1, \dots, u_d \big ]$.
+\end{algorithm}
 
 \pagebreak
 \section{Numerical Experiments}
@@ -1065,7 +1117,7 @@ In conclusion...
 \section{Appendix}
 
 \begin{definition}
-A real vector space $\H$ is called a Hilbert space, if there exists an inner product $\langle \cdot,\cdot \rangle : \H \times \H \to \R$, such that $H$ is complete with respect to the norm $\| \cdot \| := \sqrt{\langle \cdot,\cdot \rangle}$.
+A real vector space $\H$ is called a Hilbert space, if there exists an inner product $\langle \cdot,\cdot \rangle : \H \times \H \to \R$, such that $H$ is complete with respect to the norm $\| \cdot \| \coloneq \sqrt{\langle \cdot,\cdot \rangle}$.
 \end{definition}
 
 \begin{theorem}
@@ -1075,7 +1127,7 @@ Therefore each $\hat{x} \in \H^*$ can be represented as $\hat{x} = J(x)$ for som
 \end{theorem}
 
 \begin{proof}
-Let $f, g \in \F$ and $\mu := J(f)$. By the Cauchy-Schwarz inequality it holds that
+Let $f, g \in \F$ and $\mu \coloneq J(f)$. By the Cauchy-Schwarz inequality it holds that
 \[ \big | \mu[g] \big | = \langle f,g \rangle \leq \big \| f \big \|_{\D_x} \big \| g \big \|_{\D_x} \implies \big \| \mu \big \|_{\F^*} \le \big \| f \big \|_{D_x}. \]
 Thus $\mu \in \F^*$ and therefore $J$ is well defined. Furthermore it holds that 
 \[ \big | \mu[f] \big | = \langle f,f \rangle = \big \| f \big \|_{\D_x}^2 \implies \big \| \mu \big \|_{\F^*} \ge \big \| f \big \|_{D_x}. \]
@@ -1158,7 +1210,7 @@ which is equivalent to
 \begin{equation} \big \| \nabla f(x_k) \big \|_2 \geq \frac{1}{\big \| x_0 - x_* \big \|_2} \big ( f(x_k) - f(x_*) \big ). \end{equation}
 Inserting the bound (3) in (2) results in 
 \[ f(x_{k+1}) \leq f(x_k) - \frac{1}{2L} \frac{1}{\big \| x_0 - x_* \big \|_2^2} \big ( f(x_k) - f(x_*) \big )^2. \]
-Subtracting $f(x_*)$ on both sides and using the notation $\Delta_k := f(x_k) - f(x_*)$ yields
+Subtracting $f(x_*)$ on both sides and using the notation $\Delta_k \coloneq f(x_k) - f(x_*)$ yields
 \[ \Delta_{k+1} \leq \Delta_{k} - \frac{1}{2L} \frac{1}{\big \| x_0 - x_* \big \|_2^2} \Delta_k^2 \ \Leftrightarrow \ \frac{1}{2L} \frac{1}{\big \| x_0 - x_* \big \|_2^2} \Delta_k^2 \leq \Delta_k - \Delta_{k+1}. \]
 Since $\Delta_k$ is monotonically decreasing in $k$ by (2), we derive $1 \leq \Delta_k / \Delta_{k+1} $. Expanding the inequality with the positive factor $1/ \Delta_k \Delta_{k+1}$ therefore provides
 \[ \frac{1}{2L} \frac{1}{\big \| x_0 - x_* \big \|_2^2} \leq \frac{1}{2L} \frac{1}{\big \| x_0 - x_* \big \|_2^2} \cdot \frac{\Delta_k}{\Delta_{k+1}} \leq  \frac{1}{\Delta_{k+1}} - \frac{1}{\Delta_k}. \]
