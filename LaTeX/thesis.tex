@@ -27,9 +27,11 @@
 \newcommand{\Y}{\mathcal{Y}}
 \renewcommand{\H}{\mathcal{H}}
 \renewcommand{\L}{\mathcal{L}}
+\renewcommand{\P}{\mathcal{P}}
 
 \usepackage{amsmath}
 \DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\E}{\mathds{E}}
 
 \usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx}
@@ -953,7 +955,11 @@ In the following we will investigate this hypothesis from a theoretical backgrou
 
 \subsection{Theory}
 
-At first we need some background knowledge on the singular value decomposition (SVD) and low-rank approximations. The following result is denoted and proven as theorem 2.5.2 in \cite{SVD}.
+To effectively reduce the dimensionality we need some background knowledge on the singular value decomposition (SVD) and low-rank approximations.
+
+\subsubsection{Singular Value Decomposition}
+
+The following result is denoted and proven as theorem 2.5.2 in \cite{SVD}.
 
 \begin{theorem}[Singular Value Decomposition] \label{thm:svd}
 For every matrix $A \in \R^{m \times n}$ there exist orthogonal matrices $U \in \R^{m \times m}$ and $V \in \R^{n \times n}$ and a diagonal matrix 
@@ -972,7 +978,7 @@ Theorem \ref{thm:svd} shows that the sequence of singular values is unique, sinc
 
 As a simple implication of theorem \ref{thm:svd} we denote the following corollary.
 
-\begin{corollary}
+\begin{corollary} \label{cor:svd}
 Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V^T$, such that $p \coloneq \text{min}\{m,n\}$ and $\sigma_1 \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0$ for $r \leq p$.
 \begin{itemize}
 \item[1.] Denoting the columns of $U$ and $V$ with $u_i$ and $v_i$, we have
@@ -990,7 +996,7 @@ for $i=1, \dots, p$. Analogously we conclude the second statement
 \[ A^T u_i = V \Sigma U^T u_i = V \Sigma e_i = V \sigma_i e_i = \sigma_i v_i. \]
 \item[2.] Since $A^TA$ is symmetric, its spectral decomposition is given by
 \[ A^TA = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T = V \Sigma^T \Sigma V^{-1}. \]
-Using $\Sigma^T \Sigma = \text{diag}(\sigma_1^2, \dots, \sigma_r^2)$ we conclude the corollary. \qedhere
+Using $\Sigma^T \Sigma = \text{diag}(\sigma_1^2, \dots, \sigma_r^2, 0, \dots, 0) \in \R^{n \times n}$ we conclude the corollary. \qedhere
 \end{itemize}
 \end{proof}
 
@@ -1009,7 +1015,9 @@ Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U 
 \[ \min_{\text{rank}(B)=k} \big \| A-B \big \|_2 = \big \| A - A^k \big \|_2 = \sigma_{k+1}. \]
 \end{theorem}
 
-This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will be useful for the subspace extraction. \\
+This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will be useful for the subspace extraction.
+
+\subsubsection{Dimensionality Reduction}
 
 Next, we investigate a single output neural network architecture 
 \[ f: \R^d \times \R^n \to \R : (x,w) \mapsto f(x,w). \]
@@ -1088,10 +1096,119 @@ This concludes the theoretical motivation of the subspace extraction. Based on t
 \pagebreak
 \subsection{Methodology}
 
-The key issue of dimensionality reduction consist of finding a suitable dimension $d \in \N$ and a $d-$dimensional subspace that approximately covers the optimization trajectory. For this we need to sample $t \in \N$ parameter vectors along the optimization trajectory, which can be achieved by training the network with one of the proposed algorithms in section \ref{sec:Training}. \\
+The key issue of dimensionality reduction consist of finding a suitable dimension $d \in \N$ and a $d-$dimensional subspace that approximately covers the optimization trajectory. We will address this problem via principal component analysis (PCA), which is based on the concept of orthogonal projections.
 
-Next we centralize these samples as $\bar{w} \coloneq\sum_{i=1}^{t} w_i$ and need to find the d-dimensional subspace, that covers the space $W$, spanned by these centralized samples, namely
-\[ W \coloneq \big \langle w_1 - \bar{w}, \dots, w_t - \bar{w} \big \rangle. \]
+\subsubsection{Orthogonal Projections}
+
+The results of this subsection are denoted in section 2.6.1 in \cite{SVD}.
+
+\begin{lemma} \label{lem:orthProjection}
+Let $S \subseteq \R^n$ be a subspace. There exists a unique matrix $P \in \R^{n \times n}$, such that
+\[ \text{Im}(P) = S \ \wedge \ P^2 = P = P^T. \]
+ The linear map $\tilde{P} : \R^n \to \R^n : x \mapsto Px$ is called the orthogonal projection onto $S$.
+\end{lemma}
+
+\begin{proof}
+To prove the existence of an orthogonal projection, we let $d \coloneq \text{dim}(S)$ denote the dimension of $S$ and $V := [v_1, \dots, v_d] \in \R^{n \times d}$ denote an orthonormal basis of $S$. We define
+\[ P \coloneq VV^T \in \R^{n \times n} \]
+and observe by the orthonormality of $V$, that $V^TV = I_d$. Thus $P$ is idempotent, this is
+\[ P^2 = VV^T VV^T = V I_d V^T = VV^T = P. \]
+Furthermore $P$ is symmetric, since 
+\[ P^T = (VV^T)^T = VV^T = P. \]
+By the orthonormality of $V$, for arbitrary $s \in S$ there exists $a = (a_1, \dots, a_d)^T \in \R^d$ with
+\[ s = a_1v_1 + \dots + a_dv_d = Va. \]
+Based on this we derive $S \subseteq \text{Im}(P)$ since
+\[ Ps = VV^Ts = VV^TVa = VI_da = Va =s. \]
+Additionally $\text{Im}(P) \subseteq S$ due to the fact, that for $y \in \R^n$, we have $\tilde{a} \coloneq V^Ty \in \R^d$, so
+\[ Py = VV^Ty = V\tilde{a} \in S. \]
+Thus $\text{Im}(P) = S$. This proves the existence of an orthogonal projection $P$ onto $S$. To prove uniqueness of $P$, we should first note that based on $P^2 = P = P^T$ we have
+\[ \forall x,y \in \R^n : (Px)^T(y-Py) = x^TP^Ty - x^TP^TPy = x^TPy - x^TPy = 0. \]
+Using $Px \in S$ for every $x \in \R^n$, we can conclude that 
+\[ \forall y \in \R^n : y - Py \in S^\perp := \big \{ a \in \R^n \mid \forall b \in S : a^Tb = 0 \big \}. \]
+Next we let $P_1$ and $P_2$ denote orthogonal projections onto $S$, then for any $z \in \R^n$ we derive
+\[ \begin{split}
+\big \| (P_1-P_2)z \big \|_2^2 
+&= \big \| P_1z -P_2z \big \|_2^2 \\\
+&= z^TP_1^TP_1z - z^TP_2^TP_1z -  z^TP_1^TP_2z + z^TP_2^TP_2z \\\
+&= z^TP_1z - z^TP_2^TP_1z -  z^TP_1^TP_2z + z^TP_2z,
+\end{split} \]
+where we have used the property $P_i^2 = P_i = P_i^T$ for $i=1,2$. Since each term on the right-hand side is a real number, we can transpose each term to derive
+\[ \begin{split}
+\big \| (P_1-P_2)z \big \|_2^2 
+&=  z^TP_1z - z^TP_2^TP_1z -  z^TP_1^TP_2z + z^TP_2z \\\
+&= (P_1z)^Tz - (P_1z)^TP_2z - (P_2z)^TP_1z + (P_2z)^Tz \\\
+&= (P_1z)^T(z-P_2z) + (P_2z)^T(z-P_1z).
+\end{split} \] 
+Using $\text{Im}(P_1) = S = \text{Im}(P_2)$, we observe that 
+\[ P_1z \in S \ \wedge \ z-P_2z \in S^\perp \ \wedge \ P_2z \in S \ \wedge \ z - P_1z \in S^\perp. \]
+Thus the right-hand side of the equality is zero and by the positive definiteness of the norm we conclude $P_1 - P_2 = 0$. This implies $P_1 = P_2$ showing the uniqueness of $P$.
+\end{proof}
+
+In our setting, the $d$-dimensional subspace $S \subseteq \R^n$ is unknown, which is why the following definition will be needed.
+
+\begin{definition}
+For $d \in \N$ we define the set of rank-$d$ orthogonal projection matrices
+\[ \P_d \coloneq \Big \{ P \in \R^{n \times n} \mid \text{rank}(P) = d \ \wedge \ P^2 = P = P^T \Big \}. \]
+\end{definition}
+
+Having this background knowledge on orthogonal projections in mind, we can proceed with the theory on principal component analysis.
+
+\subsubsection{Principal Component Analysis} \label{sec:PCA}
+
+The results of this subsection can be found in chapter 15.1 of \cite{PCA}. In the following we fix $d \leq n$ and let $W = [w_1, \dots, w_t] \in \R^{n \times t}$ be a mean-centered data matrix, that is $\sum_{i=1}^{t}w_i=0$. \\
+
+Principal component analysis consists of finding the orthogonal projection matrix $P^* \in \P_d$, that minimizes the reconstruction error
+\[ \P_d \to \R : P \mapsto \sum_{i=1}^{t} \big \| Pw_i - w_i \big \|_2^2. \]
+Equivalently PCA can be formulated as finding the solution $P^* \in \P_d$, such that
+\[ P^* \coloneq \argmin_{P \in \P_d} \big \| PW - W \big \|_F^2, \]
+where $\| \cdot \|_F$ denotes the Frobenius norm. Casually speaking, principal component analysis aims to project the original data to a lower-dimensional space while preserving as much information as possible. The following theorem provides a method on solving the PCA problem via singular value decomposition.
+
+\begin{theorem} \label{thm:PCA}
+The PCA solution $P^* \in \P_d$ can be decomposed as
+\[ P^* = U_dU_d^T, \]
+where $U_d \in \R^{n \times d}$ is the matrix formed by the first $d$ left singular vectors of $W$.
+\end{theorem}
+
+\begin{proof}
+Let $P \in \P_d$ be arbitrary. By the linearity of the trace, we observe that
+\[ \begin{split}
+\big \| PW - W \big \|_F^2 
+&= \text{Tr} \big [ (PW-W)^T(PW-W) \big ] \\\
+&= \text{Tr} \big [ W^T P^2 W - 2 W^TPW + W^TW \big ] \\\
+&= \text{Tr} \big [ W^TW\big ] - \text{Tr} \big [W^TPW \big ],
+\end{split} \]
+since $P^T=P=P^2$ by definition. Using that $\text{Tr} \big [ W^TW\big ]$ is independent of $P$, we derive
+\[ \argmin_{P \in \P_d} = \big \| PW-W \big \|_F^2 = \argmax_{P \in \P_d} \text{Tr} \big [ W^TPW\big ]. \]
+By the proof of lemma \ref{lem:orthProjection}, there exists an orthonormal basis $Q = [q_1, \dots, q_d] \in \R^{n \times d}$, such that $P$ can be decomposed as $P=QQ^T$. Using the invariance of the trace under cyclic permutation and the orthonormality of $Q$, we have
+\[ \text{Tr} \big [ W^TPW \big ] = \text{Tr} \big [ W^TQQ^TW \big ] = \text{Tr} \big [ Q^TWW^TQ \big ] = \sum_{i=1}^{d} q_i^TWW^Tq_i. \]
+To maximize the rightmost expression we perform SVD on $W = U \Sigma V^T$, such that
+\[ WW^T = U \Sigma V^T V \Sigma^T U^T = U \Sigma \Sigma^T U^T. \]
+Using the notation $Z = U^TQQ^TU$ we derive by the invariance under cyclic permutation, that
+\[ \text{Tr} \big [ Q^TWW^TQ \big ] = \text{Tr} \big [ Q^TU \Sigma \Sigma^T U^TQ \big ] = \text{Tr} \big [ U^TQQ^TU\Sigma \Sigma^T \big ] = \text{Tr} \big [ Z \Sigma \Sigma^T \big ]. \]
+As $Z$ is orthogonal as a product of three orthogonal matrices we conclude (why orthogonal?)
+\[  \text{Tr} \big [ W^TPW \big ] = \text{Tr} \big [ Z \Sigma \Sigma^T ] = \sum_{i=1}^{d} z_{i,i} \sigma_i^2 \leq \sum_{i=1}^{d} \sigma_i^2. \]
+The upper bound is attained in the case where $Q = U_d = [u_1, \dots, u_d]$ contains the first $d$ columns of $U$, such that based on corollary \ref{cor:svd} we can use $W^Tu_i = \sigma_iv_i$ to conclude
+\[ \text{Tr} \big [ W^TPW \big ] = \sum_{i=1}^{d} q_i^TWW^Tq_i = \sum_{i=1}^{d} u_i^TWW^Tu_i = \sum_{i=1}^{d} u_i^TW v_i \sigma_i = \sum_{i=1}^{d} \sigma_i^2. \]
+This completes the proof.
+\end{proof}
+
+Using principal component analysis we can finally construct an effective method for dimensionality reduction.
+
+\subsubsection{Algorithm}
+
+To find the lower-dimensional subspace, that approximately covers the optimization trajectory we first need to sample $t \in \N$ parameter vectors along the optimization trajectory, which can be achieved by training the network with one of the proposed algorithms in section \ref{sec:Training}. \\
+
+The idea of dimensionality reduction consists of applying PCA to the parameters $\{ w_1, \dots, w_t \}$. For this we need to centralize these samples as $\bar{w} \coloneq\sum_{i=1}^{t} w_i$ and define
+\[ W \coloneq \big [ w_1 - \bar{w}, \dots, w_t - \bar{w} \big ] \in \R^{n \times t}. \]
+This enables us to apply PCA on the mean-centered data matrix $W$. As seen in section \ref{sec:PCA}, for $d \in \N$, the orthogonal projection on the $d-$dimensional subspace, that covers the parameter trajectory best, is induced by
+\[ P^* \coloneq \argmin_{P \in \P_d} \big \| PW - W \big \|_F^2. \]
+By theorem \ref{thm:PCA} we can construct $P^*$ from the left singular vectors of $W$. For this we apply corollary \ref{cor:svd} to compute the right singular vectors $v_i$ for $i=1,\dots,d$ by the spectral decomposition of $W^TW \in \R^{t \times t}$. These can then be used to derive the left singular vectors
+\[ u_i = \frac{1}{\sigma_i} Wv_i, \quad i=1, \dots, d. \]
+
+Thus we have found an orthonormal basis $U_d = [u_1, \dots, u_d]$ of the $d$-dimensional subspace, that covers the optimization trajectory best. The orthogonal projection onto this subspace is given by
+\[ P : \R^n \to \R^n : w \mapsto U_dU_d^Tw. \]
+
+In summary, the algorithm for dimensionality reduction can be notated as follows.
 
 \begin{algorithm}
 \caption{Dynamic Linear Dimensionality Reduction (DLDR)} \ \\
@@ -1104,6 +1221,8 @@ Next we centralize these samples as $\bar{w} \coloneq\sum_{i=1}^{t} w_i$ and nee
 \textcolor{white}{$\Big |$}7: Determine the singular vectors $u_i = 1/\sigma_iWv_i$ for $i=1, \dots, d$. \\
 \textcolor{white}{$\Big |$}8: Return the orthonormal basis $ \big [u_1, \dots, u_d \big ]$.
 \end{algorithm}
+
+For complexity ...
 
 \pagebreak
 \section{Numerical Experiments}
@@ -1243,6 +1362,8 @@ This completes the proof.
 \bibitem{Linear} Jaehoon Lee, Lechao Xiao, Samuel S. Schoenholz, Yasaman Bahri, Roman Novak, Jascha Sohl-Dickstein, Jeffrey Pennington. \textit{Wide Neural Networks of Any Depth Evolve as Linear Models Under Gradient Descent}. Journal of Statistical Mechanics: Theory and Experiment. 2020(12):124002, 2020.
 
 \bibitem{SVD} Gene H. Golub, Charles F. Van Loan. \textit{Matrix Computations}. Third edition, 1996.
+
+\bibitem{PCA} Mehryar Mohri, Afshin Rostamizadeh, Ameet Talwalkar. \textit{Foundations of Machine Learning}. Second edition, 2018.
 
 \end{thebibliography}
 

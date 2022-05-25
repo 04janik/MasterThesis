@@ -1,4 +1,4 @@
-\babel@toc {english}{}
+\babel@toc {english}{}\relax 
 \contentsline {section}{\numberline {1}Introduction}{2}{}%
 \contentsline {section}{\numberline {2}Neural Networks}{3}{}%
 \contentsline {subsection}{\numberline {2.1}Notation}{3}{}%
@@ -11,7 +11,12 @@
 \contentsline {section}{\numberline {4}Dynamic Linear Dimensionality Reduction}{28}{}%
 \contentsline {subsection}{\numberline {4.1}Approach}{28}{}%
 \contentsline {subsection}{\numberline {4.2}Theory}{29}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}Singular Value Decomposition}{29}{}%
+\contentsline {subsubsection}{\numberline {4.2.2}Dimensionality Reduction}{30}{}%
 \contentsline {subsection}{\numberline {4.3}Methodology}{34}{}%
-\contentsline {section}{\numberline {5}Numerical Experiments}{35}{}%
-\contentsline {section}{\numberline {6}Conclusion}{36}{}%
-\contentsline {section}{\numberline {7}Appendix}{37}{}%
+\contentsline {subsubsection}{\numberline {4.3.1}Orthogonal Projections}{34}{}%
+\contentsline {subsubsection}{\numberline {4.3.2}Principal Component Analysis}{35}{}%
+\contentsline {subsubsection}{\numberline {4.3.3}Algorithm}{37}{}%
+\contentsline {section}{\numberline {5}Numerical Experiments}{38}{}%
+\contentsline {section}{\numberline {6}Conclusion}{39}{}%
+\contentsline {section}{\numberline {7}Appendix}{40}{}%
