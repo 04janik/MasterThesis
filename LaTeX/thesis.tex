@@ -16,23 +16,28 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{algorithm}[theorem]{Algorithm}
 
-\usepackage{dsfont}
-\newcommand{\N}{\mathds{N}}
-\newcommand{\R}{\mathds{R}}	
+\usepackage{amssymb}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}	
 \newcommand{\A}{\mathcal{A}}
 \newcommand{\B}{\mathcal{B}}
 \newcommand{\D}{\mathcal{D}}
 \newcommand{\F}{\mathcal{F}}
+\newcommand{\I}{\mathcal{I}}
 \newcommand{\X}{\mathcal{X}}
 \newcommand{\Y}{\mathcal{Y}}
 \renewcommand{\H}{\mathcal{H}}
 \renewcommand{\L}{\mathcal{L}}
 \renewcommand{\P}{\mathcal{P}}
 
+\renewcommand{\b}{\mathsf{b}}
+\newcommand{\w}{\mathsf{w}}
+\newcommand*{\tr}{^{\mkern-1.5mu\mathsf{T}}}
+
 \usepackage{amsmath}
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
-\DeclareMathOperator*{\E}{\mathds{E}}
+\DeclareMathOperator*{\E}{\mathbb{E}}
 
 \usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx}
 
@@ -62,16 +67,17 @@ This section introduces the basic concepts of neural networks and provides the n
 To start things off, we consider the simple model of a neuron. 
 
 \begin{definition}
-Let $d \in \N$, $w \in \R^{d+1}$ and $\sigma: \R \to \R$. A neuron is defined as
-\[ \nu : \R^{d} \to \R : x \mapsto \sigma \Big ( \sum_{i=1}^{d} w_ix_i + w_{d+1}\Big ).\]
-In this notion $\sigma$ is referred to as activation function and the entries of $w$ as weights.
+Let $n_x \in \N$, $\w \in \R^{n_x}$, $\b \in \R$ and $\sigma: \R \to \R$. A neuron is defined as
+\[ \nu : \R^{n_x} \to \R : x \mapsto \sigma \Big ( \w \tr x + \b \Big ).\] % \sigma \Big ( \sum_{i=1}^{n} w_ix_i + b \Big ) =
+In this notion $\sigma$ is called the activation function, $\w$ the weights and $\b$ the bias of $\nu$.
 \end{definition}
 
 As a generalization of this concept, one can use multiple neurons in parallel to form a layer.
 
 \begin{definition}  \label{def:layer}
-Let $d, k \in \N$, $w_1, \dots, w_k \in \R^{d+1}$, $\sigma_1, \dots \sigma_k \in \{ \sigma : \R \to \R \}$ and $\nu_1, \dots, \nu_k$ be neurons with weights $w_i$ and activation function $\sigma_i$ for $i=1, \dots, k$. A layer is defined as
-\[ f : \R^d \to \R^k : x \mapsto \begin{bmatrix} \nu_1(x) \\ \vdots \\ \nu_k(x) \end{bmatrix}. \]
+Let $n_x, n_y \in \N$, $W = [\w_1, \dots, \w_{n_y}] \in \R^{n_x \times n_y}$, $\b \in \R^{n_y}$ and $\sigma : \R \to \R$. Given neurons $\nu_i$ with weights $\w_i$, bias $\b_i$ and activation function $\sigma$ for $i=1, \dots, n_y$, we define a layer as
+\[ f : \R^{n_x} \to \R^{n_y} : x \mapsto \begin{bmatrix} \nu_1(x) \\ \vdots \\ \nu_{n_y}(x) \end{bmatrix} = \sigma \Big ( W\tr x + \b \Big ), \]
+where the activation function $\sigma$ is applied entry-wise.
 \end{definition}
 
 To provide a better understanding, these basic concepts can be visualized as graphs. \\
@@ -90,13 +96,13 @@ To provide a better understanding, these basic concepts can be visualized as gra
 	\end{minipage}
 \end{figure}
 
-Logically one can use the output of a layer as input for another layer. Iteratively doing so will construct specific functions known as neural networks. In order to formalize this idea we denote the following definition. \\
+In the following we will no longer distinguish between weights and biases and simply refer to them as parameters. Logically one can use the output of a layer as input for another layer. Iteratively doing so will construct specific functions known as neural networks. In order to formalize this idea we denote the following definition. \\
 
 \pagebreak
 \begin{definition} \label{def:network}
-Let $l \in \N$ and $d_0, \dots, d_l \in \N$. A neural network is defined as a function
-\[ f : \R^{d_0} \to \R^{d_l} : x \mapsto f_l \circ f_{l-1} \circ \cdots \circ f_1 (x),\]
-where each $f_i$ for $i=1, \dots, l$ is a layer with input dimension $d_{i-1}$ and output dimension $d_i$. Networks with a certain level of complexity, say $l>2$, are referred to as deep neural networks.
+Let $l \in \N$ and $n_0, \dots, n_l \in \N$. A neural network is defined as a function
+\[ f : \R^{n_0} \to \R^{n_l} : x \mapsto f_l \circ f_{l-1} \circ \cdots \circ f_1 (x),\]
+where $f_i$ for $i=1, \dots, l$ is a layer with input dimension $n_{i-1}$ and output dimension $n_i$. Networks with a certain level of complexity, say $l>2$, are referred to as deep neural networks.
 \end{definition}
 
 Just like neurons and layers, neural networks can also be visualized as graphs.
@@ -110,52 +116,52 @@ Just like neurons and layers, neural networks can also be visualized as graphs.
 
 Neural networks find massive adoption in machine learning as they can model arbitrary complex functions. For example one could envision functions that predict the weather at a specific place and time or functions that determine if an image contains a cat or a dog. Clearly there is no simple mathematical formula to describe such problems. \\
 
-A common practice to learn those functions is, to fix the number of layers, the number of neurons per layer as well as the activation functions, to choose some initial weights and then iteratively adjust the weights in order to approximate the unknown target function. This approach requires some mapping between a neural network and its weights. In the notion of definition \ref{def:network} one can determine the total number of weights in $f$ as
-\[ n = \sum_{i=0}^{l-1} (d_i + 1) \cdot d_{i+1}. \]
-Denoting these weights as a parameter vector $w \in \R^n$ enables us to define a function
-\[ \tilde{f} : \R^d \times \R^n \to \R^p : (x,w) \mapsto \tilde{f}(x,w), \]
-such that for fixed $w_1, w_2 \in \R^n$ the functions $\tilde{f}(x,w_1)$ and $\tilde{f}(x,w_2)$ are neural networks matching in their number of layers, number of neurons as well as activation functions and differing only in their choice of weights. One calls $\tilde{f}(x,w_1)$ and $\tilde{f}(x,w_2)$ realizations of the neural network architecture $\tilde{f}$. \\
+A common practice to learn those functions is, to fix the number of layers, the number of neurons per layer as well as the activation functions, to choose some initial parameters and then iteratively adjust the parameters in order to approximate the unknown target function. In the notion of definition \ref{def:network} one can determine the total number parameters in $f$ as
+\[ n = \sum_{i=0}^{l-1} (n_i + 1) \cdot n_{i+1}. \]
+Denoting these parameters as a vector $w \in \R^n$ enables us to define a function
+\[ \tilde{f} : \R^{n_0} \times \R^n \to \R^{n_l} : (x,w) \mapsto \tilde{f}(x,w), \]
+such that for fixed $w_1, w_2 \in \R^n$ the functions $\tilde{f}(x,w_1)$ and $\tilde{f}(x,w_2)$ are neural networks matching in their number of layers, number of neurons as well as activation functions and differing only in their choice of parameters. One calls $\tilde{f}(x,w_1)$ and $\tilde{f}(x,w_2)$ realizations of the neural network architecture $\tilde{f}$. \\
 
-In the following, the terms neural network and neural network architecture will be used synonymously if the meaning is clear by the context. Unless otherwise specified, $d \in \N$ will denote the dimension of the input space, $p \in \N$ will denote the dimension of the output space and $n \in \N$ will denote the number of adjustable weights.
+In the following, the terms neural network and neural network architecture will be used synonymously if the meaning is clear by the context. Unless otherwise specified, $n_0 \in \N$ will denote the dimension of the input layer, $n_l \in \N$ will denote the dimension of the output layer and $n \in \N$ will denote the number of adjustable parameters.
 
 \subsection{Training}\label{sec:Training}
 
-Training a neural network refers to finding the optimal weights, given a fixed neural network architecture $\tilde{f} : \R^d \times \R^n \to \R^p$. In other words, finding a function $f \in \tilde{\F}$, where
-\[ \tilde{\F} = \Big \{ f : \R^d \to \R^p : x \mapsto \tilde{f}(x,w) \mid w \in \R^n \Big \} \]
+Training a neural network refers to finding the optimal parameters, given a fixed neural network architecture $\tilde{f} : \R^{n_0} \times \R^n \to \R^{n_l}$. In other words, finding a function $f \in \tilde{\F}$, where
+\[ \tilde{\F} = \Big \{ f : \R^{n_0} \to \R^{n_l} : x \mapsto \tilde{f}(x,w) \mid w \in \R^n \Big \} \]
 denotes the set of all neural networks with given architecture. In order to define a sense of optimality, we need a mechanism measuring the quality of network outputs. This is done by a loss function
-\[ \ell : \R^p \times \R^p \to \R : \big ( f(x,w),y \big ) \mapsto \ell \big ( f(x,w),y \big ) ,\]
-that should be chosen in such a way, that for some input $x \in \R^d$ with target output $y \in \R^p$ it associates some cost with the error between the prediction $f(x,w)$ and the true label $y$. \\
+\[ \ell: \R^{n_l} \times \R^{n_l} \to \R_+ : \big ( f(x,w),y \big ) \mapsto \ell \big ( f(x,w),y \big ) ,\]
+that should be chosen in such a way, that for some input $x \in \R^{n_0}$ with target output $y \in \R^{n_l}$ it associates some cost with the error between the prediction $f(x,w)$ and the true label $y$. \\
 
-Under the assumption, that in reality there exists a probability distribution $\D$ on $\R^d \times \R^p$, describing the correlation between inputs $x \in \R^d$ and target values $y \in \R^p$, we call a weight vector $w_* \in \R^n$ to be optimal, if
+Under the assumption, that in reality there exists a probability distribution $\D$ on $\R^{n_0} \times \R^{n_l}$, describing the correlation between inputs $x \in \R^{n_0}$ and target values $y \in \R^{n_l}$, we call a parameter vector $w_* \in \R^n$ to be optimal, if
 \[ \forall w \in \R^n : R(w_*) \leq R(w), \]
 where $R(w)$ denotes the so called risk or generalization error 
-\[ R : \R^n \to \R : w \mapsto \E_{(x,y) \sim \D } \Big [ \ell \big (f(x,w),y \big ) \Big ]. \]
+\[ R : \R^n \to \R_+ : w \mapsto \E_{(x,y) \sim \D } \Big [ \ell \big (f(x,w),y \big ) \Big ]. \]
 
 For later use we will denote the marginal distribution of the inputs as $\D_x$. At this point it should be noted, that in general the underlying probability distribution $\D$ is unknown. Hence we can not evaluate the expectation in previous expression. \\
 
 For this reason, the training of neural networks requires labeled training data
-\[ \Big \{ (x_i,y_i) \in \R^d \times \R^p \mid i=1, \dots, m \Big \} \]
+\[ \Big \{ (x_i,y_i) \in \R^{n_0} \times \R^{n_l} \mid i=1, \dots, m \Big \} \]
 for some $m \in \N$. Instead of working with the generalization error, the training data enables us to minimize the empirical error function
- \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
-where $\lambda \in \R$ is some regularization parameter used to control the complexity of $w$. \\
+ \[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
+where $\lambda \geq 0$ is some regularization parameter used to control the complexity of $w$. \\
  
 Intuitively minimization of the empirical error should lead to a minimization of the generalization error as well. Currently, a lot of research is being done on how these measures relate to each other. Nevertheless this thesis will focus on how to minimize the empirical error given labeled training data. \\
 
-The problem of finding some weight vector $w$ that minimizes the empirical error function is usually hard to solve as the error may have highly nonlinear dependencies on the weights. This is why in practice one often aims to compare several local minima and to settle for one that is sufficient enough, regardless of whether it is a global minimum or not.
+The problem of finding some parameter vector $w$ that minimizes the empirical error function is usually hard to solve as the error may have highly nonlinear dependencies on the parameters. This is why in practice one often aims to compare several local minima and to settle for one that is sufficient enough, regardless of whether it is a global minimum or not.
 
 \begin{definition}
 Let $f: \R^n \to \R$ be differentiable. The gradient of $f$ is defined as
-\[ \nabla f : \R^n \to \R^n : x = (x_1, \dots, x_n) \mapsto \bigg [ \frac{\partial}{\partial x_1} f(x), \cdots, \frac{\partial}{\partial x_n} f(x) \bigg ]^T. \]
+\[ \nabla f : \R^n \to \R^n : x = (x_1, \dots, x_n) \mapsto \bigg [ \frac{\partial}{\partial x_1} f(x), \cdots, \frac{\partial}{\partial x_n} f(x) \bigg ]\tr . \]
 \end{definition}
 
 Due to the complexity of the error function, in general there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first raised by Cauchy in \cite{GD}.
 
 \begin{algorithm}
 \caption{Gradient Descent} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and $\epsilon \geq 0 \in \R$. \\
+\textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and $\epsilon \geq 0$. \\
 \textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
 \textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0$. \\
 \textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \alpha_k \cdot \nabla f(x_k)$ and $k \leftarrow k+1$. \\
 \textcolor{white}{$\Big |$}6: \textbf{end while}
 \end {algorithm}
@@ -171,7 +177,7 @@ The smallest constant $L$, that suffices the previous condition is called Lipsch
 Casually speaking, the Lipschitz continuity of $\nabla f$ ensures that the gradient does not change heavily for two points that are close to each other.
 
 \begin{definition}
-Let $f: \R^n \to \R$. The set of stationary points of $f$ is defined as
+Let $f: \R^n \to \R$ be differentiable. A stationary point of $f$ is an element of
 \[ \big \{ x \in \R^n \mid \nabla f(x) = 0 \big \}. \]
 \end{definition}
 
@@ -182,46 +188,46 @@ Let $\X$ be a subset of some real vector space and $f: \X \to \R$ be bounded fro
 \[ \forall x \in \X : f(x_*) \leq f(x). \]
 \end{definition}
 
-To prove convergence of the gradient descent algorithm for bounded $f$ with Lipschitz continuous gradient, we need the following intermediate result from [?].
+To prove convergence of the gradient descent algorithm for bounded $f$ with Lipschitz continuous gradient, we need the following result which is formulated as lemma 1.2.3 in \cite{ConvexOptimization}.
 
 \begin{lemma} \label{lem:descent}
-Let $f: \R^n \to \R$ be differentiable, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L>0$, then
-\[ \forall x,y \in \R^n : f(y) \leq f(x) + \big \langle \nabla f(x) , y -x \big \rangle + \frac{L}{2} \big \| y - x \big \|_2^2. \]
+Let $f: \R^n \to \R$ be differentiable, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L \geq 0$, then
+\[ \forall x,x' \in \R^n : f(x') \leq f(x) + \big \langle \nabla f(x) , x' -x \big \rangle + \frac{L}{2} \big \| x'- x \big \|_2^2. \]
 \end{lemma}
 
 \begin{proof}
-Let $x,y \in \R^n$, define $z_{\lambda} \coloneq x + \lambda (y - x)$ for $\lambda \in \R$ and consider the function
-\[ \phi : \R^n \mapsto \R : \lambda \mapsto f(z_{\lambda}) = f \big (x + \lambda (y-x) \big ). \]
+Let $x,x' \in \R^n$, define $z_{\lambda} \coloneq x + \lambda (x' - x)$ for $\lambda \in \R$ and consider the function
+\[ \phi : \R^n \to \R : \lambda \mapsto f(z_{\lambda}). \]
 Since $f$ is differentiable we can apply the chain rule to derive
-\[ \phi' : \R^n \mapsto \R : \lambda \mapsto (y-x)^T \cdot \nabla f \big ( x + \lambda (y-x) \big ). \]
+\[ \phi' : \R^n \to \R : \lambda \mapsto (x'-x)\tr \cdot \nabla f(z_\lambda) . \]
 Integration over $\phi'$ from $\lambda = 0$ to $\lambda = 1$ yields
-\[ \int_{0}^{1} \big \langle \nabla f(z_{\lambda}), y-x \big \rangle \ d\lambda = \int_{0}^{1} \phi'(\lambda) \ d \lambda = \phi(1) - \phi(0) = f(y) - f(x). \]
+\[ \int_{0}^{1} \big \langle \nabla f(z_{\lambda}), x'-x \big \rangle \ d\lambda = \int_{0}^{1} \phi'(\lambda) \ d \lambda = \phi(1) - \phi(0) = f(x') - f(x). \]
 This equality can be rewritten as
 \[ \begin{split} 
-f(y) - f(x) 
-&= \int_{0}^{1}\big \langle \nabla f(z_{\lambda}), y-x \big \rangle \ d\lambda \\\
-&= \int_{0}^{1} \big \langle \nabla f(z_{\lambda}) - \nabla f(x) + \nabla f(x) , y-x\big \rangle \ d\lambda \\\
-&= \big \langle \nabla f(x), y-x \big \rangle + \int_{0}^{1} \big \langle \nabla f(z_{\lambda}) - \nabla f(x), y-x \big \rangle \ d\lambda.
+f(x') - f(x) 
+&= \int_{0}^{1}\big \langle \nabla f(z_{\lambda}), x'-x \big \rangle \ d\lambda \\\
+&= \int_{0}^{1} \big \langle \nabla f(z_{\lambda}) - \nabla f(x) + \nabla f(x) , x'-x\big \rangle \ d\lambda \\\
+&= \big \langle \nabla f(x), x'-x \big \rangle + \int_{0}^{1} \big \langle \nabla f(z_{\lambda}) - \nabla f(x), x'-x \big \rangle \ d\lambda.
 \end{split} \]
 Using the Cauchy-Schwarz inequality we derive
 \[ \begin{split}
-\Big | \ f(y) - f(x) - \big \langle \nabla f(x), y-x \big \rangle \ \Big | 
-&= \Big | \ \int_{0}^{1} \big \langle \nabla f(z_{\lambda}) - \nabla f(x), y-x \big \rangle \ d\lambda \ \Big | \\\
-&\leq \int_{0}^{1} \Big | \ \big \langle \nabla f(z_{\lambda}) - \nabla f(x), y-x \big \rangle \ \Big | \ d\lambda \\\
-&\leq \int_{0}^{1} \big \| \nabla f( z_{\lambda}) - \nabla f(x) \big \|_2 \cdot \big \| y-x \big \|_2 \ d\lambda.
+\Big | \ f(x') - f(x) - \big \langle \nabla f(x), x'-x \big \rangle \ \Big | 
+&= \Big | \ \int_{0}^{1} \big \langle \nabla f(z_{\lambda}) - \nabla f(x), x'-x \big \rangle \ d\lambda \ \Big | \\\
+&\leq \int_{0}^{1} \Big | \ \big \langle \nabla f(z_{\lambda}) - \nabla f(x), x'-x \big \rangle \ \Big | \ d\lambda \\\
+&\leq \int_{0}^{1} \big \| \nabla f( z_{\lambda}) - \nabla f(x) \big \|_2 \cdot \big \| x'-x \big \|_2 \ d\lambda.
 \end{split} \]
-Due to the Lipschitz continuty of $\nabla f$ we can use the upper bound 
-\[ \big \| \nabla f( z_{\lambda}) - \nabla f(x) \big \|_2 \leq L \cdot \big \| z_{\lambda} - x \big \|_2 = L \cdot \big \| \lambda(y-x) \big \|_2 = L\lambda \cdot \big \| y-x \big \|_2 \]
+Due to the Lipschitz continuity of $\nabla f$ we can use the upper bound 
+\[ \big \| \nabla f( z_{\lambda}) - \nabla f(x) \big \|_2 \leq L \cdot \big \| z_{\lambda} - x \big \|_2 = L \cdot \big \| \lambda(x'-x) \big \|_2 = L\lambda \cdot \big \| x'-x \big \|_2 \]
 for $\lambda \in [0,1]$, to conclude
-\[ \Big | \ f(y) - f(x) - \big \langle \nabla f(x), y-x \big \rangle \ \Big | \leq \int_{0}^{1} L\lambda \cdot \big \| y-x \big \|_2^2 \ d\lambda = \frac{L}{2} \big \| y-x \big \|_2^2. \]
+\[ \Big | \ f(x') - f(x) - \big \langle \nabla f(x), x'-x \big \rangle \ \Big | \leq \int_{0}^{1} L\lambda \cdot \big \| x'-x \big \|_2^2 \ d\lambda = \frac{L}{2} \big \| x'-x \big \|_2^2. \]
 Rearranging the inequality finally yields
-\[ f(y) \leq f(x) + \big \langle \nabla f(x) , y -x \big \rangle + \frac{L}{2} \big \| y - x \big \|_2^2. \]
-This completes the proof, since $x,y$ were chosen arbitrary.
+\[ f(x') \leq f(x) + \big \langle \nabla f(x) , x' -x \big \rangle + \frac{L}{2} \big \| x' - x \big \|_2^2. \]
+This completes the proof, since $x,x'$ were chosen arbitrary.
 \end{proof}
 
 \begin{theorem} \label{thm:descent}
-Let $f: \R^n \to \R$ be differentiable with a global minimizer $x_* \in \R^n$, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L>0$, then gradient descent with $\epsilon = 0$ and constant step size $\alpha_k = 1/L$ produces a sequence $(x_k)_{k \in \N_0} \in \R^n$, such that 
-\[ \forall n \in \N : \min_{0 \leq k \leq n} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L \big ( f(x_0) - f(x_*) \big )}{n+1}. \]
+Let $f: \R^n \to \R$ be differentiable with a global minimizer $x_* \in \R^n$, such that the gradient $\nabla f$ is Lipschitz continuous with Lipschitz constant $L>0$, then gradient descent with $\epsilon = 0$ and constant step size $\alpha_k = 1/L$ produces a sequence $(x_k)_{k=0}^\infty$, such that 
+\[ \forall m \in \N : \min_{0 \leq k \leq m} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L \big ( f(x_0) - f(x_*) \big )}{m+1}. \]
 \end{theorem}
 
 \begin{proof}
@@ -236,16 +242,16 @@ f(x_{k+1})
 \end{split} \]
 Hence the gradient descent algorithm with constant step size $\alpha_k = 1/L$ guarantees to make progress unless $\nabla f(x_k) \neq 0$. The previous expression is equivalent to
 \[ \big \| \nabla f(x_k) \big \|_2^2 \leq 2L \big ( f(x_k) - f(x_{k+1}) \big ). \]
-Summing up both sides from $k=0$ to some $n \in \N$ and taking the average results in
-\[ \frac{1}{n+1} \sum_{k=0}^{n} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L}{n+1} \sum_{k=0}^{n} f(x_k) - f(x_{k+1}) = \frac{2L}{n+1} \big ( f(x_0) - f(x_{n+1}) \big ). \]
-Using $f(x_*) \leq f(x_k)$ for every $k \in \N$, we conclude
-\[ \min_{0 \leq k \leq n} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{1}{n+1} \sum_{k=0}^{n} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L}{n+1} \big ( f(x_0) - f(x_*) \big ). \]
-This completes the proof, since $n$ was chosen arbitrary.
+Summing up both sides from $k=0$ to some $m \in \N$ and taking the average results in
+\[ \frac{1}{m+1} \sum_{k=0}^{m} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L}{m+1} \sum_{k=0}^{m} f(x_k) - f(x_{k+1}) = \frac{2L}{m+1} \big ( f(x_0) - f(x_{m+1}) \big ). \]
+Using $f(x_*) \leq f(x_k)$ for every $k \in \N_0$, we conclude
+\[ \min_{0 \leq k \leq m} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{1}{m+1} \sum_{k=0}^{m} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L}{m+1} \big ( f(x_0) - f(x_*) \big ). \]
+This completes the proof, since $m$ was chosen arbitrary.
 \end{proof}
 
-The theorem can be found in [?]. Note that in practice it is inefficient to use a constant step size of $1/L$. Nevertheless it is useful for theoretical analysis to guarantee convergence. \\
+The theorem can be found as equation (1.2.15) in the beginning of section 1.2.3 of \cite{ConvexOptimization}. Note that in practice it is inefficient to use a constant step size of $1/L$. Nevertheless it is useful for theoretical analysis to guarantee convergence. \\
 
-Theorem \ref{thm:descent} states, that in the limit as $n \to \infty$, gradient descent converges to a stationary point $\hat{x} \in \R^n$ with $\nabla f(\hat{x}) = 0$. Since we have seen in the proof, that $f(x_k)$ is monotonically decreasing in $k$, gradient descent converges to the next stationary point in direction of descent, which is either a local minimum, a global minimum or a saddle point. \\
+Theorem \ref{thm:descent} states, that in the limit as $n \to \infty$, gradient descent converges to a stationary point $x \in \R^n$ with $\nabla f(x) = 0$. Since we have seen in the proof, that $f(x_k)$ is monotonically decreasing in $k$, gradient descent converges to the next stationary point in direction of descent, which is either a local minimum, a global minimum or a saddle point. \\
 
 Next we will define a special class of functions having the nice property, that every stationary point is a global minimum and therefore gradient descent is an excellent tool for minimization.
 
@@ -258,7 +264,7 @@ Casually speaking a set is convex if it contains the connection line between any
 
 \begin{definition}
 Let $\X$ be a convex subset of some real vector space. A function $f: \X \to \R$ is said to be convex, if
-\[ \forall x,x' \in \X : \forall \lambda \in [0,1] : f \big (\lambda x + (1-\lambda) x' \big ) \leq \lambda f(x) + (1- \lambda) f(x'). \]
+\[ \forall x,x' \in \X : \forall \lambda \in [0,1] : f \big (x + \lambda (x'-x) \big ) \leq f(x) + \lambda \big ( f(x') - f(x) \big ). \]
 \end{definition}
 
 For later use we denote the following property of convex functions.
@@ -270,15 +276,15 @@ Let $\X$ be a convex subset of some real vector space. For convex functions $f: 
 \begin{proof}
 Let $x,x' \in \X$ and $\lambda \in [0,1]$ be arbitrary, then
 \[ \begin{split}
-\big ( f+g \big )(\lambda x + (1-\lambda)x') 
-&= f(\lambda x + (1-\lambda)x') + g(\lambda x + (1-\lambda)x') \\\
-&\leq \lambda f(x) + (1- \lambda) f(x') + \lambda g(x) + (1- \lambda) g(x') \\\
-&= \lambda \big ( f+g \big ) (x) + (1- \lambda) \big ( f+g \big )(x').
+\big ( f+g \big ) \big (x + \lambda (x'-x) \big ) 
+&= f \big ( x + \lambda (x'-x) \big ) + g \big (x + \lambda (x'-x) \big ) \\\
+\textcolor{white}{\Big |} &\leq f(x) + \lambda \big ( f(x') - f(x) \big ) + g(x) + \lambda \big ( g(x') - g(x) \big ) \\\
+&= ( f + g )(x) + \lambda \big ( (f + g)(x') - (f+g)(x) \big ).
 \end{split} \]
 This shows the convexity of $f+g$.
 \end{proof}
 
-Functions that are convex and continuous differentiable have the nice property, that every stationary point is a global minimum.
+Functions that are convex and continuous differentiable have the nice property, that every stationary point is a global minimum. Mathematically this can be formulated as follows.
 
 \begin{lemma}
 Let $f: \R^n \to \R$ be convex and continuous differentiable and $x \in \R^n$, then
@@ -288,29 +294,29 @@ Let $f: \R^n \to \R$ be convex and continuous differentiable and $x \in \R^n$, t
 \begin{proof}
 Let $x \in \R^n$ with $\nabla f(x) = 0$. For arbitrary $x' \in \R^n$ we define the function
 \[ \phi : \R \to \R : \lambda \mapsto f(x) + \lambda \big ( f(x') - f(x) \big ) - f \big ( x + \lambda (x'-x) \big ), \]
-which is continuous differentiable with derivative
-\[ \phi' : \R \to \R : \lambda \mapsto f(x') - f(x) - \nabla f \big (x + \lambda(x'-x)\big )^T (x'-x). \]
-Since $\phi$ is non-negative on the interval $[0,1]$ with $\phi(0) = 0$, we derive
-\[ \phi'(0) = f(x') - f(x) - \nabla f(x)^T (x'-x) \geq 0. \]
-Using $\nabla f(x) = 0$ we conclude
+which is non-negative on the interval $[0,1]$ by convexity of $f$. Denoting the derivative as
+\[ \phi' : \R \to \R : \lambda \mapsto f(x') - f(x) - (x'-x) \tr \cdot \nabla f \big (x + \lambda(x'-x)\big ) \]
+and using the non-negativity of $\phi$ together with $\phi(0) = 0$, we observe that
+\[ \phi'(0) = f(x') - f(x) - (x'-x) \tr \cdot \nabla f(x) \geq 0. \]
+Since $x$ was chosen such that $\nabla f(x) = 0$, we can rearrange terms to conclude
 \[ \forall x' \in \R^n : f(x) \leq f(x'). \]
-This completes the proof, since the backwards direction is trivial.
+This completes the proof, since the backwards direction is trivial. \\
 \end{proof}
 
-Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. Unfortunately this does not apply to the empirical error function used for training neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:kernel}. \\
+Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. Unfortunately this does not apply to the empirical error function used for training neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:kernel}. Next we will provide further iterative optimization methods. \\
 
-The gradient descent method is based on the first order Taylor expansion. Intuitively, inclusion of second order information should speed up the minimization process. This idea lead to the famous Newton's method, which requires the objective function to be twice differentiable. Furthermore we have to compute the Hessian matrix, leading to way more computation effort needed in comparison to gradient descent. In order to limit this additional effort, one can approximate the inverse Hessian matrix instead of computing it exactly. One popular method, that pursues this approach is the following from \cite{BFGS}.
+The gradient descent method is based on the first order Taylor expansion. Intuitively, inclusion of second order information should speed up the minimization process. This idea lead to the famous Newton's method, which requires the objective function to be twice differentiable. Furthermore, to apply Newton's method, we have to compute the Hessian matrix, leading to way more computation effort needed in comparison to gradient descent. In order to reduce this additional effort, one can approximate the inverse Hessian matrix instead of computing it exactly. One popular method, that pursues this approach is the following from \cite{BFGS}.
 
 \begin{algorithm}
 \caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS)} \ \\
-\textcolor{white}{$\Big |$}1: Requires twice-differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0 \in \R$. \\
+\textcolor{white}{$\Big |$}1: Requires twice-differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
 \textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$, $B_0 \leftarrow I_n$. \\
-\textcolor{white}{$\Big |$}3: \textbf{while} $ \| \nabla f(x_k) \|_2 > \epsilon $ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
+\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0$. \\
 \textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \alpha_k B_k \nabla f(x_{k})$. \\
 \textcolor{white}{$\Big |$}6: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
-\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k^Ts_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k^T$. \\
-\textcolor{white}{$\Big |$}8: \quad Set $B_{k+1} \leftarrow V_k^TB_{k}V_k + \rho_k s_k s_k^T$ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k\tr s_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k\tr $. \\
+\textcolor{white}{$\Big |$}8: \quad Set $B_{k+1} \leftarrow V_k\tr B_{k}V_k + \rho_k s_k s_k\tr $ and $k \leftarrow k+1$. \\
 \textcolor{white}{$\Big |$}9: \textbf{end while}
 \end{algorithm}
 
@@ -319,11 +325,11 @@ With the initialization $B_0 = I_n$, the method starts with a simple gradient de
 Unfortunately, Hessian matrix computation or Hessian matrix approximation is infeasible for deep neural networks due to the large number of parameters. However, later on we will introduce an approach to train neural networks in tiny subspaces, such that second order methods become applicable. \\
 
 At this stage we are restricted to training neural networks via gradient descent on the empirical error function. Recalling its definition
- \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \| w \|^2, \]
-we realize, that the computation effort needed to compute the gradient, depends on the number of training samples $m$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will use two of them. \\
+ \[ E : \R^n \to \R : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
+we observe, that the computation effort needed to compute the gradient, depends on the number of training samples $m \in \N$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will introduce two of them. \\
 
-Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $I_k \subset \{ 1, \dots, m \}$ of size $| I_k | = b \in \N$ and uses
-\[ \nabla E(w_k,I_k) \coloneq \frac{1}{b} \sum_{i \in I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \| w_k \|^2 \]
+Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $\I_k \subset \{ 1, \dots, m \}$ of size $| \I_k | = b \in \N$ and uses
+\[ \nabla E(w_k,\I_k) \coloneq \frac{1}{b} \sum_{i \in \I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \big \| w_k \big \|_2^2 \]
 as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates. Formally stochastic gradient descent proceeds as follows.
 
 \begin{algorithm}
@@ -331,25 +337,25 @@ as an approximation of $\nabla E(w_k)$. Although only a small amount of data is 
 \textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
 \textcolor{white}{$\Big |$}2: Requires a batch size $b \in \N$ and a number of epochs $K \in \N$. \\
 \textcolor{white}{$\Big |$}3: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
-\textcolor{white}{$\Big |$}5: \quad Choose a step size $\alpha_k > 0 \in \R$. \\
-\textcolor{white}{$\Big |$}6: \quad Set $w_{k+1} \leftarrow w_k - \alpha_k \cdot \nabla E(w_k,I_k)$. \\
+\textcolor{white}{$\Big |$}4: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
+\textcolor{white}{$\Big |$}5: \quad Choose a step size $\alpha_k > 0$. \\
+\textcolor{white}{$\Big |$}6: \quad Set $w_{k+1} \leftarrow w_k - \alpha_k \cdot \nabla E(w_k,\I_k)$. \\
 \textcolor{white}{$\Big |$}7: \textbf{end for}
 \end{algorithm}
 
-In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training dataset. Thus on average each individual training sample will contribute $K$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this theory. \\
+In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training dataset. Thus on average each individual training sample will contribute $K$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this thesis. \\
 
-So far we have not discussed how to choose the step sizes $\alpha_k$. To simplify things, in practice one usually chooses a step size $\alpha > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the stochastic gradient descent algorithm by including past gradients for the current parameter update called adaptive moment estimation and was first raised in \cite{Adam}. \\
+So far we have not discussed how to choose the step sizes $\alpha_k$. To simplify things, in practice one usually chooses a step size $\alpha > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the stochastic gradient descent algorithm by including past gradients for the current parameter update is called adaptive moment estimation and was first raised in \cite{Adam}. \\
 
 \begin{algorithm}
 \caption{Adaptive Moment Estimation (Adam)} \ \\
 \textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$.  \\
 \textcolor{white}{$\Big |$}2: Requires constant step size $\alpha > 0 \in \R$, batch size $b \in \N$ and number of epochs $K \in \N$. \\
-\textcolor{white}{$\Big |$}3: Requires momentum factors $\beta_1, \beta_2 \in [0,1)$ and a scalar $\epsilon > 0 \in \R$. \\
+\textcolor{white}{$\Big |$}3: Requires momentum factors $\beta_1, \beta_2 \in [0,1)$ and a scalar $\epsilon > 0$. \\
 \textcolor{white}{$\Big |$}4: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}5: \quad Draw a random subset $I_k \subset \{1, \dots, m \}$ of size $| I_k | = b$. \\
-\textcolor{white}{$\Big |$}6: \quad Set $m_{k} \leftarrow \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,I_k)$ and let $\hat{m}_k = \frac{m_k}{1-\beta_1^k}$. \\
-\textcolor{white}{$\Big |$}7: \quad Set $v_{k} \leftarrow \beta_2 v_{k-1} + (s-\beta_2) \cdot \nabla E(w_k,I_k)^2$ and let $\hat{v}_k = \frac{v_k}{1-\beta_2^k}$. \\
+\textcolor{white}{$\Big |$}5: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
+\textcolor{white}{$\Big |$}6: \quad Set $m_{k} \leftarrow \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,\I_k)$ and let $\hat{m}_k \coloneq \frac{m_k}{1-\beta_1^k}$. \\
+\textcolor{white}{$\Big |$}7: \quad Set $v_{k} \leftarrow \beta_2 v_{k-1} + (1-\beta_2) \cdot \nabla E(w_k,\I_k)^2$ and let $\hat{v}_k \coloneq \frac{v_k}{1-\beta_2^k}$. \\
 \textcolor{white}{$\Big |$}8: \quad Set $w_{k+1} \leftarrow w_k - \alpha \cdot \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \epsilon}$. \\
 \textcolor{white}{$\Big |$}9: \textbf{end for}
 \end{algorithm}
@@ -359,7 +365,68 @@ In here, all operations on vectors are performed element-wise. The scalar $\epsi
 This completes the necessary basics on notation and training of neural networks. Next we will investigate certain approaches on how to improve the training of neural networks in order prevent the curse of non-convexity and reduce the computation and time effort needed.  \\
 
 \textbf{To Do:} Cite 2.8 and 2.9 \\
+\textbf{Exploration:} Further second order method \\
 \textbf{Optional:} Backpropagation
+
+\pagebreak
+$\b:$ bias vector \\
+$\w:$ weight vector \\
+- \\
+$b:$ batch size \\
+$d_{\X}:$ metric on input space \\
+$d_{\Y}:$ metric on output space \\
+$f:$ real valued function \\
+$g:$ real valued function \\
+$\tilde{f}:$ neural network architecture \\
+$i:$ several indices \\
+$k:$ iteration index \\
+$l:$ number of layers in neural network \\
+$\ell:$ loss function \\
+$m:$ real number / number of training samples \\
+$m_k:$ vector in Adam \\
+$n_0:$ input dimension of neural network \\
+$n_l:$ output dimension of neural network \\
+$n_x:$ input dimension of layer \\
+$n_y:$ output dimension of layer \\
+$n:$ number of parameters in neural network \\
+$s:$ real valued vector in BFGS \\
+$v_k:$ vector in Adam \\
+$w:$ parameter vector in neural network \\
+$x:$ real valued vector (input) \\
+$x':$ real valued vector (input) \\
+$y:$ real valued vector (output) \\
+$z_{\lambda}:$ real valued vector \\
+- \\
+$\alpha:$ step size \\
+$\beta_1:$ momentum factor \\
+$\beta_2:$ momentum factor \\
+$\epsilon:$ convergence criterium \\
+$\lambda:$ real valued scalar / regularization parameter \\
+$\nu:$ neuron \\
+$\phi:$ real valued helper function \\
+$\rho:$ real value in BFGS\\
+$\sigma:$ activation function \\
+- \\
+$B:$ inverse hessian matrix approximation \\
+$E:$ empirical error \\
+$I_n:$ identity matrix \\
+$K:$ number of epochs \\
+$L:$ lipschitz constant \\
+$R:$ generalization error \\
+$V:$ matrix in BFGS \\
+$W:$ weight matrix in layer \\
+- \\
+$\tilde{\F}:$ set of neural networks with given architecture \\
+$\D:$ probability distribution \\
+$\D_x:$ marginal probability distribution \\
+$\I:$ set of indices
+$\X:$ input space \\
+$\Y:$ output space \\
+- \\
+$\E:$ expected value \\
+$\N:$ natural numbers \\
+$\R:$ real numbers \\
+
 
 \pagebreak
 \section{Kernel Gradient Descent} \label{sec:kernel}
@@ -375,7 +442,7 @@ That is we are no longer optimizing the specific parameters of the unknown targe
 \[ C: \F \to \R : f \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i),y_i \big), \]
 associating some cost to each element of the function space $\F$.  In this notion, we can write
 \[ E = C \circ (w \mapsto f(x,w)). \]
-In contrast to the weight optimization approach, the choice of a convex loss function $\ell$ provides a convex cost $C$, since by lemma \ref{lem:convexity} the sum of convex functions is convex again. We will introduce the functional gradient descent method, that enables us to minimize $C$ in the function space $\F$ and is an analog to the gradient descent method in the parameter space $\R^n$. Since $C$ is convex in the function space, convergence to a global minimum will be guaranteed in contrast to the non-convex parameter optimization problem. \\
+In contrast to the parameter optimization approach, the choice of a convex loss function $\ell$ provides a convex cost $C$, since by lemma \ref{lem:convexity} the sum of convex functions is convex again. We will introduce the functional gradient descent method, that enables us to minimize $C$ in the function space $\F$ and is an analog to the gradient descent method in the parameter space $\R^n$. Since $C$ is convex in the function space, convergence to a global minimum will be guaranteed in contrast to the non-convex parameter optimization problem. \\
 
 Note that this approach is great for theoretical analysis due to the advantage of convexity. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. Nevertheless we can use the analysis of functional gradient descent to get a better understanding of gradient descent in the function space. \\
 
@@ -393,7 +460,7 @@ Until now it is unclear how all of the elements in $\F^*$ arise. We will see tha
 Given a fixed probability distribution $\D_x$ on the input space $\R^d$, one can equip the function space $\F$ with the seminorm
 \[ \| \cdot \|_{\D_x} : \F \to \R : f \mapsto \sqrt{\langle f , f \rangle_{\D_x}} \] 
 in terms of the symmetric positive semidefinite bilinear form
-\[ \langle \cdot,\cdot \rangle_{\D_x} : \F \times \F \to \R : (f,g) \mapsto \langle f,g \rangle_{\D_x} \coloneq \E_{x \sim \D_x} \Big [ f(x)^Tg(x) \Big ].\]
+\[ \langle \cdot,\cdot \rangle_{\D_x} : \F \times \F \to \R : (f,g) \mapsto \langle f,g \rangle_{\D_x} \coloneq \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ].\]
 \end{lemma}
 
 \begin{proof}
@@ -402,20 +469,20 @@ Let $f_1, f_2, f, g \in \F$ and $\lambda \in \R$. $\langle \cdot,\cdot \rangle_{
 (i) $\langle f_1 + f_2 , g \rangle_{\D_x} = \langle f_1 , g \rangle_{\D_x} + \langle f_2 , g \rangle_{\D_x}$:
 \[ \begin{split}
 \langle f_1 + f_2 , g \rangle_{\D_x}
-&= \E_{x \sim \D_x} \Big [ \big ( f_1(x) + f_2(x) \big )^Tg(x) \Big ] \\\
-&= \E_{x \sim \D_x} \Big [ f_1(x)^Tg(x) + f_2(x)^Tg(x) \Big ] \\\
-&= \E_{x \sim \D_x} \Big [ f_1(x)^Tg(x) \Big ] + \E_{x \sim \D_x} \Big [ f_2(x)^Tg(x) \Big ] \\\
+&= \E_{x \sim \D_x} \Big [ \big ( f_1(x) + f_2(x) \big )\tr g(x) \Big ] \\\
+&= \E_{x \sim \D_x} \Big [ f_1(x)\tr g(x) + f_2(x)\tr g(x) \Big ] \\\
+&= \E_{x \sim \D_x} \Big [ f_1(x)\tr g(x) \Big ] + \E_{x \sim \D_x} \Big [ f_2(x)\tr g(x) \Big ] \\\
 &= \langle f_1 , g \rangle_{\D_x} + \langle f_2 , g \rangle_{\D_x},
 \end{split} \]
 
 (ii) $\langle \lambda f , g \rangle_{\D_x} = \lambda \langle f, g \rangle_{\D_x}$:
-\[ \langle \lambda f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ \lambda f(x)^Tg(x) \Big ] = \lambda \cdot \E_{x \sim \D_x} \Big [ f(x)^Tg(x) \Big ] = \lambda \langle f, g \rangle_{\D_x}, \]
+\[ \langle \lambda f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ \lambda f(x)\tr g(x) \Big ] = \lambda \cdot \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ] = \lambda \langle f, g \rangle_{\D_x}, \]
 
 (iii) $\langle f , g \rangle_{\D_x} = \langle g , f \rangle_{\D_x}$:
-\[ \langle f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)^Tg(x) \Big ] = \E_{x \sim \D_x} \Big [ g(x)^Tf(x) \Big ] = \langle g , f \rangle_{\D_x}. \]
+\[ \langle f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ] = \E_{x \sim \D_x} \Big [ g(x)\tr f(x) \Big ] = \langle g , f \rangle_{\D_x}. \]
 
 Furthermore $\langle \cdot,\cdot \rangle_{\D_x}$ is positive semidefinite, since for any $f \in \F$ it holds, that
-\[ \langle f , f \rangle_{\D_x} =  \E_{x \sim \D_x} \Big [ f(x)^Tf(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{d} f_i(x)^2 \Big ] \geq 0. \]
+\[ \langle f , f \rangle_{\D_x} =  \E_{x \sim \D_x} \Big [ f(x)\tr f(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{d} f_i(x)^2 \Big ] \geq 0. \]
 
 Thus $\| \cdot \|_{\D_x} = \sqrt{\langle \cdot , \cdot \rangle_{\D_x}}$ is a seminorm on the function space $\F$.
 \end{proof}
@@ -571,14 +638,14 @@ This thesis will work with kernels over the input space $\R^d$, not only with on
 \begin{definition}
 A multi-dimensional kernel over $\R^d$ is a function
 \[ K: \R^d \times \R^d \to \R^{p \times p} : (x,x') \mapsto K(x,x'), \]
-such that $K(x,x') = K(x',x)^T$ for any $x,x' \in \R^d$.
+such that $K(x,x') = K(x',x)\tr $ for any $x,x' \in \R^d$.
 \end{definition}
 
 Based on the marginal distribution $\D_x$, kernels induce symmetric bilinear forms.
 
 \begin{lemma} \label{lem:form}
 A kernel $K: \R^d \times \R^d \to \R^{p \times p}$ induces the symmetric bilinear form
-\[ \langle \cdot, \cdot \rangle_K : \F \times \F \to \R : (f,g) \mapsto \langle f , g \rangle _K \coloneq \E_{x,x' \sim \D_x} \Big [ f(x)^T K(x,x') g(x') \Big ], \]
+\[ \langle \cdot, \cdot \rangle_K : \F \times \F \to \R : (f,g) \mapsto \langle f , g \rangle _K \coloneq \E_{x,x' \sim \D_x} \Big [ f(x)\tr  K(x,x') g(x') \Big ], \]
 where $x, x' \in \R^d$ are drawn independently according to $\D_x$. 
 \end{lemma}
 
@@ -588,24 +655,24 @@ Let $f_1, f_2, f, g \in \F$ and $\lambda \in \R$. $\langle \cdot,\cdot \rangle_{
 (i) $\langle f_1 + f_2 , g \rangle_{K} = \langle f_1 , g \rangle_{K} + \langle f_2 , g \rangle_{K}$:
 \[ \begin{split}
 \langle f_1 + f_2 , g \rangle_{K}
-&= \E_{x,x' \sim \D_x} \Big [ \big ( f_1(x) + f_2(x) \big )^TK(x,x')g(x') \Big ] \\\
-&= \E_{x,x' \sim \D_x} \Big [ f_1(x)^TK(x,x')g(x') + f_2(x)^TK(x,x')g(x') \Big ] \\\
-&= \E_{x,x' \sim \D_x} \Big [ f_1(x)^TK(x,x')g(x') \Big ] + \E_{x,x' \sim \D_x} \Big [ f_2(x)^TK(x,x')g(x') \Big ] \\\
+&= \E_{x,x' \sim \D_x} \Big [ \big ( f_1(x) + f_2(x) \big )\tr K(x,x')g(x') \Big ] \\\
+&= \E_{x,x' \sim \D_x} \Big [ f_1(x)\tr K(x,x')g(x') + f_2(x)\tr K(x,x')g(x') \Big ] \\\
+&= \E_{x,x' \sim \D_x} \Big [ f_1(x)\tr K(x,x')g(x') \Big ] + \E_{x,x' \sim \D_x} \Big [ f_2(x)\tr K(x,x')g(x') \Big ] \\\
 &= \langle f_1 , g \rangle_{K} + \langle f_2 , g \rangle_{K},
 \end{split} \]
 
 (ii) $\langle \lambda f , g \rangle_{K} = \lambda \langle f, g \rangle_{K}$:
 \[ \begin{split} 
 \langle \lambda f , g \rangle_{K} 
-&= \E_{x,x' \sim \D_x} \Big [ \lambda f(x)^TK(x,x')g(x') \Big ] \\\
-&= \lambda \cdot \E_{x,x' \sim \D_x} \Big [ f(x)^TK(x,x')g(x') \Big ] = \lambda \langle f, g \rangle_{K}, 
+&= \E_{x,x' \sim \D_x} \Big [ \lambda f(x)\tr K(x,x')g(x') \Big ] \\\
+&= \lambda \cdot \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x,x')g(x') \Big ] = \lambda \langle f, g \rangle_{K}, 
 \end{split} \]
 
 (iii) $\langle f , g \rangle_{K} = \langle g , f \rangle_{K}$:
 \[ \begin{split} \langle f , g \rangle_{K} 
-&= \E_{x,x' \sim \D_x} \Big [ f(x)^TK(x,x')g(x') \Big ] \\\
-&= \E_{x,x' \sim \D_x} \Big [ f(x)^TK(x',x)^Tg(x') \Big ] \\\
-&= \E_{x,x' \sim \D_x} \Big [ g(x')^TK(x',x)f(x) \Big ] = \langle g , f \rangle_{K}.
+&= \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x,x')g(x') \Big ] \\\
+&= \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x',x)\tr g(x') \Big ] \\\
+&= \E_{x,x' \sim \D_x} \Big [ g(x')\tr K(x',x)f(x) \Big ] = \langle g , f \rangle_{K}.
 \end{split} \]
 
 In contrast to $\langle \cdot , \cdot \rangle_{\D_x}$, the bilinear map $\langle \cdot , \cdot \rangle_{K}$ is not necessarily positive semidefinite.
@@ -630,9 +697,9 @@ Since $\langle \cdot, \cdot \rangle_K$ is symmetric by lemma \ref{lem:form} it r
 Case $\| f \|_{\D_x} > 0$: Since $K$ is positive definite with respect to $\| \cdot \| _{\D_x}$, we derive $\langle f, f \rangle_K > 0$. \\
 
 Case $\| f \|_{\D_x} = 0$: By the definition of $\langle \cdot , \cdot \rangle_{\D_x}$, we derive
-\[ \big \| f \big \|_{\D_x}^2 = \langle f , f \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)^Tf(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{d} f_i(x)^2 \Big ] = 0. \]
+\[ \big \| f \big \|_{\D_x}^2 = \langle f , f \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)\tr f(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{d} f_i(x)^2 \Big ] = 0. \]
 Thus for every $x \sim \D_x$ it holds that $f(x) = 0$. Therefore we conclude
-\[ \langle f , f \rangle_{K} = \E_{x,x' \sim \D_x} \Big [ f(x)^TK(x,x')f(x') \Big ] = 0. \]
+\[ \langle f , f \rangle_{K} = \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x,x')f(x') \Big ] = 0. \]
 In total we have shown that $\langle f, f \rangle_K > 0$ for every $f \in \F$, such that $\| \cdot \|_K$ is a seminorm.
 \end{proof}
 
@@ -697,11 +764,11 @@ where $x_1, \dots, x_m \in \R^d$ denotes the finite support of the empiricial di
 Let $x \in \R^d$ be arbitrary. By the definition of $\Phi_K$ we have
 \[ \Phi_K \big ( \mu \big )(x) = \Phi_K \Big ( \langle d, \cdot \rangle_{\D_x} \Big )(x) = \begin{bmatrix} \mu [K_{\cdot,1}(\cdot,x) ] \\ \vdots \\ \mu [ K_{\cdot,p}(\cdot,x)] \end{bmatrix} = \begin{bmatrix} \big \langle d, K_{\cdot,1}(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{\cdot,p}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix}. \]
 Recalling the definition of $\langle \cdot , \cdot \rangle_{\D_x}$, it holds that
-\[ \big \langle d, K_{\cdot,j}(\cdot,x) \big \rangle_{\D_x} = \E_{x' \sim \D_x} \Big [ d(x')^TK_{\cdot,j}(x',x) \Big ] \]
+\[ \big \langle d, K_{\cdot,j}(\cdot,x) \big \rangle_{\D_x} = \E_{x' \sim \D_x} \Big [ d(x')\tr K_{\cdot,j}(x',x) \Big ] \]
 for $j = 1, \dots, p$. Thus we derive
-\[ \Phi_K \big ( \mu \big )(x) = \begin{bmatrix} \big \langle d, K_{\cdot,1}(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{\cdot,p}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix} = \E_{x' \sim \D_x} \begin{bmatrix} d(x')^TK_{\cdot,1}(x',x) \\ \vdots \\ d(x')^TK_{\cdot,p}(x',x) \end{bmatrix} = \E_{x' \sim \D_x} \Big [ d(x')^T K(x',x) \Big ]^T. \]
-With $K(x',x)^T = K(x,x')$ for every $x,x' \in \R^d$ by definition, we conclude
-\[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ d(x')^T K(x',x) \Big ]^T = \E_{x' \sim \D_x} \Big [ K(x',x)^Td(x') \Big ] = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ]. \]
+\[ \Phi_K \big ( \mu \big )(x) = \begin{bmatrix} \big \langle d, K_{\cdot,1}(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{\cdot,p}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix} = \E_{x' \sim \D_x} \begin{bmatrix} d(x')\tr K_{\cdot,1}(x',x) \\ \vdots \\ d(x')\tr K_{\cdot,p}(x',x) \end{bmatrix} = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x',x) \Big ]\tr . \]
+With $K(x',x)\tr  = K(x,x')$ for every $x,x' \in \R^d$ by definition, we conclude
+\[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x',x) \Big ]\tr  = \E_{x' \sim \D_x} \Big [ K(x',x)\tr d(x') \Big ] = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ]. \]
 The last step consists of using the assumption, that $\D_x$ is the empirical distribution on a finite dataset $x_1, \dots, x_m \in \R^d$. This enables us to derive
 \[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ] = \frac{1}{m}\sum_{i=1}^{m} K(x,x_i)d(x_i). \]
 This proves the statement of the lemma.
@@ -736,8 +803,8 @@ we derive by the linearity of $\langle \cdot, \cdot \rangle_{\D_x}$, that
 \[ \begin{split} 
 \big \langle d|_{f(t)}, - \nabla_K C|_{f(t)} \big \rangle_{\D_x} 
 &= - \frac{1}{m} \sum_{i=1}^{m} \big \langle d|_{f(t)}, K(\cdot,x_i)d|_{f(t)}(x_i) \big \rangle_{\D_x} \\\
-&= - \frac{1}{m} \sum_{i=1}^{m} \E_{x \sim \D_x} \Big [ d|_{f(t)}(x)^TK(x,x_i)d|_{f(t)}(x_i) \Big ] \\\
-&= - \E_{x' \sim \D_x} \E_{x \sim \D_x} \Big [ d|_{f(t)}(x)^TK(x,x')d|_{f(t)}(x') \Big ]
+&= - \frac{1}{m} \sum_{i=1}^{m} \E_{x \sim \D_x} \Big [ d|_{f(t)}(x)\tr K(x,x_i)d|_{f(t)}(x_i) \Big ] \\\
+&= - \E_{x' \sim \D_x} \E_{x \sim \D_x} \Big [ d|_{f(t)}(x)\tr K(x,x')d|_{f(t)}(x') \Big ]
 = - \big \langle d|_{f(t)}, d|_{f(t)} \big \rangle_{K}.
 \end{split} \]
 Finally we conclude, that
@@ -810,8 +877,8 @@ Furthermore, we can write the kernel gradient of $C$ at $f_{w(t)}$ with respect 
 \nabla_{\tilde{K}} C|_{f_{w(t)}}
 &= \frac{1}{m} \sum_{i=1}^{m} K(\cdot,x_i) \cdot d|_{f_{w(t)}}(x_i) \\\
 &= \frac{1}{m} \sum_{i=1}^{m} \bigg [ \frac{1}{n} \sum_{k=1}^{n}f^{(k)} \otimes f^{(k)} \bigg ] (\cdot,x_i) \cdot d|_{f_{w(t)}}(x_i) \\\
-&= \frac{1}{n} \sum_{k=1}^{n} \bigg [ \frac{1}{m} \sum_{i=1}^{m} f^{(k)}(x_i)	^T d|_{f_{w(t)}}(x_i) \bigg ] \cdot f^{(k)} \\\
-&= \frac{1}{n} \sum_{k=1}^{n} \E_{x \sim \D_x} \Big [ f^{(k)}(x)^T d|_{f_{w(t)}}(x) \Big ] \cdot f^{(k)} \\\
+&= \frac{1}{n} \sum_{k=1}^{n} \bigg [ \frac{1}{m} \sum_{i=1}^{m} f^{(k)}(x_i)	\tr  d|_{f_{w(t)}}(x_i) \bigg ] \cdot f^{(k)} \\\
+&= \frac{1}{n} \sum_{k=1}^{n} \E_{x \sim \D_x} \Big [ f^{(k)}(x)\tr  d|_{f_{w(t)}}(x) \Big ] \cdot f^{(k)} \\\
 &= \frac{1}{n} \sum_{k=1}^{n} \big \langle f^{(k)}, d|_{f_{w(t)}} \big \rangle_{\D_x} \cdot f^{(k)}.
 \end{split} \]
 Comparison of the previous two expressions provides
@@ -851,7 +918,7 @@ Let $T \subset \R$ be an index set. A family of random variables $\{ X_t \mid t 
 \begin{lemma}
 Let $f: \R^{d_0} \to \R^{d_l}$ be a neural network of depth $l$, with a Lipschitz continuous non-linear activation function $\sigma: \R \to \R$ at each neuron. In the limit as $d_1, \dots, d_{l-1} \to \infty$ sequentially, the output functions $f_i(x,w)$ for $i=1, \dots, d_l$, tend to i.i.d. centered Gaussian processes of covariance $\Sigma^{(l)}$, where $\Sigma^{(l)}$ is defined recursively by
 \[ \begin{split}
-\Sigma^{(l)}(x,x') &= \frac{1}{d_0} x^Tx' + \beta^2 \\\
+\Sigma^{(l)}(x,x') &= \frac{1}{d_0} x\tr x' + \beta^2 \\\
 \Sigma^{(l+1)}(x,x') &= \E_{f \sim \mathcal{N}(0, \Sigma^{(l)})} \Big [ \sigma \big ( f(x) \big ) \sigma \big ( f(x') \big) \Big ] + \beta^2,
 \end{split} \]
 taking the expectation with respect to a centered Gaussian process $f$ of covariance $\Sigma^{(l)}$.
@@ -965,7 +1032,7 @@ The following result is denoted and proven as theorem 2.5.2 in \cite{SVD}.
 For every matrix $A \in \R^{m \times n}$ there exist orthogonal matrices $U \in \R^{m \times m}$ and $V \in \R^{n \times n}$ and a diagonal matrix 
 \[ \Sigma \coloneq \text{diag}(\sigma_1, \dots, \sigma_p) \in \R^{m \times n} \]
 with $p \coloneq \text{min} \{ m,n \}$ and singular values $\sigma_1 \geq \sigma_2 \geq \cdots \geq \sigma_p \geq 0$, such that
-\[ A = U \Sigma V^T. \]
+\[ A = U \Sigma V\tr . \]
 \end{theorem}
 
 The SVD decomposes any real valued matrix in a product of three special matrices. This representation yields the singular values which, like eigenvalues, characterize important properties of a matrix. For the further course we need the following definition.
@@ -979,39 +1046,39 @@ Theorem \ref{thm:svd} shows that the sequence of singular values is unique, sinc
 As a simple implication of theorem \ref{thm:svd} we denote the following corollary.
 
 \begin{corollary} \label{cor:svd}
-Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V^T$, such that $p \coloneq \text{min}\{m,n\}$ and $\sigma_1 \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0$ for $r \leq p$.
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V\tr $, such that $p \coloneq \text{min}\{m,n\}$ and $\sigma_1 \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0$ for $r \leq p$.
 \begin{itemize}
 \item[1.] Denoting the columns of $U$ and $V$ with $u_i$ and $v_i$, we have
-\[ A v_i = \sigma_i u_i, \quad A^T u_i = \sigma_i v_i, \quad i=1,\dots,p.\]
-\item[2.] The squares of the singular values $\sigma_1^2, \dots, \sigma_r^2$ are the eigenvalues of $A^TA$ to the corresponding eigenvectors $v_1, \dots, v_r$.
+\[ A v_i = \sigma_i u_i, \quad A\tr  u_i = \sigma_i v_i, \quad i=1,\dots,p.\]
+\item[2.] The squares of the singular values $\sigma_1^2, \dots, \sigma_r^2$ are the eigenvalues of $A\tr A$ to the corresponding eigenvectors $v_1, \dots, v_r$.
 \end{itemize}
 \end{corollary}
 
 \begin{proof}
 \ 
 \begin{itemize}
-\item[1.] Using $A=U \Sigma V^T$ and the orthogonality of $V$ we derive
-\[ Av_i = U \Sigma V^T v_i = U \Sigma e_i = U \sigma_i e_i = \sigma_i u_i \]
+\item[1.] Using $A=U \Sigma V\tr $ and the orthogonality of $V$ we derive
+\[ Av_i = U \Sigma V\tr  v_i = U \Sigma e_i = U \sigma_i e_i = \sigma_i u_i \]
 for $i=1, \dots, p$. Analogously we conclude the second statement
-\[ A^T u_i = V \Sigma U^T u_i = V \Sigma e_i = V \sigma_i e_i = \sigma_i v_i. \]
-\item[2.] Since $A^TA$ is symmetric, its spectral decomposition is given by
-\[ A^TA = V \Sigma^T U^T U \Sigma V^T = V \Sigma^T \Sigma V^T = V \Sigma^T \Sigma V^{-1}. \]
-Using $\Sigma^T \Sigma = \text{diag}(\sigma_1^2, \dots, \sigma_r^2, 0, \dots, 0) \in \R^{n \times n}$ we conclude the corollary. \qedhere
+\[ A\tr  u_i = V \Sigma U\tr  u_i = V \Sigma e_i = V \sigma_i e_i = \sigma_i v_i. \]
+\item[2.] Since $A\tr A$ is symmetric, its spectral decomposition is given by
+\[ A\tr A = V \Sigma\tr  U\tr  U \Sigma V\tr  = V \Sigma\tr  \Sigma V\tr  = V \Sigma\tr  \Sigma V^{-1}. \]
+Using $\Sigma\tr  \Sigma = \text{diag}(\sigma_1^2, \dots, \sigma_r^2, 0, \dots, 0) \in \R^{n \times n}$ we conclude the corollary. \qedhere
 \end{itemize}
 \end{proof}
 
 The SVD is an excellent tool to find low-rank approximations of a matrix $A \in \R^{m \times n}$, that is to find a matrix $B \in \R^{m \times n}$ with $\text{rank}(B) < \text{rank}(A)$ such that $\|A -B\|$ is small for some given matrix norm. We can generate such a low-rank approximation by simply reducing the number of singular values in the singular value decomposition.
 
 \begin{definition}
-Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V^T$. For $k < r = \text{rank}(A)$ we define an approximation of $A$ as
-\[ A^k \coloneq \sum_{i=1}^{k} u_i \sigma_i v_i^T = \tilde{U} \tilde{\Sigma} \tilde{V}^T, \]
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V\tr $. For $k < r = \text{rank}(A)$ we define an approximation of $A$ as
+\[ A^k \coloneq \sum_{i=1}^{k} u_i \sigma_i v_i\tr  = \tilde{U} \tilde{\Sigma} \tilde{V}\tr , \]
 where $\tilde{U} \coloneq [u_1, \dots, u_k]$, $\tilde{V} \coloneq [v_1, \dots, v_k]$ and $\tilde{\Sigma} \coloneq \text{diag}(\sigma_1, \dots, \sigma_k)$.
 \end{definition}
 
 In terms of the spectral norm $\| \cdot \|_2$, the matrix $A^k$ is the best possible rank-$k$ approximation. The underlying theorem is the following, which is denoted and proven as theorem 2.5.3 in \cite{SVD}.
 
 \begin{theorem}[Eckart-Young-Mirsky] \label{thm:eym}
-Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U \Sigma V^T$. For every $k < r = \text{rank}(A)$ it holds, that
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U \Sigma V\tr $. For every $k < r = \text{rank}(A)$ it holds, that
 \[ \min_{\text{rank}(B)=k} \big \| A-B \big \|_2 = \big \| A - A^k \big \|_2 = \sigma_{k+1}. \]
 \end{theorem}
 
@@ -1050,42 +1117,42 @@ Thus, the gradient flow $w$ covers the parameter dynamics during gradient descen
 
 \begin{lemma} \label{lem:flow}
 In the case of a single output neural network architecture, the gradient flow according to $E$ suffices the ordinary differential equation
-\[ \partial_tw_t = - \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
+\[ \partial_tw_t = - \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
 where 
-\[ \nabla_w f(\X, w_t)^T \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
+\[ \nabla_w f(\X, w_t)\tr  \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
 denotes the gradients of $f$ at $w_t$ on the training data set $\X$ and 
-\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} \coloneq \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]^T \in \R^m \]
+\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} \coloneq \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]\tr  \in \R^m \]
 denotes the functional gradients of the costs $\L_i$ at $f_{w_t}$ evaluated on $x_i$ for $i=1,\dots,m$.
 \end{lemma}
 
 \begin{proof}
 By definition \ref{def:flow} we need to show, that
-\[ \partial_t w_t = - \nabla E(w_t) = - \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
+\[ \partial_t w_t = - \nabla E(w_t) = - \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
 For arbitrary $w \in \R^n$ we can apply the chain rule to derive the gradient
 \[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w \ell \big ( f(x_i,w), y_i \big ) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i). \]
 Using the definitions from the lemma, this is equivalent to
-\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i) = \nabla_wf(\X, w_t)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
+\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i) = \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
 This completes the proof, since $w$ was chosen arbitrary.
 \end{proof}
 
 In the infinite width limit, we can apply theorem \ref{thm:linear} to approximate the neural network architecture $f$ as a linear model
 \[ f^\textit{lin}(x, w_t) \approx f(x, w_0) + \nabla_wf(\X,w_0)(w_t-w_0). \]
 This is nothing else than a first order Taylor expansion. However, the key observation is, that in the infinite width limit, the error term converges to zero. Based on this, the differential equation in lemma \ref{lem:flow} can be rewritten as
-\[ \partial_tw_t = -\nabla_wf(\X,w_0)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
+\[ \partial_tw_t = -\nabla_wf(\X,w_0)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
 where the first factor is a constant matrix and the second factor changes over time $t$. \\
 
 At this stage we can explain the main idea of how to reduce the dimensionality of the parameter space. If $\nabla_wf(\X,w_0)$ can be approximated by a low-rank matrix, the training trajectory $(w_k)_{k=0, \dots, K}$ would only depend on this low-rank constant matrix and the functional gradient of $C$, which will enable us to effectively reduce the dimensionality. To clarify this, we apply singular value decomposition on $\nabla_wf(\X,w_0)$ and derive
-\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0^T, \]
+\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0\tr , \]
 where $U_0 \in \R^{m \times m}$ and $V_0 \in \R^{n \times n}$ are orthogonal and $\Sigma_0 = \text{diag}(\sigma_1, \dots, \sigma_m)$ is positive semi-definite. Using the notation
-\[ \tilde{f}: \R^n \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]^T, \]
+\[ \tilde{f}: \R^n \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]\tr , \]
 we can apply definition \ref{def:ntk} to derive the neural tangent kernel
-\[ \Theta_{w_0} = \sum_{k=1}^{n} \partial_{w_k} \tilde{f}(w_0) \otimes \partial_{w_k} \tilde{f}(w_0) = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)^T = U_0 \Sigma_0 \Sigma_0^T U_0^T. \]
+\[ \Theta_{w_0} = \sum_{k=1}^{n} \partial_{w_k} \tilde{f}(w_0) \otimes \partial_{w_k} \tilde{f}(w_0) = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)\tr  = U_0 \Sigma_0 \Sigma_0\tr  U_0\tr . \]
 This is nothing else than the spectral decomposition of $\Theta_0$. By theorem \ref{thm:stieltjes} $\cdots$ . Thus by theorem \ref{thm:eym} we can approximate $\Sigma_0$ by a low-rank matrix $\tilde{\Sigma}_0 = \text{diag}(\sigma_1, \dots, \sigma_d)$, such that
-\[ \Sigma_0 \approx \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0^T, \]
+\[ \Sigma_0 \approx \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr , \]
 where $\tilde{U}_0 \in \R^{m \times d}$ contains the first $d$ columns of an $m-$dimensional identity matrix and $\tilde{V}_0 \in \R^{n \times d}$ contains the first $d$ columns of an $n-$dimensional identity matrix. Using this approximation we can derive
-\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0^T \approx U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0^T V_0^T. \]
+\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0\tr  \approx U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr  V_0\tr . \]
 Thus, the dynamics of gradient flow are approximately governed by
-\[ \partial_t w_t \approx -\nabla_wf(\X,w_0)^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \approx - V_0 \tilde{V}_0 \Big ( \tilde{\Sigma}_0 \tilde{U}_0^T U_0^T \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \Big ) \]
+\[ \partial_t w_t \approx -\nabla_wf(\X,w_0)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \approx - V_0 \tilde{V}_0 \Big ( \tilde{\Sigma}_0 \tilde{U}_0\tr  U_0\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \Big ) \]
 The clasped part yields the projected gradient in the $d-$dimensional subspace and the variables $V_0 \tilde{V}_0$ establish a projection from the lower-dimensional space back to the $n-$dimensional parameter space. \\
 
 This concludes the theoretical motivation of the subspace extraction. Based on this approach we could effectively train neural networks in the lower-dimensional subspace. However, the previous discussion holds only in the infinite width limit for training in the lazy regime. The rest of this thesis is dedicated to numerical experiments indicating that deep neural networks indeed can be trained in low-dimensional subspaces, although the theoretical conditions do not hold in practice. \\
@@ -1104,40 +1171,40 @@ The results of this subsection are denoted in section 2.6.1 in \cite{SVD}.
 
 \begin{lemma} \label{lem:orthProjection}
 Let $S \subseteq \R^n$ be a subspace. There exists a unique matrix $P \in \R^{n \times n}$, such that
-\[ \text{Im}(P) = S \ \wedge \ P^2 = P = P^T. \]
+\[ \text{Im}(P) = S \ \wedge \ P^2 = P = P\tr . \]
  The linear map $\tilde{P} : \R^n \to \R^n : x \mapsto Px$ is called the orthogonal projection onto $S$.
 \end{lemma}
 
 \begin{proof}
 To prove the existence of an orthogonal projection, we let $d \coloneq \text{dim}(S)$ denote the dimension of $S$ and $V := [v_1, \dots, v_d] \in \R^{n \times d}$ denote an orthonormal basis of $S$. We define
-\[ P \coloneq VV^T \in \R^{n \times n} \]
-and observe by the orthonormality of $V$, that $V^TV = I_d$. Thus $P$ is idempotent, this is
-\[ P^2 = VV^T VV^T = V I_d V^T = VV^T = P. \]
+\[ P \coloneq VV\tr  \in \R^{n \times n} \]
+and observe by the orthonormality of $V$, that $V\tr V = I_d$. Thus $P$ is idempotent, this is
+\[ P^2 = VV\tr  VV\tr  = V I_d V\tr  = VV\tr  = P. \]
 Furthermore $P$ is symmetric, since 
-\[ P^T = (VV^T)^T = VV^T = P. \]
-By the orthonormality of $V$, for arbitrary $s \in S$ there exists $a = (a_1, \dots, a_d)^T \in \R^d$ with
+\[ P\tr  = (VV\tr )\tr  = VV\tr  = P. \]
+By the orthonormality of $V$, for arbitrary $s \in S$ there exists $a = (a_1, \dots, a_d)\tr  \in \R^d$ with
 \[ s = a_1v_1 + \dots + a_dv_d = Va. \]
 Based on this we derive $S \subseteq \text{Im}(P)$ since
-\[ Ps = VV^Ts = VV^TVa = VI_da = Va =s. \]
-Additionally $\text{Im}(P) \subseteq S$ due to the fact, that for $y \in \R^n$, we have $\tilde{a} \coloneq V^Ty \in \R^d$, so
-\[ Py = VV^Ty = V\tilde{a} \in S. \]
-Thus $\text{Im}(P) = S$. This proves the existence of an orthogonal projection $P$ onto $S$. To prove uniqueness of $P$, we should first note that based on $P^2 = P = P^T$ we have
-\[ \forall x,y \in \R^n : (Px)^T(y-Py) = x^TP^Ty - x^TP^TPy = x^TPy - x^TPy = 0. \]
+\[ Ps = VV\tr s = VV\tr Va = VI_da = Va =s. \]
+Additionally $\text{Im}(P) \subseteq S$ due to the fact, that for $y \in \R^n$, we have $\tilde{a} \coloneq V\tr y \in \R^d$, so
+\[ Py = VV\tr y = V\tilde{a} \in S. \]
+Thus $\text{Im}(P) = S$. This proves the existence of an orthogonal projection $P$ onto $S$. To prove uniqueness of $P$, we should first note that based on $P^2 = P = P\tr $ we have
+\[ \forall x,y \in \R^n : (Px)\tr (y-Py) = x\tr P\tr y - x\tr P\tr Py = x\tr Py - x\tr Py = 0. \]
 Using $Px \in S$ for every $x \in \R^n$, we can conclude that 
-\[ \forall y \in \R^n : y - Py \in S^\perp := \big \{ a \in \R^n \mid \forall b \in S : a^Tb = 0 \big \}. \]
+\[ \forall y \in \R^n : y - Py \in S^\perp := \big \{ a \in \R^n \mid \forall b \in S : a\tr b = 0 \big \}. \]
 Next we let $P_1$ and $P_2$ denote orthogonal projections onto $S$, then for any $z \in \R^n$ we derive
 \[ \begin{split}
 \big \| (P_1-P_2)z \big \|_2^2 
 &= \big \| P_1z -P_2z \big \|_2^2 \\\
-&= z^TP_1^TP_1z - z^TP_2^TP_1z -  z^TP_1^TP_2z + z^TP_2^TP_2z \\\
-&= z^TP_1z - z^TP_2^TP_1z -  z^TP_1^TP_2z + z^TP_2z,
+&= z\tr P_1\tr P_1z - z\tr P_2\tr P_1z -  z\tr P_1\tr P_2z + z\tr P_2\tr P_2z \\\
+&= z\tr P_1z - z\tr P_2\tr P_1z -  z\tr P_1\tr P_2z + z\tr P_2z,
 \end{split} \]
-where we have used the property $P_i^2 = P_i = P_i^T$ for $i=1,2$. Since each term on the right-hand side is a real number, we can transpose each term to derive
+where we have used the property $P_i^2 = P_i = P_i\tr $ for $i=1,2$. Since each term on the right-hand side is a real number, we can transpose each term to derive
 \[ \begin{split}
 \big \| (P_1-P_2)z \big \|_2^2 
-&=  z^TP_1z - z^TP_2^TP_1z -  z^TP_1^TP_2z + z^TP_2z \\\
-&= (P_1z)^Tz - (P_1z)^TP_2z - (P_2z)^TP_1z + (P_2z)^Tz \\\
-&= (P_1z)^T(z-P_2z) + (P_2z)^T(z-P_1z).
+&=  z\tr P_1z - z\tr P_2\tr P_1z -  z\tr P_1\tr P_2z + z\tr P_2z \\\
+&= (P_1z)\tr z - (P_1z)\tr P_2z - (P_2z)\tr P_1z + (P_2z)\tr z \\\
+&= (P_1z)\tr (z-P_2z) + (P_2z)\tr (z-P_1z).
 \end{split} \] 
 Using $\text{Im}(P_1) = S = \text{Im}(P_2)$, we observe that 
 \[ P_1z \in S \ \wedge \ z-P_2z \in S^\perp \ \wedge \ P_2z \in S \ \wedge \ z - P_1z \in S^\perp. \]
@@ -1148,7 +1215,7 @@ In our setting, the $d$-dimensional subspace $S \subseteq \R^n$ is unknown, whic
 
 \begin{definition}
 For $d \in \N$ we define the set of rank-$d$ orthogonal projection matrices
-\[ \P_d \coloneq \Big \{ P \in \R^{n \times n} \mid \text{rank}(P) = d \ \wedge \ P^2 = P = P^T \Big \}. \]
+\[ \P_d \coloneq \Big \{ P \in \R^{n \times n} \mid \text{rank}(P) = d \ \wedge \ P^2 = P = P\tr  \Big \}. \]
 \end{definition}
 
 Having this background knowledge on orthogonal projections in mind, we can proceed with the theory on principal component analysis.
@@ -1165,7 +1232,7 @@ where $\| \cdot \|_F$ denotes the Frobenius norm. Casually speaking, principal c
 
 \begin{theorem} \label{thm:PCA}
 The PCA solution $P^* \in \P_d$ can be decomposed as
-\[ P^* = U_dU_d^T, \]
+\[ P^* = U_dU_d\tr , \]
 where $U_d \in \R^{n \times d}$ is the matrix formed by the first $d$ left singular vectors of $W$.
 \end{theorem}
 
@@ -1173,22 +1240,22 @@ where $U_d \in \R^{n \times d}$ is the matrix formed by the first $d$ left singu
 Let $P \in \P_d$ be arbitrary. By the linearity of the trace, we observe that
 \[ \begin{split}
 \big \| PW - W \big \|_F^2 
-&= \text{Tr} \big [ (PW-W)^T(PW-W) \big ] \\\
-&= \text{Tr} \big [ W^T P^2 W - 2 W^TPW + W^TW \big ] \\\
-&= \text{Tr} \big [ W^TW\big ] - \text{Tr} \big [W^TPW \big ],
+&= \text{Tr} \big [ (PW-W)\tr (PW-W) \big ] \\\
+&= \text{Tr} \big [ W\tr  P^2 W - 2 W\tr PW + W\tr W \big ] \\\
+&= \text{Tr} \big [ W\tr W\big ] - \text{Tr} \big [W\tr PW \big ],
 \end{split} \]
-since $P^T=P=P^2$ by definition. Using that $\text{Tr} \big [ W^TW\big ]$ is independent of $P$, we derive
-\[ \argmin_{P \in \P_d} = \big \| PW-W \big \|_F^2 = \argmax_{P \in \P_d} \text{Tr} \big [ W^TPW\big ]. \]
-By the proof of lemma \ref{lem:orthProjection}, there exists an orthonormal basis $Q = [q_1, \dots, q_d] \in \R^{n \times d}$, such that $P$ can be decomposed as $P=QQ^T$. Using the invariance of the trace under cyclic permutation and the orthonormality of $Q$, we have
-\[ \text{Tr} \big [ W^TPW \big ] = \text{Tr} \big [ W^TQQ^TW \big ] = \text{Tr} \big [ Q^TWW^TQ \big ] = \sum_{i=1}^{d} q_i^TWW^Tq_i. \]
-To maximize the rightmost expression we perform SVD on $W = U \Sigma V^T$, such that
-\[ WW^T = U \Sigma V^T V \Sigma^T U^T = U \Sigma \Sigma^T U^T. \]
-Using the notation $Z = U^TQQ^TU$ we derive by the invariance under cyclic permutation, that
-\[ \text{Tr} \big [ Q^TWW^TQ \big ] = \text{Tr} \big [ Q^TU \Sigma \Sigma^T U^TQ \big ] = \text{Tr} \big [ U^TQQ^TU\Sigma \Sigma^T \big ] = \text{Tr} \big [ Z \Sigma \Sigma^T \big ]. \]
+since $P\tr =P=P^2$ by definition. Using that $\text{Tr} \big [ W\tr W\big ]$ is independent of $P$, we derive
+\[ \argmin_{P \in \P_d} = \big \| PW-W \big \|_F^2 = \argmax_{P \in \P_d} \text{Tr} \big [ W\tr PW\big ]. \]
+By the proof of lemma \ref{lem:orthProjection}, there exists an orthonormal basis $Q = [q_1, \dots, q_d] \in \R^{n \times d}$, such that $P$ can be decomposed as $P=QQ\tr $. Using the invariance of the trace under cyclic permutation and the orthonormality of $Q$, we have
+\[ \text{Tr} \big [ W\tr PW \big ] = \text{Tr} \big [ W\tr QQ\tr W \big ] = \text{Tr} \big [ Q\tr WW\tr Q \big ] = \sum_{i=1}^{d} q_i\tr WW\tr q_i. \]
+To maximize the rightmost expression we perform SVD on $W = U \Sigma V\tr $, such that
+\[ WW\tr  = U \Sigma V\tr  V \Sigma\tr  U\tr  = U \Sigma \Sigma\tr  U\tr . \]
+Using the notation $Z = U\tr QQ\tr U$ we derive by the invariance under cyclic permutation, that
+\[ \text{Tr} \big [ Q\tr WW\tr Q \big ] = \text{Tr} \big [ Q\tr U \Sigma \Sigma\tr  U\tr Q \big ] = \text{Tr} \big [ U\tr QQ\tr U\Sigma \Sigma\tr  \big ] = \text{Tr} \big [ Z \Sigma \Sigma\tr  \big ]. \]
 As $Z$ is orthogonal as a product of three orthogonal matrices we conclude (why orthogonal?)
-\[  \text{Tr} \big [ W^TPW \big ] = \text{Tr} \big [ Z \Sigma \Sigma^T ] = \sum_{i=1}^{d} z_{i,i} \sigma_i^2 \leq \sum_{i=1}^{d} \sigma_i^2. \]
-The upper bound is attained in the case where $Q = U_d = [u_1, \dots, u_d]$ contains the first $d$ columns of $U$, such that based on corollary \ref{cor:svd} we can use $W^Tu_i = \sigma_iv_i$ to conclude
-\[ \text{Tr} \big [ W^TPW \big ] = \sum_{i=1}^{d} q_i^TWW^Tq_i = \sum_{i=1}^{d} u_i^TWW^Tu_i = \sum_{i=1}^{d} u_i^TW v_i \sigma_i = \sum_{i=1}^{d} \sigma_i^2. \]
+\[  \text{Tr} \big [ W\tr PW \big ] = \text{Tr} \big [ Z \Sigma \Sigma\tr  ] = \sum_{i=1}^{d} z_{i,i} \sigma_i^2 \leq \sum_{i=1}^{d} \sigma_i^2. \]
+The upper bound is attained in the case where $Q = U_d = [u_1, \dots, u_d]$ contains the first $d$ columns of $U$, such that based on corollary \ref{cor:svd} we can use $W\tr u_i = \sigma_iv_i$ to conclude
+\[ \text{Tr} \big [ W\tr PW \big ] = \sum_{i=1}^{d} q_i\tr WW\tr q_i = \sum_{i=1}^{d} u_i\tr WW\tr u_i = \sum_{i=1}^{d} u_i\tr W v_i \sigma_i = \sum_{i=1}^{d} \sigma_i^2. \]
 This completes the proof.
 \end{proof}
 
@@ -1202,11 +1269,11 @@ The idea of dimensionality reduction consists of applying PCA to the parameters 
 \[ W \coloneq \big [ w_1 - \bar{w}, \dots, w_t - \bar{w} \big ] \in \R^{n \times t}. \]
 This enables us to apply PCA on the mean-centered data matrix $W$. As seen in section \ref{sec:PCA}, for $d \in \N$, the orthogonal projection on the $d-$dimensional subspace, that covers the parameter trajectory best, is induced by
 \[ P^* \coloneq \argmin_{P \in \P_d} \big \| PW - W \big \|_F^2. \]
-By theorem \ref{thm:PCA} we can construct $P^*$ from the left singular vectors of $W$. For this we apply corollary \ref{cor:svd} to compute the right singular vectors $v_i$ for $i=1,\dots,d$ by the spectral decomposition of $W^TW \in \R^{t \times t}$. These can then be used to derive the left singular vectors
+By theorem \ref{thm:PCA} we can construct $P^*$ from the left singular vectors of $W$. For this we apply corollary \ref{cor:svd} to compute the right singular vectors $v_i$ for $i=1,\dots,d$ by the spectral decomposition of $W\tr W \in \R^{t \times t}$. These can then be used to derive the left singular vectors
 \[ u_i = \frac{1}{\sigma_i} Wv_i, \quad i=1, \dots, d. \]
 
 Thus we have found an orthonormal basis $U_d = [u_1, \dots, u_d]$ of the $d$-dimensional subspace, that covers the optimization trajectory best. The orthogonal projection onto this subspace is given by
-\[ P : \R^n \to \R^n : w \mapsto U_dU_d^Tw. \]
+\[ P : \R^n \to \R^n : w \mapsto U_dU_d\tr w. \]
 
 In summary, the algorithm for dimensionality reduction can be notated as follows.
 
@@ -1215,7 +1282,7 @@ In summary, the algorithm for dimensionality reduction can be notated as follows
 \textcolor{white}{$\Big |$}1: Sample parameter trajectory $\{ w_1, \dots, w_t\}$ along the training. \\
 \textcolor{white}{$\Big |$}2: Compute the mean $\bar{w} \coloneq\sum_{i=1}^{t} w_i$. \\
 \textcolor{white}{$\Big |$}3: Centralize the samples as $W = [w_1-\bar{w}, \dots, w_t - \bar{w}]$. \\
-\textcolor{white}{$\Big |$}4: Perform spectral decomposition such that $W^TW = V \Sigma^2 V^{-1}$.  \\
+\textcolor{white}{$\Big |$}4: Perform spectral decomposition such that $W\tr W = V \Sigma^2 V^{-1}$.  \\
 \textcolor{white}{$\Big |$}5: Choose suitable subspace dimension $d \in \N$. \\
 \textcolor{white}{$\Big |$}6: Obtain the $d$ largest eigenvalues $ \big [\sigma_1^2, \dots, \sigma_d^2 \big ]$ with eigenvectors $ \big [v_1, \dots, v_d \big ]$. \\
 \textcolor{white}{$\Big |$}7: Determine the singular vectors $u_i = 1/\sigma_iWv_i$ for $i=1, \dots, d$. \\
@@ -1348,6 +1415,8 @@ This completes the proof.
 \bibitem{Paper} Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, Xiaolin Huang. \textit{Low Dimensional Landscape Hypothesis is True: DNNs can be Trained in Tiny Subspaces}. arXiv preprint arXiv:2103.11154, 2021.
 
 \bibitem{GD} Augustin Cauchy. \textit{M\'{e}thode g\'{e}n\'{e}rale pour la r\'{e}solution des systemes d'\'{e}quations simultan\'{e}es}. Comptes rendus de l'Acad\'{e}mie des sciences, volume 25, pages 536-538, 1847.
+
+\bibitem{ConvexOptimization} Yurii Nesterov. \textit{Introductory Lectures on Convex Optimization}. Applied Optimization, volume 87, 2004.
 
 \bibitem{BFGS} Richard H. Byrd, Jorge Nocedal, Robert B. Schnabel. \textit{Representations of Quasi-Newton Matrices and their Use in Limited Memory Methods}. Mathematical Programming, volume 60(1), pages 129-156, 1994 
 
