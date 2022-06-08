@@ -26,6 +26,7 @@
 \newcommand{\I}{\mathcal{I}}
 \newcommand{\X}{\mathcal{X}}
 \newcommand{\Y}{\mathcal{Y}}
+\renewcommand{\O}{\mathcal{O}}
 \renewcommand{\H}{\mathcal{H}}
 \renewcommand{\L}{\mathcal{L}}
 \renewcommand{\P}{\mathcal{P}}
@@ -127,7 +128,7 @@ In the following, the terms neural network and neural network architecture will 
 \subsection{Training in the Parameter Space}\label{sec:Training}
 
 Training a neural network refers to finding the optimal parameters, given a fixed neural network architecture $\tilde{f} : \R^{n_0} \times \R^n \to \R^{n_l}$. In other words, finding a function $f \in \F|_{\tilde{f}}$, where
-\[ \F|_{\tilde{f}} \coloneq \Big \{ f : \R^{n_0} \to \R^{n_l} : x \mapsto \tilde{f}(x,w) \mid w \in \R^n \Big \} \]
+\[ \F|_{\tilde{f}} \coloneq \Big \{ f_w : \R^{n_0} \to \R^{n_l} : x \mapsto \tilde{f}(x,w) \mid w \in \R^n \Big \} \]
 denotes the set of all neural networks with given architecture. In order to define a sense of optimality, we need a mechanism measuring the quality of network outputs. This is done by a loss function
 \[ \ell: \R^{n_l} \times \R^{n_l} \to \R_+ : \big ( f(x,w),y \big ) \mapsto \ell \big ( f(x,w),y \big ) ,\]
 that should be chosen in such a way, that for some input $x \in \R^{n_0}$ with target output $y \in \R^{n_l}$ it associates some cost with the error between the prediction $f(x,w)$ and the true label $y$. \\
@@ -197,9 +198,9 @@ Let $f: \R^n \to \R$ be differentiable, such that the gradient $\nabla f$ is Lip
 
 \begin{proof}
 Let $x,x' \in \R^n$, define $z_{\lambda} \coloneq x + \lambda (x' - x)$ for $\lambda \in \R$ and consider the function
-\[ \psi : \R^n \to \R : \lambda \mapsto f(z_{\lambda}). \]
+\[ \psi : \R \to \R : \lambda \mapsto f(z_{\lambda}). \]
 Since $f$ is differentiable we can apply the chain rule to derive
-\[ \psi' : \R^n \to \R : \lambda \mapsto (x'-x)\tr \cdot \nabla f(z_\lambda) . \]
+\[ \psi' : \R \to \R : \lambda \mapsto (x'-x)\tr \cdot \nabla f(z_\lambda) . \]
 Integration over $\psi'$ from $\lambda = 0$ to $\lambda = 1$ yields
 \[ \int_{0}^{1} \big \langle \nabla f(z_{\lambda}), x'-x \big \rangle \ d\lambda = \int_{0}^{1} \psi'(\lambda) \ d \lambda = \psi(1) - \psi(0) = f(x') - f(x). \]
 This equality can be rewritten as
@@ -368,11 +369,15 @@ This completes the necessary basics on notation and training of neural networks.
 \textbf{Optional:} Backpropagation
 
 \pagebreak
-\section{Training in the Function Space} \label{sec:kernel}
+\section{Training in the Function Space}
 
-The goal of this section is to introduce and investigate the neural tangent kernel, which was analyzed by Arthur Jacot, Franck Gabriel and Cl\'{e}ment Holger in \cite{NTK}. We start by motivating and giving the definition of functional derivatives and functional gradient descent. This leads to the definition of multi-dimensional kernels, which enable us to generalize the functional gradient descent to so called kernel gradient descent. Having this concept in mind, we will prove that the training of neural networks in the parameter space is linked to kernel gradient descent in the function space with respect to a special kernel, the neural tangent kernel.
+The goal of this section is to introduce and investigate the neural tangent kernel, which was analyzed by Arthur Jacot, Franck Gabriel and Cl\'{e}ment Hongler in \cite{NTK}. \\
+A \\
+A \\
+A \\
+A \\
 
-\subsection{Functional Gradient Descent}
+\subsection{Motivation}
 
 As seen in section \ref{sec:Training}, the training of neural networks via parameter optimization is usually accomplished by minimizing the empirical error
 \[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2 \]
@@ -382,9 +387,12 @@ That is we are no longer optimizing the specific parameters of the unknown targe
 \[ C: \F \to \R_+ : f \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i),y_i \big), \]
 associating some cost to each element of the function space $\F$. The interpretation of $\ell$ as a convex function in $f$ provides a convex cost $C$, since by lemma \ref{lem:convexity} the sum of convex functions is convex again. This is a huge advantage in comparison to the parameter optimization approach, where the convexity does not translates to $E$ due to the composition of $\ell$ with $f$. \\
 
-We will introduce the functional gradient descent method, that enables us to minimize $C$ in the function space $\F$ and is an analog to the gradient descent method in the parameter space $\R^n$. Since $C$ is convex in the function space, convergence to a global minimum will be guaranteed in contrast to the non-convex parameter optimization problem. \\
+In the following we will introduce the kernel gradient descent algorithm, which is a generalization of gradient descent from the parameter space $\R^n$ to the function space $\F$. Since we can ensure convexity of the cost $C$ in the function space, convergence of kernel gradient descent to a global minimum will be guaranteed. \\
 
-Note that this approach is great for theoretical analysis due to the advantage of convexity. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. Nevertheless we can use the analysis of functional gradient descent to get a better understanding of gradient descent in the parameter space. \\
+Note that this approach is great for theoretical analysis due to the advantage of convexity. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. Nevertheless we can use the analysis of kernel gradient descent to get a better understanding of gradient descent in the parameter space. That is why we aim to investigate the relationship between the two optimization approaches.
+
+
+\subsection{Functional Derivative}
 
 To start things off, we need the definition of functionals, mapping each element of the function space $\F$ to a real value. The cost $C$ is an example of such a functional.
 
@@ -393,49 +401,25 @@ A functional on the vector space $\F$ is defined as a mapping
 \[ \mu: \F \to \R : f \mapsto \mu[f]. \]
 \end{definition}
 
-To minimize functionals via the same approach in gradient descent, we need to translate the well known concepts of differentiability and gradients from the parameter space $\R^n$ to the function space $\F$. The following definition can be found in Appendix A of \cite{Functionals}.
-
-\begin{definition} \label{def:derivative}
-Let $\phi, f_0 \in \F$. A functional $\mu: \F \to \R$ is said to be differentiable at the point $f_0$ in direction $\phi$, if
-\[ \int \frac{\partial\mu}{\partial f_0(x)}(x)\phi(x) \ dx = \lim_{\epsilon \to 0} \frac{\mu[f_0 + \epsilon \phi] - \mu[f_0]}{\epsilon} \]
-exists. The functional gradient of $\mu$ at $f_0$ is defined as 
-\[ \nabla \mu |_{f_0} : \R^{n_0} \to \R^{n_l} : x \mapsto \frac{\partial \mu}{\partial f_0(x)}(x). \]
- If the limit exists for every $\phi \in \F$ we define the functional derivative of $\mu$ at $f_0$ as
-\[ \partial_{f} \mu |_{f_0} : \F \to \R : \phi \mapsto \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi] \Big ]_{\epsilon=0}. \]
-\end{definition}
-
-Based on these definitions, we can iteratively minimize functionals in a similar manner to the gradient descent method. Formally this is achieved as follows.
-
-\begin{algorithm}
-\caption{Functional Gradient Descent} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable $\mu: \F \to \R$, random $f_0 \in \F$ and $\epsilon \geq 0$. \\
-\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
-\textcolor{white}{$\Big |$}3: \textbf{while} $\big \| \nabla \mu |_{f_k} \big \|_{\D_x} > \epsilon$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0$. \\
-\textcolor{white}{$\Big |$}5: \quad Set $f_{k+1} \leftarrow f_k - \alpha_k \cdot \nabla \mu |_{f_k}$ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}6: \textbf{end while}
-\end {algorithm}
-
-With a slight change in notation, the same argumentation that was used for convergence of gradient descent on functions, can be applied to the functional gradient descent algorithm. \\
-
-Thus, the choice of a convex loss $\ell$, which yields a convex cost functional $C$, enables us to guarantee convergence of functional gradient descent to a global minimum. As said before, this is great for theoretical considerations. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. \\
-
-To still derive conclusions for the parameter training based on the properties of training in the function space, we need to establish a relationship between the two minimization approaches. This can be achieved by the use of kernels. Before we explain this idea in detail, we need some background knowledge from functional analysis. \\
-
-\textbf{To Do:} A la "In general, you can parametrize any function in a number of ways, each parametrization gives rise to different steps in gradient descent." \\
-\textbf{Optional:} Proofs for convergence of Functional Gradient Descent. 
-
-\pagebreak
-\subsection{The Dual Space}
-
-In the following the focus is on functionals that are linear and continuous. We will see, that these kind of functionals can be represented by elements of the function space $\F$, which is a crucial ingredient for the further theory. More precisely, we will construct a surjective mapping from $\F$ to the set of linear and continuous functionals on $\F$, the dual space.
+Minimizing functionals via the same approach in gradient descent, requires a translation of the well known concepts of differentiability and gradients from the parameter space $\R^n$ to the function space $\F$. The following definition is based on Appendix A of \cite{Functionals}.
 
 \begin{definition}
-Given a real vector space $\F$, we define the dual space
-\[ \F^* \coloneq \Big \{ \mu : \F \to \R \mid \mu \text{ linear and continuous} \Big \}. \]
+Let $\phi, f_0 \in \F$. A functional $\mu : \F \to \R$ is said to be differentiable at the point $f_0$ in direction $\phi$, if
+\[ \mu '_\phi [ f_0 ] \coloneq \lim_{\epsilon \to 0} \frac{1}{\epsilon} \Big ( \mu[f_0 + \epsilon \phi] - \mu[f_0] \Big ) = \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi] \Big ]_{\epsilon=0} \]
+exists. If the limit exists for every $\phi \in \F$ we define the functional derivative of $\mu$ at $f_0$ as
+\[ \partial_{f} \mu |_{f_0} : \F \to \R : \phi \mapsto \mu '_\phi [ f_0 ] \]
+and call $\mu$ differentiable at $f_0$.
 \end{definition}
 
-At this point it is unclear how all of the elements in $\F^*$ arise. As mentioned, they can be constructed by elements of the function space $\F$, for which we need to equip  $\F$ with a semi-norm. This procedure is based on the following result from \cite{NTK}.
+This is analog to the notion of directional derivatives in $\R^{n_0}$. Likewise we can motivate the functional gradient in $\F$ based on the properties of the classical gradient in $\R^{n_0}$. To clarify this, we let $f \in \F$ and $x,v \in \R^{n_0}$, such that $\| v \|_2 = 1$ and consider the directional derivative of $f$ in $x$ along the direction $v$, which is given by
+\[ f'_v(x) \coloneq \lim_{\epsilon \to 0} \frac{1}{\epsilon} \Big ( f(x + \epsilon v) - f(x) \Big ). \]
+The gradient $\nabla f(x)$ can be thought of as the best linear approximation of $f$ in $x$.
+\[ f(x + \epsilon v ) - f(x) = \epsilon \big \langle \nabla f(x), v \big \rangle + \O (\epsilon) \]
+we derive 
+\[ f'_v(x) = \big \langle \nabla f(x), v \big \rangle. \]
+Roughly speaking we could translate this concept and define the functional gradient of a functional $\mu: \F \to \R$ at $f_0 \in \F$ as an element $d \in \F$, such that
+\[ \forall \phi \in \F : \mu '_\phi [ f_0 ] = \langle d, \phi \rangle_\F, \]
+for a reasonable inner product $\langle \cdot, \cdot \rangle_\F$. It will turn out, that this is completely possible. We will start with the definition of an inner product and show the existence of the functional gradient afterwards. The following lemma is based on \cite{NTK}.
 
 \begin{lemma}
 Given a fixed probability distribution $\D_x$ on the input space $\R^{n_0}$, one can equip the function space $\F$ with the seminorm
@@ -468,7 +452,9 @@ Furthermore $\langle \cdot,\cdot \rangle_{\D_x}$ is positive semidefinite, since
 Thus $\| \cdot \|_{\D_x} = \sqrt{\langle \cdot , \cdot \rangle_{\D_x}}$ is a seminorm on the function space $\F$.
 \end{proof}
 
-Just as norms induce metrics, semi-norms induce pseudometrics, so that we can define a distance between two elements of $\F$ in terms of the bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$.
+Note that $\langle \cdot, \cdot \rangle_{\D_x}$ is not strictly positive definite. For example, in the case where $\D_x$ is a discrete distribution, any $f \in \F$ mapping the support of $\D_x$ to zero, satisfies $\langle f, f \rangle_{\D_x} = 0$. However, for our setting only the datapoints with a positive probability measure in terms of $\D_x$ are of interest. That is why we can define an equivalence relation on $\F$, such that
+\[ \forall f,g \in \F \ : \ f \sim g \ \Leftrightarrow \ \langle f, \cdot \rangle_{\D_x} = \langle g, \cdot \rangle_{\D_x}. \]
+Thus $\langle \cdot, \cdot \rangle_{\D_x}$ restricted to $\F / \sim$ is strictly positive definite, making $\langle \cdot, \cdot \rangle_{\D_x}$ an inner product. Based on the following lemma, $\F / \sim$ is complete, such that $\big ( F / \sim, \langle \cdot, \cdot \rangle_{\D_x} \big )$ is a Hilbert space.
 
 \begin{lemma}
 The seminorm $\| \cdot \|_{\D_x}$ induces the pseudometric
@@ -490,7 +476,7 @@ Let $f,g,h \in \F$. $d_{\F}$ is indeed a pseudometric since it suffices \\
 d_{\F}(f,h) &= \big \| f - h \big \|_{\D_x} \\\ &= \big \| f - g + g - h \big \|_{\D_x} \\\ &\le \big \| f - g  \big \|_{\D_x} + \big \| g - h \big \|_{\D_x} = d_{\F}(f,g) + d_{\F}(g,h). 
 \end{split} \]
 
-The upper equations follow directly from the properties of the semi-norm $\| \cdot \|_{\D_x}$. \\
+The upper equations follow directly from the properties of the seminorm $\| \cdot \|_{\D_x}$. \\
 
 It remains to show the completeness of $\F$, which arises from the fact, that every Cauchy sequence in $\R$ converges. To clarify this, we let $(f_n)_{n=1}^\infty$ denote a Cauchy sequence in $\F$, so
 \begin{equation} \tag{$\ast$} \forall \epsilon > 0 : \exists N \in \N : \forall m,n > N : d_{\F}(f_n, f_m)^2 < \epsilon. \end{equation}
@@ -515,7 +501,22 @@ Hence the Cauchy sequence $(f_n)_{n=1}^\infty$ has a limit in $\F$, which makes 
 
 Note that since $(\F, d_{\F})$ is only a pseudometric space and not a metric space, the limit $f_\textit{lim}$ constructed in the proof is not unique. Essentially any $f \in \F$, that suffices 
 \[ \E_{x \sim \D_x} \Big [ f(x) \Big ] = \Big [ \hat{f}_1, \dots, \hat{f}_{n_l} \Big ] \tr, \]
-represents a limit function of the Cauchy sequence. This is due to the limit being measured in terms of the semi-norm $\| \cdot \|_{\D_x}$. \\
+represents a limit function of the Cauchy sequence. This is due to the limit being measured in terms of the seminorm $\| \cdot \|_{\D_x}$. \\
+
+Based on the notion of $\langle \cdot, \cdot \rangle_{\D_x}$, the functional gradient of some differentiable $\mu : \F \to \R$ at $f_0 \in \F$ could be thought as an element $\nabla \mu |_{f_0} \in \F$, that satisfies
+\[ \forall \phi \in \F : \mu'_{\phi}[f_0] = \big \langle \nabla \mu |_{f_0}, \phi \big \rangle_{\D_x}. \]
+Note that, due to the definition of $\langle \cdot, \cdot \rangle_{\D_x}$, the functional gradient is not unique and depends only on the support of $\D_x$. However we will discuss and address this problem later on, but first let us prove the existence of functional gradients. \\
+
+We will see, that the functional gradient exists, if $\mu'_\phi[f_0]$ is linear and continuous. For this we denote the class of linear and continuous functionals on $\F$, namely the dual space of $\F$.
+
+\begin{definition}
+Given a real vector space $\F$, we define the dual space
+\[ \F^* \coloneq \Big \{ \mu : \F \to \R \mid \mu \text{ linear and continuous} \Big \}. \]
+\end{definition}
+
+To prove the existence of functional gradients, we will construct a surjective mapping 
+\[ J: \F \to \F^* : d \mapsto \langle d, \cdot \rangle_{\D_x}, \]
+such that we can conclude the existence based on $\mu'_\phi[f_0] \in \F^*$. For the construction of $J$ we have to translate some well known results from functional analysis to our setting. \\
 
 Based on the completeness of $(\F, d_\F)$, we can introduce the concept of orthogonal projections, which is necessary for our goal of establishing a mapping between $\F$ and its dual space $\F^*$. The following lemma is a translation of Theorem 3.3.1 in \cite{FunctionalAnalysis} to our case, where we have a symmetric positive semidefinite bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$ instead of an inner product.
 
@@ -553,7 +554,7 @@ Using these two observations, we conclude that
 Thus $(a_n)_{n=1}^\infty$ is a Cauchy sequence. Since $\F$ is complete and $\A$ is closed, $(a_n)_{n=1}^\infty$ converges to some $a^* \in \A$ with $\big \| f - a^* \big \|_{\D_x}^2 = \delta$, which proofs the lemma.
 \end{proof}
 
-Note that since $\| \cdot \|_{\D_x}$ is only a semi-norm and not a norm, the limit of $(a_n)_{n=1}^\infty$ is not unique. Essentially there can exist multiple orthogonal projections from $f$ onto the subset $\A$. \\
+Note that since $\| \cdot \|_{\D_x}$ is only a seminorm and not a norm, the limit of $(a_n)_{n=1}^\infty$ is not unique. Essentially there can exist multiple orthogonal projections from $f$ onto the subset $\A$. \\
 
 Lemma \ref{lem:projection} is a weakening of the Hilbert projection theorem stating that, given a Hilbert space, it even exists a unique orthogonal projection. In our case we lose the uniqueness, because $\langle \cdot, \cdot \rangle_{\D_x}$ is just positive semidefinite. However this is just a side note, since the existence of an orthogonal projection suffices for the further theory. Next we infer a useful corollary, which is notated as lemma 3.3.2 in \cite{FunctionalAnalysis}.
 
@@ -602,150 +603,48 @@ Hence we have found $d = f / \| f \|_{\D_x}^2$ with $\mu = J(d)$. This shows sur
 Thus for each functional $\mu \in \F^*$ there exists $d \in \F$ such that $\mu = \langle d, \cdot \rangle_{\D_x}$. In other words
 \[ \F^* = \Big \{ \mu : \F \to \R : f \mapsto \langle d,f \rangle _{\D_x} \mid d \in \F \Big \}. \]
 
-Lemma \ref{lem:riesz} is a weakening of the Riesz representation theorem, stating that any Hilbert space $\H$ is isometric and isomorphic to its dual space $\H^*$ via the map $J:\H \to \H^* : x \mapsto \langle x , \cdot \rangle_\H$. \\
-
-Since $\langle \cdot , \cdot \rangle_{\D_x}$ is only positive semidefinite and not positive definite we lose the property of $J$ being isometric and therefore injective. However, based on the definition of $\D_x$, $J$ maps two elements of $\F$ to the same functional, if and only if they are equal on the data. Since our objective is to minimize the cost functional $C$, which depends on the exact same data, it is no matter which representer is chosen and therefore surjectivity will  be sufficient enough for the further argumentation.
-
-\pagebreak
-\subsection{Reproducing Kernel Hilbert Space}
-
-\begin{definition}
-A multi-dimensional kernel over $\R^{n_0}$ is a function
-\[ K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l} : (x,x') \mapsto K(x,x'), \]
-such that $K(x,x') = K(x',x)\tr $ for any $x,x' \in \R^{n_0}$.
-\end{definition}
-
-The following definition from RKHS-5:
-
-\begin{definition}
-Let $\N_m \coloneq \{1, \dots, m\}$. A kernel $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ is said to be positive semidefinite if, for any $m \in \N$, $\{ x_i \mid i \in \N_m \} \subseteq \R^{n_0}$ and $\{ y_i \mid i \in \N_m \} \subseteq \R^{n_l}$, it holds
-\[ \sum_{i,j \in \N_m} y_i \tr K(x_i,x_j)y_j \geq 0. \]
-\end{definition}
-
-According to Aronszajn in.. we have denote the following theorem.
-
-\begin{theorem}
-Let $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ be a positive semidefinite kernel and define
-\[ \H_0 \coloneq \text{span} \Big \{ K_xy : \R^{n_0} \to \R^{n_l} : z \mapsto K(z,x)y \mid x \in \R^{n_0}, y \in \R^{n_l} \Big \}. \]
-Furthermore define the inner product of $f = \sum_{i \in \N_m}K_{x_i}y_i \in \H_0$ and $g = \sum_{i \in \N_m}K_{\hat{x}_i}\hat{y}_i \in \H_0$ as
-\[ \langle f,g \rangle_{\H_K} \coloneq \sum_{i,j \in \N_m} y_i \tr K(x_i, \hat{x}_j) \hat{y}_j, \]
-then the closure $\H_K \coloneq \overline{H_0}$ is a Hilbert space with inner product $\langle \cdot, \cdot \rangle_{\H_K}$.
-\end{theorem}
-
-\begin{definition}
-Let $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ be a positive semidefinite kernel. We call $\H_K$ in theorem ... the vector-valued reproducing kernel Hilbert space associated with $K$.
-\end{definition}
-
-The naming arises from the fact, that the following reproducing property holds.
+Hence we can conclude the existence of functional gradients, as long as the functional derivative $\partial_f \mu |_{f_0}$ is an element of $\F^*$. In other words, $\partial_f \mu |_{f_0}$ is linear and continuous. To guarantee this, we make the restriction, that the marginal distribution $\D_x$ on the input space $\R^{n_0}$ is given by the empirical distribution on a finite subset of $\R^{n_0}$. This means there exist $m \in \N$ and $x_1, \dots, x_m \in \R^{n_0}$, such that the distribution of inputs is given by
+\[ \D_x = \frac{1}{m} \sum_{i=1}^{m} \delta_{x_i}, \]
+where $\delta_{x_i}$ denotes the Dirac measure in $x_i$. Under this assumption, the cost $C$ depends only on the values of $f$ at a finite dataset. This implies the following result from \cite{NTK}.
 
 \begin{lemma}
-For any $f \in \H_K$ the reproducing property holds, that is
-\[ \forall x \in \R^{n_0}, y \in \R^{n_l} : \langle f(x), y \rangle = \langle f, K_xy \rangle_{\H_K}. \]
+Let $\mu: \F \to \R$ be differentiable in $f_0 \in \F$, then we have $\partial_f\mu |_{f_0} \in \F^*$. In other words, the functional derivative $\partial_f\mu |_{f_0}$ is linear and continuous.
 \end{lemma}
 
 \begin{proof}
-Let $f = \sum_{i \in \N_m}K_{x_i}y_i \in \H_0$ and $x \in \R^{n_0}, y \in \R^{n_l}$ be arbitrary. We observe that
-\[ \langle f(x), y \rangle = \sum_{i \in \N_m} \big ( K(x,x_i)y_i \big ) \tr y = \sum_{i \in \N_m} y_i \tr K(x_i,x)y = \langle f, K_xy \rangle_{\H_K}. \qedhere \]
+The prove is based on the linear operator
+\[ L : \F / \sim \to \R : [\phi] \mapsto \mu_\phi'[f_0]. \]
+The linearity follows from the definition of $\partial_f\mu |_{f_0}$. To prove this, we let $\phi_1, \phi_2 \in \F$ and derive
+\[ \begin{split} 
+\partial_f \mu |_{f_0} [\phi_1 + \phi_2]
+&= \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi_1 + \epsilon \phi_2 ] \Big ]_{\epsilon=0} \\\
+&= \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi_1] \Big ]_{\epsilon=0} + \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi_2] \Big ]_{\epsilon=0} \\\
+&= \partial_f \mu |_{f_0} [\phi_1] + \partial_f \mu |_{f_0} [\phi_2] \end{split}. \]
+Furthermore we have for $\phi \in \F$ and $\lambda \in \R$, that
+\[ \partial_f \mu |_{f_0} [\lambda \phi] = \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \lambda \phi ] \Big ]_{\epsilon=0} = \lambda \cdot \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi ] \Big ]_{\epsilon=0} = \lambda \cdot \partial_f \mu |_{f_0} [\phi]. \]
+Using that $\D_x$ is the empirical distribution on a finite subset of $\R^{n_0}$, we have, that $\F / \sim$ is a finite-dimensional normed space. Thus there exists a basis ... and we conclude, that the operator $L$ is bounded. Using that, in combination with the linearity of $L$, we obtain that 
+\[ \big \| L(x+h) - L(x) \big \| = \big \| L(h) \big \| \leq M \big \| h \big \|. \]
+Taking the limit $h \to 0$ yields the continuity of $L$ at $x$. Thus $L$ is a bounded and continuous operator. This implies, that $\partial_f\mu |_{f_0}$ is indeed linear and continuous.
 \end{proof}
 
-\pagebreak
-$\b:$ bias vector \\
-$\w:$ weight vector \\
-- \\
-$a:$ element of $\A$ \\
-$b:$ batch size \\
-$d_{\F}$ pseudo metric on $\F$ \\
-$d_{\X}:$ metric on input space \\
-$d_{\Y}:$ metric on output space \\
-$f:$ real valued function \\
-$g:$ real valued function \\
-$h:$ real valued function \\
-$\tilde{f}:$ neural network architecture \\
-$i:$ several indices \\
-$k:$ iteration index \\
-$l:$ number of layers in neural network \\
-$\ell:$ loss function \\
-$m:$ real number / number of training samples \\
-$m_k:$ vector in Adam \\
-$n_0:$ input dimension of neural network \\
-$n_l:$ output dimension of neural network \\
-$n_x:$ input dimension of layer \\
-$n_y:$ output dimension of layer \\
-$n:$ number of parameters in neural network \\
-$s:$ real valued vector in BFGS \\
-$v_k:$ vector in Adam \\
-$w:$ parameter vector in neural network \\
-$x:$ real valued vector (input) \\
-$x':$ real valued vector (input) \\
-$y:$ real valued vector (output) \\
-$z_{\lambda}:$ real valued vector \\
-- \\
-$\alpha:$ step size \\
-$\beta_1:$ momentum factor \\
-$\beta_2:$ momentum factor \\
-$\epsilon:$ convergence criterium \\
-$\lambda:$ real valued scalar / regularization parameter \\
-$\nu:$ neuron \\
-$\mu:$ element of the dual space \\
-$\phi:$ direction in functional derivative \\
-$\psi:$ real valued helper function \\
-$\rho:$ real value in BFGS\\
-$\sigma:$ activation function \\
-- \\
-$C:$ cost functional \\
-$B:$ inverse hessian matrix approximation \\
-$E:$ empirical error \\
-$I_n:$ identity matrix \\
-$J:$ Riesz mapping \\
-$K:$ number of epochs / Kernel \\
-$L:$ lipschitz constant \\
-$M:$ real valued matrix \\
-$R:$ generalization error \\
-$V:$ matrix in BFGS \\
-$W:$ weight matrix in layer \\
-- \\
-$\A:$ subset of $\F$ \\
-$\F:$ function space \\
-$\F^*$ dual space \\
-$\F |_{\tilde{f}}:$ set of neural networks with given architecture \\
-$\D:$ probability distribution \\
-$\D_x:$ marginal probability distribution \\
-$\I:$ set of indices \\
-$\H:$ hilbert space \\
-$\X:$ input space \\
-$\Y:$ output space \\
-- \\
-$\E:$ expected value \\
-$\N:$ natural numbers \\
-$\R:$ real numbers \\
+Lemma \ref{lem:riesz} is a weakening of the Riesz representation theorem, stating that any Hilbert space $\H$ is isometric and isomorphic to its dual space $\H^*$ via the map $J:\H \to \H^* : x \mapsto \langle x , \cdot \rangle_\H$. However, since $\langle \cdot , \cdot \rangle_{\D_x}$ is only positive semidefinite and not positive definite we lose the property of $J$ being isometric and therefore injective. This is a severe problem for our approach of minimizing a functional via gradient descent, because the functional gradient is not uniquely determined. Namely there could exist several descent directions that could be chosen for the iterative updates, but we have no criterium to choose one of them. To clarify this, based on the definition of $\langle \cdot, \cdot \rangle_{\D_x}$, the functional gradient $\nabla \mu |_{f_0}: \R^{n_0} \to \R^{n_l}$ is only unique on the datapoints $x \sim \D_x$. However, since $\nabla \mu |_{f_0}$ is a function on $\R^{n_0}$, in the case where $\text{supp}(\D_x) \subsetneq \R^{n_0}$ there is no unique descent direction for points $x \in \R^{n_0}$ with $x \notin \text{supp}(\D_x)$. \\
 
-Check: Notation of functionals / dual elements \\
+Kernel gradient descent is an algorithm, that addresses this problem by minimizing the cost $C$ in a special subspace of $\F$, namely a reproducing kernel Hilbert space, in which the functional gradient is uniquely determined. This idea will be explained in detail in section \ref{sec:KGD}, but first we need some background knowledge on kernels and reproducing kernel Hilbert spaces.
 
-\pagebreak
-\subsection{Kernel Gradient Descent}
+\subsection{Reproducing Kernel Hilbert Space}
 
-Until now we have a theoretical understanding of functional gradient descent in the function space $\F$. However there is not yet a connection to gradient descent in the parameter space. In theory, functional gradient descent is an excellent tool to guarantee convergence but in practice we need the explicit parameter vector $w \in \R^n$ to represent the optimal function due to functional gradient descent. This relationship between functional gradient descent and parameter gradient descent can be established by so called kernel gradient descent. \\
-
-We start by recalling the basic definition of one-dimensional kernels.
+To explain the approach of minimizing the cost functional in a reproducing kernel Hilbert space, we start with the following results from \cite{NTK}.
 
 \begin{definition}
-A one-dimensional kernel over $\R^{n_0}$ is a map 
-\[ K: \R^{n_0} \times \R^{n_0} \to \R : (x,x') \mapsto K(x,x').\]
-A kernel $K$ is said to be positive definite symmetric if for any $m \in \N$ and $x_1, \dots, x_m \in \R^{n_0}$, the matrix with entries $M_{i,j} = K(x_i,x_j) \in \R^{m \times m}$ is symmetric and positive semidefinite.
-\end{definition}
-
-This thesis will work with kernels over the input space $\R^{n_0}$, not only with one-dimensional but with multi-dimensional kernels, which motivates the following definition.
-
-\begin{definition}
-A multi-dimensional kernel over $\R^{n_0}$ is a function
+A multi-dimensional kernel over $\R^{n_0}$ is a measurable map
 \[ K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l} : (x,x') \mapsto K(x,x'), \]
 such that $K(x,x') = K(x',x)\tr $ for any $x,x' \in \R^{n_0}$.
 \end{definition}
 
-Based on the marginal distribution $\D_x$, kernels induce symmetric bilinear forms.
+Further on, we will always work with multi-dimensional kernels $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ and for reasons of simplicity just call them kernels. At first we observe, that kernels induce symmetric bilinear forms based on the marginal distribution $\D_x$.
 
 \begin{lemma} \label{lem:form}
-A kernel $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ induces the symmetric bilinear form
+A kernel $K$ induces the symmetric bilinear form
 \[ \langle \cdot, \cdot \rangle_K : \F \times \F \to \R : (f,g) \mapsto \langle f , g \rangle _K \coloneq \E_{x,x' \sim \D_x} \Big [ f(x)\tr  K(x,x') g(x') \Big ], \]
 where $x, x' \in \R^{n_0}$ are drawn independently according to $\D_x$. 
 \end{lemma}
@@ -784,56 +683,113 @@ In contrast to $\langle \cdot , \cdot \rangle_{\D_x}$, the bilinear map $\langle
 then for $f \equiv (1, \dots, 1)^T$ it holds, that
 \[ \langle f , f \rangle_{K} = \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x,x')f(x') \Big ] = -n_l < 0. \]
 
-Using these bilinear forms, one can generalize the definition of positive definite kernels.
+To construct a Hilbert space, it will be necessary, that $\langle \cdot, \cdot \rangle_K$ is positive definite.
 
 \begin{definition} \label{def:definite}
-A kernel $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ is called positive definite with respect to the seminorm $\| \cdot \| _{\D_x}$ if for every $f \in \F$ it holds, that $\| f \|_{\D_x} > 0$ implies $\langle f, f \rangle_K > 0$.
+We say that a kernel $K$ is positive definite with respect to $\D_x$, if the corresponding bilinear form $\langle \cdot, \cdot \rangle_K$ is positive definite, that is for any $f \in \F$ we have
+\[ \langle f,f \rangle_K \geq 0 \quad \wedge \quad \langle f,f\rangle_K = 0 \Leftrightarrow f \equiv 0. \]
 \end{definition}
 
-We can use positive definite kernels to equip $\F$ with another seminorm.
+Note that, taking lemma \ref{lem:form} and definition \ref{def:definite} together, positive definite kernels induce an inner product $\langle \cdot, \cdot \rangle_K$. According to Aronszajn in \cite{RKHS} we denote the following theorem.
 
-\begin{lemma}
-Given a kernel $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$, that is positive definite with respect to the seminorm $\| \cdot \|_{\D_x}$ we can use the bilinear form $\langle \cdot, \cdot \rangle_K$ to define another seminorm
-\[ \| \cdot \|_K: \F \to \R : f \mapsto \sqrt{\langle f, f \rangle_K}.  \]
+%To simplify the following notation we introduce for $m \in \N$ the symbol
+%\[ \N_m \coloneq \{ n \in \N \mid n \leq m \}. \]
+
+\begin{theorem}  \label{thm:aronszajn}
+Let $K$ be a kernel that is positive definite with respect to $\D_x$ and define
+\[ \H_0 \coloneq \text{span} \Big \{ K_xy : \R^{n_0} \to \R^{n_l} : z \mapsto K(z,x)y \mid x \in \R^{n_0}, y \in \R^{n_l} \Big \}, \]
+then the closure $\H_K \coloneq \overline{H_0}$ is a Hilbert space with inner product $\langle \cdot, \cdot \rangle_{K}$.
+\end{theorem}
+
+\begin{proof}
+This is due to..
+\end{proof}
+
+This is almost the definition of a reproducing kernel Hilbert space. The following idea is from \cite{Reproducing}.
+
+\begin{lemma} \label{lem:RKHS}
+Let $K$ be a kernel that is positive definite with respect to $\D_x$. In the case where $\D_x > 0$ for every $x \in \R^{n_0}$ we can use the notation 
+\[ f = \sum_{i} K_{x_i}y_i \quad \text{and} \quad g = \sum_{i} K_{\hat{x}_i}\hat{y}_i \]
+for $f,g \in \H_K$ and define an inner product on $\H_k$ as
+\[ \langle \cdot, \cdot \rangle_{\H_K} : \H_K \times \H_K \to \R : (f,g) \mapsto \sum_{i,j} y_i \tr K(x_i, \hat{x}_j) \hat{y}_j. \]
+We call $ \big (\H_K, \langle \cdot, \cdot \rangle_{\H_K} \big )$ the vector-valued reproducing kernel Hilbert space associated with $K$.
 \end{lemma}
 
 \begin{proof}
-Since $\langle \cdot, \cdot \rangle_K$ is symmetric by lemma \ref{lem:form} it remains to show that $\langle \cdot, \cdot \rangle_K$ is positive semidefinite. For this we let $f \in \F$ be arbitrary and investigate the following cases. \\
-
-Case $\| f \|_{\D_x} > 0$: By definition \ref{def:definite} it holds, that $\langle f, f \rangle_K > 0$. \\
-
-Case $\| f \|_{\D_x} = 0$: By definition of $\langle \cdot , \cdot \rangle_{\D_x}$, we observe that
-\[ \big \| f \big \|_{\D_x}^2 = \langle f , f \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)\tr f(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{n_l} f_i(x)^2 \Big ] = 0. \]
-Thus for every $x \sim \D_x$ it holds that $f(x) = 0$. Therefore we conclude
-\[ \langle f , f \rangle_{K} = \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x,x')f(x') \Big ] = 0. \]
-In total we have shown that $\langle f, f \rangle_K \geq 0$ for every $f \in \F$, such that $\| \cdot \|_K$ is a seminorm.
+We need to show that $\langle \cdot, \cdot \rangle_{\H_K}$ is an inner product on $\H_K$.
 \end{proof}
 
-This concludes the necessary knowledge on kernels. Next we will introduce the kernel gradient of a functional, which is based on the partial application of kernels.
+The naming arises from the fact, that the following reproducing property holds.
+
+\begin{corollary}
+For any $f \in \H_K$ the reproducing property holds, that is
+\[ \forall x \in \R^{n_0}, y \in \R^{n_l} : \langle f(x), y \rangle = \langle f, K_xy \rangle_{\H_K}. \]
+\end{corollary}
+
+\begin{proof}
+Let $f = \sum_{i}K_{x_i}y_i \in \H_K$ and $x \in \R^{n_0}, y \in \R^{n_l}$ be arbitrary. We observe that
+\[ \langle f(x), y \rangle = \sum_{i} \big ( K(x,x_i)y_i \big ) \tr y = \sum_{i,j} y_i \tr K(x_i,x)y = \langle f, K_xy \rangle_{\H_K}. \qedhere \]
+\end{proof}
+
+In our setting the requirement $\D_x > 0$ for every $x \in \R^{n_0}$ may not be given. For example consider the case of a discrete distribution. Then, by the proof of lemma \ref{lem:RKHS}, we observe that the bilinear form $\langle \cdot, \cdot \rangle_{\H_K}$ is not necessarily positive definite, such that $\big ( \H_K, \langle \cdot, \cdot \rangle_{\H_K} \big )$ is no longer a Hilbert space. However, when restricting $\H_K$ to functions in terms of data points with a positive probability measure, $\langle \cdot, \cdot \rangle_{\H_K}$ is still positive definite. Since these are exactly the functions of our interest, we can still think of $\H_K$ as a vector-valued reproducing kernel Hilbert space, although the requirement $\D_x > 0$ for every $x \in \R^{n_0}$ may not be given.
+
+\subsection{Kernel Gradient Descent} \label{sec:KGD}
+
+This subsection is dedicated to minimizing a cost functional $C: \F \to \R$ via kernel gradient descent, a generalization of gradient descent from the parameter space $\R^n$ to the function space $\F$. As explained in the previous section, we have the problem, that the functional gradients are not unique in contrast to the parameter gradients. The idea of kernel gradient descent consist of minimizing the cost $C$ in a special subspace of $\F$, namely a reproducing kernel Hilbert space, in which the functional gradient is uniquely determined. The results of this subsection are taken from \cite{NTK}.
 
 \begin{definition}
 Let $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ be a kernel. For $i=1, \dots, n_l$ one defines the partial application of $K$ as the function
-\[ K_{\cdot,i} : \R^{n_0} \times \R^{n_0} \to \R^{n_l} : (x,x') \mapsto K(x,x')_{\cdot,i}, \]
+\[ K_i : \R^{n_0} \times \R^{n_0} \to \R^{n_l} : (x,x') \mapsto K(x,x')_{\cdot,i}, \]
 where $K(x,x')_{\cdot,i}$ denotes the $i$-th column of the $n_l \times n_l$ matrix $K(x,x')$.
 \end{definition}
 
-Fixing one argument of $K_{\cdot,i}$ results in a function in $\F$. This enables the following definition.
+Fixing one argument of $K_i$ results in a function in $\F$. This enables the following definition.
 
-\begin{definition}
+\begin{definition} \label{def:phi}
 Given a kernel $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$, we define the map
 \[ \Phi_K : \F^* \to \F : \mu \mapsto f_{\mu}, \]
 mapping a dual element $\mu \in \F^*$ to the function
-\[ f_{\mu} : \R^{n_0} \to \R^{n_l} : x \mapsto \Big ( \mu \big [ K_{\cdot,1}(\cdot,x) \big ], \dots, \mu \big [ K_{\cdot,n_l}(\cdot,x) \big ] \Big ) \tr. \]
+\[ f_{\mu} : \R^{n_0} \to \R^{n_l} : x \mapsto  \begin{bmatrix} \mu \big [K_1(\cdot,x) \big ] \\ \vdots \\ \mu \big [ K_{n_l}(\cdot,x) \big ] \end{bmatrix}. \]
 \end{definition}
 
 Based on the definition of $\Phi_K$ we can define the kernel gradient of a functional.
 
 \begin{definition}
-Let $f_0 \in \F$, $\mu : \F \to \R$ be a differentiable functional with $\partial_f\mu|_{f_0} \in \F^*$ and $K$ be a kernel. The kernel gradient of $\mu$ at $f_0$ with respect to $K$ is defined as
+Let $f_0 \in \F$, $\mu : \F \to \R$ be a differentiable functional and $K$ be a kernel. The kernel gradient of $\mu$ at $f_0$ with respect to $K$ is defined as
 \[ \nabla_K\mu|_{f_0}: \R^{n_0} \to \R^{n_l} : x \mapsto \Phi_K \Big ( \partial_f\mu|_{f_0} \Big )(x). \]
 \end{definition}
 
-Using this definition, we can formulate the kernel gradient descent method.
+Note that the kernel gradient is well-defined based on the restriction, that $\D_x$ is given by the empirical distribution on a finite dataset. This was proven in lemma \cite{lem:funcDerivative}, which states, that  $\partial_f \mu |_{f_0} \in \F^*$ for every $f_0 \in \F$. By Lemma \ref{lem:riesz} there exists a representer $d|_{f_0} \in \F$, such that the functional derivative of $C$ can be written as
+\[ \partial_{f} C |_{f_0} = \big \langle d|_{f_0}, \cdot \big \rangle_{\D_x}. \]
+
+Based on this observation, we can interpret the kernel gradient of $C$ with respect to a positive definite kernel $K$ as an element of the vector-valued reproducing kernel Hilbert space $\H_K$. To clarify this, we denote the following result.
+
+\begin{lemma} \label{lem:phi}
+Let $\mu = \langle d, \cdot \rangle_{\D_x} \in \F^*$ and $K$ be a kernel, then
+\[ \Phi_K(\mu) = \frac{1}{m}\sum_{i=1}^{m} K(\cdot,x_i)d(x_i), \]
+where $x_1, \dots, x_m \in \R^{n_0}$ denotes the finite support of the empiricial distribution $\D_x$.
+\end{lemma}
+
+\begin{proof}
+Let $x \in \R^{n_0}$ be arbitrary. By the definition of $\Phi_K$ we have
+\[ \Phi_K \big ( \mu \big )(x) = \Phi_K \Big ( \langle d, \cdot \rangle_{\D_x} \Big )(x) = \begin{bmatrix} \mu \big [K_1(\cdot,x) \big ] \\ \vdots \\ \mu \big [ K_{n_l}(\cdot,x) \big ] \end{bmatrix} = \begin{bmatrix} \big \langle d, K_1(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{n_l}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix}. \]
+Recalling the definition of $\langle \cdot , \cdot \rangle_{\D_x}$, it holds that
+\[ \big \langle d, K_i(\cdot,x) \big \rangle_{\D_x} = \E_{x' \sim \D_x} \Big [ d(x')\tr K_i(x',x) \Big ] \]
+for $i = 1, \dots, n_l$. Thus we derive
+\[ \Phi_K \big ( \mu \big )(x) = \begin{bmatrix} \big \langle d, K_1(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{n_l}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix} = \E_{x' \sim \D_x} \begin{bmatrix} d(x')\tr K_{1}(x',x) \\ \vdots \\ d(x')\tr K_{n_l}(x',x) \end{bmatrix} = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x',x) \Big ]\tr . \]
+With $K(x',x)\tr  = K(x,x')$ for every $x,x' \in \R^{n_0}$ by definition, we conclude
+\[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x',x) \Big ]\tr  = \E_{x' \sim \D_x} \Big [ K(x',x)\tr d(x') \Big ] = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ]. \]
+The last step consists of using the assumption, that $\D_x$ is the empirical distribution on a finite dataset $x_1, \dots, x_m \in \R^{n_0}$. This enables us to derive
+\[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ] = \frac{1}{m}\sum_{i=1}^{m} K(x,x_i)d(x_i), \]
+which proves the statement of the lemma.
+\end{proof}
+
+Hence in the case where the kernel $K$ is positive definite, $\Phi_K$ from definition \ref{def:phi} maps a dual element $\mu \in \F^*$ to the vector-valued reproducing kernel Hilbert space $\H_K$, namely
+\[ \Phi_K: \F^* \to \H_K : \mu \mapsto \frac{1}{m} \sum_{i=1}^{m} K_{x_i}y_i, \]
+where $y_i \coloneq d(x_i)$. For the kernel gradient of $C$ at $f_0$ this translates to
+\[ \nabla_KC|_{f_0}(x) = \Phi_K \Big ( \big \langle d|_{f_0} , \cdot \big \rangle_{\D_x} \Big )(x) = \frac{1}{m} \sum_{i=1}^{m} K(x,x_i)d|_{f_0}(x_i). \]
+
+Thus, in contrast to the functional gradient, the kernel gradient generalizes to values outside the dataset thanks to the kernel $K$. Based on the definition of kernel gradient, we can finally introduce the kernel gradient descent algorithm.
 
 \begin{algorithm}
 \caption{Kernel Gradient Descent} \ \\
@@ -845,57 +801,27 @@ Using this definition, we can formulate the kernel gradient descent method.
 \textcolor{white}{$\Big |$}6: \textbf{end while}
 \end {algorithm}
 
-In the following, we will apply kernel gradient descent to minimize the cost $C$. During this we are especially interested in the evolution of the parameters defining the sequence $(f_k)_{k \in \N_0}$. \\
+The kernel gradient enables us to establish a relationship between training in the function space and training in the parameter space. Before we explain this in detail, we prove that kernel gradient descent actually minimizes the cost $C$, although our descent direction is taken from a subspace $\H_K \subset \F$.
 
-With the choice of a differentiable loss function, the cost functional $C : \F \to \R$ is differentiable as well, such that the functional derivative $\partial_{f} C |_{f_0}$ is well-defined for every $f_0 \in \F$. \\
-
-In the following we will make the restriction, that the marginal distribution $\D_x$ on the input space $\R^d$ is given by the empirical distribution on a finite subset of $\R^d$. This means there exist $m \in \N$ and $x_1, \dots, x_m \in \R^d$ such that 
-\[ \D_x = \frac{1}{m} \sum_{i=1}^{m} \delta_{x_i}, \]
-where $\delta_{x_i}$ denotes the Dirac measure in $x_i$ for $i=1,\dots,m$. Under this assumption, the cost $C$ depends only on the values of $f$ at a finite dataset. Thus we conclude, that $\partial_{f} C |_{f_0}$ is linear and continuous and therefore $\partial_{f} C |_{f_0} \in \F^*$ for every $f_0 \in \F$. Hence by Lemma \ref{lem:riesz} there exists a representer $d|_{f_0} \in \F$, such that the functional derivative of $C$ can be written as
-\[ \partial_{f} C |_{f_0} = \big \langle d|_{f_0}, \cdot \big \rangle_{\D_x}. \]
-
-Next we will use this restriction on the distribution $\D_x$, to simplify the notation of $\Phi_K$.
-
-\begin{lemma} \label{lem:phi}
-Let $\mu = \langle d, \cdot \rangle_{\D_x} \in \F^*$ and $K: \R^d \times \R^d \to \R^{p \times p}$ be a kernel, then
-\[ \Phi_K(\mu) = \frac{1}{m}\sum_{i=1}^{m} K(\cdot,x_i)d(x_i), \]
-where $x_1, \dots, x_m \in \R^d$ denotes the finite support of the empiricial distribution $\D_x$.
-\end{lemma}
-
-\begin{proof}
-Let $x \in \R^d$ be arbitrary. By the definition of $\Phi_K$ we have
-\[ \Phi_K \big ( \mu \big )(x) = \Phi_K \Big ( \langle d, \cdot \rangle_{\D_x} \Big )(x) = \begin{bmatrix} \mu [K_{\cdot,1}(\cdot,x) ] \\ \vdots \\ \mu [ K_{\cdot,p}(\cdot,x)] \end{bmatrix} = \begin{bmatrix} \big \langle d, K_{\cdot,1}(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{\cdot,p}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix}. \]
-Recalling the definition of $\langle \cdot , \cdot \rangle_{\D_x}$, it holds that
-\[ \big \langle d, K_{\cdot,j}(\cdot,x) \big \rangle_{\D_x} = \E_{x' \sim \D_x} \Big [ d(x')\tr K_{\cdot,j}(x',x) \Big ] \]
-for $j = 1, \dots, p$. Thus we derive
-\[ \Phi_K \big ( \mu \big )(x) = \begin{bmatrix} \big \langle d, K_{\cdot,1}(\cdot,x) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{\cdot,p}(\cdot,x) \big \rangle_{\D_x} \end{bmatrix} = \E_{x' \sim \D_x} \begin{bmatrix} d(x')\tr K_{\cdot,1}(x',x) \\ \vdots \\ d(x')\tr K_{\cdot,p}(x',x) \end{bmatrix} = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x',x) \Big ]\tr . \]
-With $K(x',x)\tr  = K(x,x')$ for every $x,x' \in \R^d$ by definition, we conclude
-\[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x',x) \Big ]\tr  = \E_{x' \sim \D_x} \Big [ K(x',x)\tr d(x') \Big ] = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ]. \]
-The last step consists of using the assumption, that $\D_x$ is the empirical distribution on a finite dataset $x_1, \dots, x_m \in \R^d$. This enables us to derive
-\[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ] = \frac{1}{m}\sum_{i=1}^{m} K(x,x_i)d(x_i). \]
-This proves the statement of the lemma.
-\end{proof}
-
-By lemma \ref{lem:phi} we can write the kernel gradient of $C$ at $f_0$ with respect to some kernel $K$ as
-\[ \nabla_KC|_{f_0}(x) = \Phi_K \Big ( \big \langle d|_{f_0} , \cdot \big \rangle_{\D_x} \Big )(x) = \frac{1}{m} \sum_{i=1}^{m} K(x,x_i)d|_{f_0}(x_i). \]
-
-Due to the definition of the kernel, $\nabla_KC|_{f_0}$ has the advantage of being well-defined on the whole input space $\R^d$, where as the partial derivative $\partial_fC|_{f_0} =\langle d|_{f_0}, \cdot \rangle_{\D_x}$ is based on the bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$ and therefore only defined on the finite dataset.
+%Due to the definition of the kernel, $\nabla_KC|_{f_0}$ has the advantage of being well-defined on the whole input space $\R^d$, where as the partial derivative $\partial_fC|_{f_0} =\langle d|_{f_0}, \cdot \rangle_{\D_x}$ is based on the bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$ and therefore only defined on the finite dataset.
 
 \begin{definition}
-Let $K$ be a kernel. A time dependent function $f : \R \to \F$ is said to follow the kernel gradient descent on $C$ with respect to K if it satisfies the differential equation
+Let $K$ be a kernel. A time dependent function 
+\[ f : [0, \infty) \to \F : t \mapsto f(t) \]
+is said to follow the kernel gradient descent on $C$ with respect to K if it satisfies
 \[ \partial_tf(t) = - \nabla_KC|_{f(t)}. \]
 \end{definition}
 
-We can think of such a function as a continuous extension to the sequence produced by kernel gradient descent on $C$, which can be used to investigate the change in $C$.
+Roughly speaking we can think of such a function as the continuous extension to the sequence produced by kernel gradient descent on $C$, when using an infinitely small step size. Based on this we can denote the following result, to prove  convergence of kernel gradient descent.
 
 \begin{lemma}
-Let $K$ be a positive definite kernel with respect to $\| \cdot \|_{\D_x}$ and $f: \R \to \F$ be a time dependent function, that follows the kernel gradient descent on $C$ with respect to $K$, then the evolution of $C \circ f$ during kernel gradient descent is expressed by
+Let $K$ be a positive definite kernel with respect to $\D_x$ and $f: [0, \infty) \to \F$ be a time dependent function, that follows the kernel gradient descent on $C$ with respect to $K$, then the evolution of $C \circ f$ during kernel gradient descent is expressed by
 \[ \partial_tC|_{f(t)} = - \big \| d|_{f(t)} \big \|_{K}^2, \]
 where $d|_{f(t)} \in \F$ denotes the representer of $\partial_f C|_{f(t)} = \big \langle d|_{f(t)}, \cdot \big \rangle_{\D_x} \in \F^*$ for $t \in \R$.
 \end{lemma}
 
 \begin{proof}
-Using the notation $C|_{f(t)} = C \big [f(t) \big ]$, we derive
+Using the notation $C|_{f(t)} = C [f(t)]$, we derive
 \[ \partial_tC|_{f(t)} = \partial_f C|_{f(t)} \big [ \partial_t f(t) \big ] = \big \langle d|_{f(t)}, \cdot \big \rangle_{\D_x} \big [ \partial_t f(t) \big ] = \big \langle d|_{f(t)}, \partial_t f(t) \big \rangle_{\D_x}. \]
 Since $f$ follows the kernel gradient descent on $C$ with respect to $K$ this can be rewritten as
 \[ \partial_tC|_{f(t)} = \big \langle d|_{f(t)}, \partial_t f(t) \big \rangle_{\D_x} = \big \langle d|_{f(t)}, - \nabla_K C|_{f(t)} \big \rangle_{\D_x}. \]
@@ -1075,37 +1001,108 @@ Theorem 2.1 from \cite{Linear}
 \end{proof}
 
 \pagebreak
-\textbf{To Do} \\
-Lemma 3.5: check pseudometric properties \\
-Lemma 3.5: confirm completeness argument \\
-Lemma 3.8: explain why we need this lemma \\
+\textbf{To Do Section 3.1} \\
+TBD \\
 
-\textbf{TO DO - Section 3.2} \\
-\textbf{LEONARDO:} Why is $\partial_{f} C |_{f_0}$ linear and continuous? \\
-\textbf{LEONARDO:} Why does the first equality in proof of lemma 3.20 holds? \\
+\textbf{To Do Section 3.2} \\
+TBD \\
 
-\textbf{TO DO - Section 3.3} \\
-\textbf{LEONARDO:} Why does the first equality in proof of lemma 3.24 holds? \\
-\textbf{LEONARDO:} Is the equivalence between the gradient methods clear? \\
+\textbf{To Do Section 3.3} \\
+TBD \\
 
-\textbf{TO DO} \\
-References (E-Mail + 3.7 wikipedia references) \\
-Notation (double variables) \\
-Notation 3.7: d instead of $\mu$ \\
+\textbf{To Do - Section 3.4} \\
+Norm in kernel gradient descent \\
+Why is $\partial_{f} C |_{f_0}$ linear and continuous? \\
+Why does the first equality in proof of lemma 3.21 holds? \\
 
-\textbf{TO DO MORE DETAILED} \\
-Completeness argument \\
+\textbf{To Do - Section 3.5} \\
+Why does the first equality in proof of lemma 3.25 holds? \\
+Explain equivalence between the gradient methods. \\
+
+\textbf{To Do more detailed} \\
 Critical point of functionals \\
 Convergence of kernel gradient descent \\
-More general words on why we need theorems and definitions \\
+Feedback Leonardo \\
 
-\textbf{TO DO POTENTIALLY} \\
-Proofs 3.29 - 3.31 \\
+\textbf{To Do potentially} \\
 Backpropagation \\
-Convergence of functional gradient descent \\
 
-\textbf{TIPS} \\
-libgen.rs for sources \\
+\pagebreak
+
+\pagebreak
+$\b:$ bias vector \\
+$\w:$ weight vector \\
+- \\
+$a:$ element of $\A$ \\
+$b:$ batch size \\
+$d_{\F}$ pseudo metric on $\F$ \\
+$d_{\X}:$ metric on input space \\
+$d_{\Y}:$ metric on output space \\
+$f:$ real valued function \\
+$g:$ real valued function \\
+$h:$ real valued function \\
+$\tilde{f}:$ neural network architecture \\
+$i:$ several indices \\
+$k:$ iteration index \\
+$l:$ number of layers in neural network \\
+$\ell:$ loss function \\
+$m:$ real number / number of training samples \\
+$m_k:$ vector in Adam \\
+$n_0:$ input dimension of neural network \\
+$n_l:$ output dimension of neural network \\
+$n_x:$ input dimension of layer \\
+$n_y:$ output dimension of layer \\
+$n:$ number of parameters in neural network \\
+$s:$ real valued vector in BFGS \\
+$v_k:$ vector in Adam \\
+$w:$ parameter vector in neural network \\
+$x:$ real valued vector (input) \\
+$x':$ real valued vector (input) \\
+$y:$ real valued vector (output) \\
+$z:$ real valued vector(input) \\
+$z_{\lambda}:$ real valued vector \\
+- \\
+$\alpha:$ step size \\
+$\beta_1:$ momentum factor \\
+$\beta_2:$ momentum factor \\
+$\epsilon:$ convergence criterium \\
+$\lambda:$ real valued scalar / regularization parameter \\
+$\nu:$ neuron \\
+$\mu:$ element of the dual space \\
+$\phi:$ direction in functional derivative \\
+$\psi:$ real valued helper function \\
+$\rho:$ real value in BFGS\\
+$\sigma:$ activation function \\
+- \\
+$C:$ cost functional \\
+$B:$ inverse hessian matrix approximation \\
+$E:$ empirical error \\
+$I_n:$ identity matrix \\
+$J:$ Riesz mapping \\
+$K:$ number of epochs / Kernel \\
+$L:$ lipschitz constant \\
+$M:$ real valued matrix \\
+$R:$ generalization error \\
+$V:$ matrix in BFGS \\
+$W:$ weight matrix in layer \\
+- \\
+$\A:$ subset of $\F$ \\
+$\F:$ function space \\
+$\F^*$ dual space \\
+$\F |_{\tilde{f}}:$ set of neural networks with given architecture \\
+$\D:$ probability distribution \\
+$\D_x:$ marginal probability distribution \\
+$\I:$ set of indices \\
+$\H:$ hilbert space \\
+$\X:$ input space \\
+$\Y:$ output space \\
+$\Phi_K:$ mapping to Hilbert space \\ 
+- \\
+$\E:$ expected value \\
+$\N:$ natural numbers \\
+$\R:$ real numbers \\
+
+Check: Notation of functionals / dual elements \\
 
 \pagebreak
 \section{Training in Low-Dimensional Subspaces}
@@ -1407,6 +1404,244 @@ For complexity ...
 In conclusion...
 
 \pagebreak
+\section{Training in the Function Space} \label{sec:kernel}
+
+The goal of this section is to introduce and investigate the neural tangent kernel, which was analyzed by Arthur Jacot, Franck Gabriel and Cl\'{e}ment Holger in \cite{NTK}. We start by motivating and giving the definition of functional derivatives and functional gradient descent. Then, the repetition of some background knowledge on dual spaces and reproducing kernel Hilbert spaces, enables us to introduce the kernel gradient descent algorithm. Having this concept in mind, we prove that training in the parameter space is linked to kernel gradient descent in the function space with respect to a special kernel, the neural tangent kernel.
+
+\subsection{Functional Gradient Descent}
+
+As seen in section \ref{sec:Training}, the training of neural networks via parameter optimization is usually accomplished by minimizing the empirical error
+\[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2 \]
+on labeled training data $\{ (x_i,y_i) \}_{i=1}^m \subset \R^{n_0} \times \R^{n_l}$. Due to the non-convexity of the error function $E$, it is in general hard to find a global minimum. However, for theoretical analysis, this problem can be prevented by moving from the parameter space $\R^n$ to the function space
+\[ \F \coloneq \Big \{ f: \R^{n_0} \to \R^{n_l} \Big \}. \]
+That is we are no longer optimizing the specific parameters of the unknown target function but rather the function itself. This approach requires the definition of a cost functional
+\[ C: \F \to \R_+ : f \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i),y_i \big), \]
+associating some cost to each element of the function space $\F$. The interpretation of $\ell$ as a convex function in $f$ provides a convex cost $C$, since by lemma \ref{lem:convexity} the sum of convex functions is convex again. This is a huge advantage in comparison to the parameter optimization approach, where the convexity does not translates to $E$ due to the composition of $\ell$ with $f$. \\
+
+We will introduce the functional gradient descent method, that enables us to minimize $C$ in the function space $\F$ and is an analog to the gradient descent method in the parameter space $\R^n$. Since $C$ is convex in the function space, convergence to a global minimum will be guaranteed in contrast to the non-convex parameter optimization problem. \\
+
+Note that this approach is great for theoretical analysis due to the advantage of convexity. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. Nevertheless we can use the analysis of functional gradient descent to get a better understanding of gradient descent in the parameter space. \\
+
+To start things off, we need the definition of functionals, mapping each element of the function space $\F$ to a real value. The cost $C$ is an example of such a functional.
+
+\begin{definition}
+A functional on the vector space $\F$ is defined as a mapping
+\[ \mu: \F \to \R : f \mapsto \mu[f]. \]
+\end{definition}
+
+To minimize functionals via the same approach in gradient descent, we need to translate the well known concepts of differentiability and gradients from the parameter space $\R^n$ to the function space $\F$. The following definition can be found in Appendix A of \cite{Functionals}.
+
+\begin{definition} \label{def:derivative}
+Let $\phi, f_0 \in \F$. A functional $\mu: \F \to \R$ is said to be differentiable at the point $f_0$ in direction $\phi$, if
+\[ \int \frac{\partial\mu}{\partial f_0(x)}(x)\phi(x) \ dx = \lim_{\epsilon \to 0} \frac{\mu[f_0 + \epsilon \phi] - \mu[f_0]}{\epsilon} \]
+exists. The functional gradient of $\mu$ at $f_0$ is defined as 
+\[ \nabla \mu |_{f_0} : \R^{n_0} \to \R^{n_l} : x \mapsto \frac{\partial \mu}{\partial f_0(x)}(x). \]
+If the limit exists for every $\phi \in \F$ we define the functional derivative of $\mu$ at $f_0$ as
+\[ \partial_{f} \mu |_{f_0} : \F \to \R : \phi \mapsto \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi] \Big ]_{\epsilon=0}. \]
+\end{definition}
+
+Based on these definitions, we can iteratively minimize functionals in a similar manner to the gradient descent method. Formally this is achieved as follows.
+
+\begin{algorithm}
+\caption{Functional Gradient Descent} \ \\
+\textcolor{white}{$\Big |$}1: Requires differentiable $\mu: \F \to \R$, random $f_0 \in \F$ and $\epsilon \geq 0$. \\
+\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
+\textcolor{white}{$\Big |$}3: \textbf{while} $\big \| \nabla \mu |_{f_k} \big \|_{\F} > \epsilon$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}4: \quad Choose a step size $\alpha_k > 0$. \\
+\textcolor{white}{$\Big |$}5: \quad Set $f_{k+1} \leftarrow f_k - \alpha_k \cdot \nabla \mu |_{f_k}$ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}6: \textbf{end while}
+\end {algorithm}
+
+With a slight change in notation, the same argumentation that was used for convergence of gradient descent on functions, can be applied to the functional gradient descent algorithm. \\
+
+\textbf{Optional:} Proofs for convergence of functional gradient descent. \\
+
+Thus, the choice of a convex loss $\ell$, which yields a convex cost functional $C$, enables us to guarantee convergence of functional gradient descent to a global minimum. As said before, this is great for theoretical considerations. In practice however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. In general, one can parametrize any function in a number of ways, such that each parametrization gives rise to different parameter updates in gradient descent. That is why there is no direct connection between functional gradient descent and gradient descent in the parameter space. \\
+
+To still derive conclusions for the parameter training based on the properties of training in the function space, we need to establish a relationship between the two minimization approaches. It turns out, that this can be achieved by minimizing $C$ in a special subspace of $\F$, namely a reproducing kernel Hilbert space. This modified version of functional gradient descent is called kernel gradient descent and will be studied in section \ref{sec:KGD} in detail. But first we need some background knowledge from functional analysis.
+
+\pagebreak
+\subsection{The Dual Space}
+
+In the following the focus is on functionals that are linear and continuous. We will see, that these kind of functionals can be represented by elements of the function space $\F$, which is a crucial ingredient for the further theory. More precisely, we will construct a surjective mapping from $\F$ to the set of linear and continuous functionals on $\F$, the dual space.
+
+\begin{definition}
+Given a real vector space $\F$, we define the dual space
+\[ \F^* \coloneq \Big \{ \mu : \F \to \R \mid \mu \text{ linear and continuous} \Big \}. \]
+\end{definition}
+
+At this point it is unclear how all of the elements in $\F^*$ arise. As mentioned, they can be constructed by elements of the function space $\F$, for which we need to equip  $\F$ with a seminorm. This procedure is based on the following result from \cite{NTK}.
+
+\begin{lemma}
+Given a fixed probability distribution $\D_x$ on the input space $\R^{n_0}$, one can equip the function space $\F$ with the seminorm
+\[ \| \cdot \|_{\D_x} : \F \to \R : f \mapsto \sqrt{\langle f , f \rangle_{\D_x}} \] 
+in terms of the symmetric positive semidefinite bilinear form
+\[ \langle \cdot,\cdot \rangle_{\D_x} : \F \times \F \to \R : (f,g) \mapsto \langle f,g \rangle_{\D_x} \coloneq \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ].\]
+\end{lemma}
+
+\begin{proof}
+Let $f_1, f_2, f, g \in \F$ and $\lambda \in \R$. $\langle \cdot,\cdot \rangle_{\D_x}$ is indeed symmetric and bilinear since it suffices \\
+
+(i) $\langle f_1 + f_2 , g \rangle_{\D_x} = \langle f_1 , g \rangle_{\D_x} + \langle f_2 , g \rangle_{\D_x}$:
+\[ \begin{split}
+\langle f_1 + f_2 , g \rangle_{\D_x}
+&= \E_{x \sim \D_x} \Big [ \big ( f_1(x) + f_2(x) \big )\tr g(x) \Big ] \\\
+&= \E_{x \sim \D_x} \Big [ f_1(x)\tr g(x) + f_2(x)\tr g(x) \Big ] \\\
+&= \E_{x \sim \D_x} \Big [ f_1(x)\tr g(x) \Big ] + \E_{x \sim \D_x} \Big [ f_2(x)\tr g(x) \Big ] \\\
+&= \langle f_1 , g \rangle_{\D_x} + \langle f_2 , g \rangle_{\D_x},
+\end{split} \]
+
+(ii) $\langle \lambda f , g \rangle_{\D_x} = \lambda \langle f, g \rangle_{\D_x}$:
+\[ \langle \lambda f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ \lambda f(x)\tr g(x) \Big ] = \lambda \cdot \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ] = \lambda \langle f, g \rangle_{\D_x}, \]
+
+(iii) $\langle f , g \rangle_{\D_x} = \langle g , f \rangle_{\D_x}$:
+\[ \langle f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ] = \E_{x \sim \D_x} \Big [ g(x)\tr f(x) \Big ] = \langle g , f \rangle_{\D_x}. \]
+
+Furthermore $\langle \cdot,\cdot \rangle_{\D_x}$ is positive semidefinite, since for any $f \in \F$ it holds, that
+\[ \langle f , f \rangle_{\D_x} =  \E_{x \sim \D_x} \Big [ f(x)\tr f(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{n_l} f_i(x)^2 \Big ] \geq 0. \]
+
+Thus $\| \cdot \|_{\D_x} = \sqrt{\langle \cdot , \cdot \rangle_{\D_x}}$ is a seminorm on the function space $\F$.
+\end{proof}
+
+Just as norms induce metrics, seminorms induce pseudometrics, so that we can define a distance between two elements of $\F$ in terms of the bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$.
+
+\begin{lemma}
+The seminorm $\| \cdot \|_{\D_x}$ induces the pseudometric
+\[ d_{\F}: \F \times \F \to \R_+ : (f,g) \mapsto \big \| f-g \big \|_{\D_x}, \]
+such that $(\F,d_{\F})$ is a complete pseudometric space.
+\end{lemma}
+
+\begin{proof}
+Let $f,g,h \in \F$. $d_{\F}$ is indeed a pseudometric since it suffices \\
+
+(i) $d_{\F}(f,f) = 0$:
+\[ d_{\F}(f,f) = \big \| f - f \big \|_{\D_x} = 0, \]
+
+(ii) $d_{\F}(f,g) = d_{\F}(g,f)$:
+\[ d_{\F}(f,g) = \big \| f - g \big \|_{\D_x} = \big \| g - f \big \|_{\D_x} = d_{\F}(g,f), \]
+
+(iii) $d_{\F}(f,h) \le d_{\F}(f,g) + d_{\F}(g,h)$:
+\[ \begin{split} 
+d_{\F}(f,h) &= \big \| f - h \big \|_{\D_x} \\\ &= \big \| f - g + g - h \big \|_{\D_x} \\\ &\le \big \| f - g  \big \|_{\D_x} + \big \| g - h \big \|_{\D_x} = d_{\F}(f,g) + d_{\F}(g,h). 
+\end{split} \]
+
+The upper equations follow directly from the properties of the seminorm $\| \cdot \|_{\D_x}$. \\
+
+It remains to show the completeness of $\F$, which arises from the fact, that every Cauchy sequence in $\R$ converges. To clarify this, we let $(f_n)_{n=1}^\infty$ denote a Cauchy sequence in $\F$, so
+\begin{equation} \tag{$\ast$} \forall \epsilon > 0 : \exists N \in \N : \forall m,n > N : d_{\F}(f_n, f_m)^2 < \epsilon. \end{equation}
+Recalling the definition of $\| \cdot \|_{\D_x}$, we have
+\[ d_{\F}(f_n ,f_m)^2 = \big \| f_n - f_m \big \|_{\D_x}^2 = \E_{x \sim \D_x} \Big [ ( f_n - f_m )(x) \tr ( f_n - f_m )(x) \Big ]. \]
+Using this and the notation $(\hat{f}_n)_i \coloneq \E_{x \sim \D_x} \big [ ( f_n)_i(x) \big ]$, the inequality in $(\ast)$ translates to
+\[ d_{\F}(f_n ,f_m)^2 = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{n_l} (f_n - f_m)_i(x)^2 \Big ] = \Big [ \sum_{i=1}^{n_l} \big ( ( \hat{f}_n)_i - (\hat{f}_m)_i \big )^2 \Big ] < \epsilon. \]
+Since all of the summands are non-negative, we observe for $i=1,\dots, n_l$, that
+\[ \forall \epsilon > 0 : \exists N \in \N : \forall m,n > N : \big | (\hat{f}_n)_i - (\hat{f}_m)_i \big | < \epsilon. \]
+Hence $((\hat{f}_n)_i)_{n=1}^\infty$ is a Cauchy sequence in $\R$ and therefore converges to a limit
+\[ \hat{f}_i \coloneq \lim_{n \to \infty} (\hat{f}_n)_i \in \R. \]
+Equivalently this can be formulated as
+\[ \forall \epsilon > 0 : \exists N \in \N : \forall n > N : \big | (\hat{f}_n)_i - \hat{f}_i \big | < \epsilon. \]
+Using these limits we can construct a function $f_\textit{lim} \in \F$ as
+\[ f_\textit{lim}: \R^{n_0} \to \R^{n_l} : x \mapsto \Big [ \hat{f}_1, \dots, \hat{f}_{n_l} \Big ] \tr. \]
+Again, using $(\hat{f}_n)_i = \E_{x \sim \D_x} \big [ ( f_n)_i(x) \big ]$ and the definition of $\| \cdot \|_{\D_x}$, we observe for $n \in \N$, that
+\[ d_{\F}(f_n ,f_\textit{lim})^2 = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{n_l} (f_n - f_\textit{lim})_i(x)^2 \Big ] = \Big [ \sum_{i=1}^{n_l} \big ( ( \hat{f}_n)_i - \hat{f}_i \big )^2 \Big ]. \]
+Since each sequence $((\hat{f}_n)_i)_{n=1}^\infty$ converges, we finally conclude, that
+\[ \forall \epsilon > 0 : \exists N \in \N : \forall n > N : d_{\F}(f_n, f_\textit{lim})^2 < \epsilon. \]
+Hence the Cauchy sequence $(f_n)_{n=1}^\infty$ has a limit in $\F$, which makes $(\F,d_{\F})$ complete.
+\end{proof}
+
+Note that since $(\F, d_{\F})$ is only a pseudometric space and not a metric space, the limit $f_\textit{lim}$ constructed in the proof is not unique. Essentially any $f \in \F$, that suffices 
+\[ \E_{x \sim \D_x} \Big [ f(x) \Big ] = \Big [ \hat{f}_1, \dots, \hat{f}_{n_l} \Big ] \tr, \]
+represents a limit function of the Cauchy sequence. This is due to the limit being measured in terms of the seminorm $\| \cdot \|_{\D_x}$. \\
+
+Based on the completeness of $(\F, d_\F)$, we can introduce the concept of orthogonal projections, which is necessary for our goal of establishing a mapping between $\F$ and its dual space $\F^*$. The following lemma is a translation of Theorem 3.3.1 in \cite{FunctionalAnalysis} to our case, where we have a symmetric positive semidefinite bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$ instead of an inner product.
+
+\begin{lemma} \label{lem:projection}
+Let $\A \subseteq \F$ be non-empty, closed and convex. For every $f \in \F$ there exists some $a^* \in \A$ such that 
+\[ \big \| f - a^* \big \|_{\D_x}^2 = \inf_{a \in \A} \big \| f - a \big \|_{\D_x}^2. \]
+Each $a^* \in \A$ that suffices this property, is called an orthogonal projection of $f$ on $\A$.
+\end{lemma}
+
+\begin{proof}
+By definition of the infimum there exists a sequence $(a_n)_{n=1}^\infty$ in $\A$, such that
+\[ \lim_{n \to \infty} \big \| f - a_n \big \|_{\D_x}^2 = \inf_{a \in \A} \big \| f - a \big \|_{\D_x}^2 =: \delta. \]
+We show that $(a_n)_{n=1}^\infty$ is a Cauchy sequence. For this we let $n,m \in \N$ and observe that
+\[ \begin{split}
+\big \| a_n - a_m \big \|_{\D_x}^2 
+&= \big \| (f-a_n) - (f-a_m) \big \|_{\D_x}^2 \\\
+&= \big \| f - a_n \big \|_{\D_x}^2 + \big \| f - a_m \big \|_{\D_x}^2 - 2 \big \langle f-a_n, f-a_m \big \rangle_{\D_x}.
+\end{split} \]
+Furthermore we have
+\[ \big \| (f-a_n) + (f-a_m) \big \|_{\D_x}^2 = \big \| f - a_n \big \|_{\D_x}^2 + \big \| f - a_m \big \|_{\D_x}^2 + 2 \big \langle f-a_n, f-a_m \big \rangle_{\D_x}. \]
+
+Combining both expressions yields
+\[ \begin{split}
+\big \| a_n - a_m \big \|_{\D_x}^2 
+&= 2 \big \| f - a_n \big \|_{\D_x}^2 + 2 \big \| f - a_m \big \|_{\D_x}^2 - \big \| (f-a_n) + (f-a_m) \big \|_{\D_x}^2 \\\
+&= 2 \big \| f - a_n \big \|_{\D_x}^2 + 2 \big \| f - a_m \big \|_{\D_x}^2 - 4 \big \| f - \frac{1}{2}(a_n+a_m) \big \|_{\D_x}^2.
+\end{split} \]
+
+By the definition of $\delta$ we observe that
+\[ \forall \epsilon > 0 : \exists N \in \N : \forall n > N : \big \| f - a_n \big \|_{\D_x}^2 < \delta + \epsilon. \]
+Furthermore, since $\A$ is convex, $\frac{1}{2}(a_n + a_m) \in \A$ and we derive
+\[ \big \| f - \frac{1}{2}(a_n+a_m) \big \|_{\D_x}^2 \geq \inf_{a \in \A} \big \| f - a \big \|_{\D_x}^2 = \delta. \]
+Using these two observations, we conclude that
+\[ \forall \epsilon > 0 : \exists N \in \N : \forall n > N : \big \| a_n - a_m \big \|_{\D_x}^2 \leq 2(\delta + \epsilon) + 2(\delta + \epsilon) - 4\delta = 4\epsilon \]
+Thus $(a_n)_{n=1}^\infty$ is a Cauchy sequence. Since $\F$ is complete and $\A$ is closed, $(a_n)_{n=1}^\infty$ converges to some $a^* \in \A$ with $\big \| f - a^* \big \|_{\D_x}^2 = \delta$, which proofs the lemma.
+\end{proof}
+
+Note that since $\| \cdot \|_{\D_x}$ is only a seminorm and not a norm, the limit of $(a_n)_{n=1}^\infty$ is not unique. Essentially there can exist multiple orthogonal projections from $f$ onto the subset $\A$. \\
+
+Lemma \ref{lem:projection} is a weakening of the Hilbert projection theorem stating that, given a Hilbert space, it even exists a unique orthogonal projection. In our case we lose the uniqueness, because $\langle \cdot, \cdot \rangle_{\D_x}$ is just positive semidefinite. However this is just a side note, since the existence of an orthogonal projection suffices for the further theory. Next we infer a useful corollary, which is notated as lemma 3.3.2 in \cite{FunctionalAnalysis}.
+
+\begin{corollary} \label{cor:projection}
+Let $f \in \F$ and $\A \subseteq \F$ be a non-empty and closed subspace. For every $a \in \A$ it holds, that $\langle f - a^* , a \rangle_{\D_x} = 0$, where $a^* \in \A$ denotes an orthogonal projection of $f$ on $\A$.
+\end{corollary}
+
+\begin{proof}
+Let $a \in \A$ and $\lambda \in \R$. Since $\A$ is a subspace, $a^* + \lambda a \in \A$ and we derive
+\[ \big \| (a^* + \lambda a) -f \big \|_{\D_x}^2 \geq  \inf_{a \in \A} \big \| f - a \big \|_{\D_x}^2 = \big \| a^* - f \big \|_{\D_x}^2. \]
+Rearranging the inequality yields
+\[ \big \| (a^* - f) + \lambda a \big \|_{\D_x} ^2 - \big \| a^* - f \big \|_{\D_x}^2 = 2 \big \langle a^* -f , \lambda a \big \rangle_{\D_x} + \big \| \lambda a \big \|_{\D_x}^2 \geq 0, \]
+giving rise to the definition of the non-negative function
+\[ \psi : \R \to \R : \lambda \mapsto 2 \lambda \big \langle a^* -f , a \big \rangle_{\D_x} + \lambda^2 \big \| a \big \|_{\D_x}^2. \]
+Under the assumption that $\big \langle a^* - f , a \big \rangle_{\D_x} \neq 0$ and $\| a \|_{\D_x}^2 \neq 0$, we derive
+\[ \psi \Big ( - \frac{ \big \langle a^* - f , a \big \rangle_{\D_x}}{\| a \|_{\D_x}^2} \Big ) = -2 \cdot \frac{ \big \langle a^* - f , a \big \rangle_{\D_x}^2}{ \| a \|_{\D_x}^2} + \frac{\big \langle a^* - f , a \big \rangle_{\D_x}^2}{ \| a \|_{\D_x}^2} = - \frac{ \big \langle a^* - f , a \big \rangle_{\D_x}^2}{ \| a \|_{\D_x}^2} < 0 \]
+and under the assumption that $\big \langle a^* - f, a \big \rangle_{\D_x} \neq 0$ and $\| a \|_{\D_x}^2 = 0$, we derive
+\[ \psi \Big ( -  \big \langle a^* - f , a \big \rangle_{\D_x} \Big ) = -2 \cdot \big \langle a^* - f , a \big \rangle_{\D_x}^2 < 0, \]
+which is a contradiction to $\psi(\lambda) \geq 0$ for every $\lambda \in \R$. Thus $ \big \langle f - a^* , a \big \rangle_{\D_x} = 0$.
+\end{proof}
+
+Finally, the concept of orthogonal projections enables us to construct any $\mu \in \F^*$ based on a representer $d \in \F$. The following lemma is a translation of theorem 3.8.1 in \cite{FunctionalAnalysis} to our setting.
+
+\begin{lemma}
+The map
+\[ J: \F \to \F^* : d \mapsto \langle d, \cdot \rangle_{\D_x} \]
+is linear and surjective.
+\end{lemma}
+
+\begin{proof}
+The linearity follows directly from the linearity of $\langle \cdot, \cdot \rangle_{\D_x}$. To prove that $J$ is indeed surjective, we let $\mu \in \F^*$ and need to find some $d \in \F$ such that $\mu = J(d)$. \\
+
+Case $\mu=0$: We can choose $d=0$, with $\mu = 0 = J(d)$. \\
+
+Case $\mu \neq 0$: Due to the linearity of $\mu$ we can normalize and find some $e \in \F$ with $\mu[e] = 1$. Let $N \coloneq \mu^{-1}(0)$ denote the kernel of $\mu$, which is non-empty, closed and convex since $\mu$ is linear and continuous. Thus by Lemma \ref{lem:projection} there exists some $p_e \in N$, such that $p_e$ is an orthogonal projection of $e$ on $N$. Define $f \coloneq e - p_e$, then $f \notin N$ since
+\[ \mu[f] = \mu[e] - \mu[p_e] = \mu[e] - 0 = 1. \]
+Thus we can choose any $g \in \F$, define $h \coloneq g - \mu[g]f$ and use the linearity of $\mu$ to derive
+\[ \mu[h] = \mu \big [g- \mu[g]f \big] = \mu[g] - \mu[g] \mu[f] = \mu[g] - \mu[g] \cdot 1 = 0. \]
+This implies $h \in N$, so that $\langle f , h \rangle_{\D_x} = \langle e - p_e, h \rangle_{\D_x} = 0$ by corollary \ref{cor:projection} and we conclude
+\[ \langle f, g \rangle_{\D_x} = \langle f , h \rangle_{\D_x} + \langle f , \mu[g]f \rangle_{\D_x} = 0 + \mu[g] \cdot \langle f , f \rangle_{\D_x} = \mu[g] \cdot \| f \|_{\D_x}^2. \]
+Now we can assume that $\| f \|_{\D_x}^2 \neq 0$. Otherwise we would have $\langle f, g \rangle_{\D_x} = 0$ for every $g \in \F$ and therefore $f = 0$ which is a contradiction to $f \notin N$. Rearranging terms results in
+\[ \mu[g] = \big \langle f / \| f \|_{\D_x}^2 , g \big \rangle_{\D_x} = J \big (f / \| f \|_{\D_x}^2 \big)[g]. \]
+Hence we have found $d = f / \| f \|_{\D_x}^2$ with $\mu = J(d)$. This shows surjectivity.
+\end{proof}
+
+Thus for each functional $\mu \in \F^*$ there exists $d \in \F$ such that $\mu = \langle d, \cdot \rangle_{\D_x}$. In other words
+\[ \F^* = \Big \{ \mu : \F \to \R : f \mapsto \langle d,f \rangle _{\D_x} \mid d \in \F \Big \}. \]
+
+Lemma \ref{lem:riesz} is a weakening of the Riesz representation theorem, stating that any Hilbert space $\H$ is isometric and isomorphic to its dual space $\H^*$ via the map $J:\H \to \H^* : x \mapsto \langle x , \cdot \rangle_\H$. \\
+
+Since $\langle \cdot , \cdot \rangle_{\D_x}$ is only positive semidefinite and not positive definite we lose the property of $J$ being isometric and therefore injective. However, based on the definition of $\D_x$, $J$ maps two elements of $\F$ to the same functional, if and only if they are equal on the data. Since our objective is to minimize the cost functional $C$, which depends on the exact same data, it is no matter which representer is chosen and therefore surjectivity will  be sufficient enough for the further argumentation. 
+
+\pagebreak
 \section{Appendix}
 
 \begin{definition}
@@ -1514,6 +1749,25 @@ Finally we can use $\Delta_k = f(x_k) - f(x_*)$ to conclude
 This completes the proof.
 \end{proof}
 
+\begin{lemma}
+Given a kernel $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$, that is positive definite with respect to the seminorm $\| \cdot \|_{\D_x}$ we can use the bilinear form $\langle \cdot, \cdot \rangle_K$ to define another seminorm
+\[ \| \cdot \|_K: \F \to \R : f \mapsto \sqrt{\langle f, f \rangle_K}.  \]
+\end{lemma}
+
+\begin{proof}
+Since $\langle \cdot, \cdot \rangle_K$ is symmetric by lemma \ref{lem:form} it remains to show that $\langle \cdot, \cdot \rangle_K$ is positive semidefinite. For this we let $f \in \F$ be arbitrary and investigate the following cases. \\
+
+Case $\| f \|_{\D_x} > 0$: By definition \ref{def:definite} it holds, that $\langle f, f \rangle_K > 0$. \\
+
+Case $\| f \|_{\D_x} = 0$: By definition of $\langle \cdot , \cdot \rangle_{\D_x}$, we observe that
+\[ \big \| f \big \|_{\D_x}^2 = \langle f , f \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)\tr f(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{n_l} f_i(x)^2 \Big ] = 0. \]
+Thus for every $x \sim \D_x$ it holds that $f(x) = 0$. Therefore we conclude THIS IS NOT TRUE
+\[ \langle f , f \rangle_{K} = \E_{x,x' \sim \D_x} \Big [ f(x)\tr K(x,x')f(x') \Big ] = 0. \]
+In total we have shown that $\langle f, f \rangle_K \geq 0$ for every $f \in \F$, such that $\| \cdot \|_K$ is a seminorm.
+\end{proof}
+
+This concludes the necessary knowledge on kernels.
+
 \textbf{Problem:} Maxima in lemma \ref{lem:coercivity}
 
 \pagebreak
@@ -1536,6 +1790,10 @@ This completes the proof.
 \bibitem{Functionals} Robert G. Parr, Yang Weitao. \textit{Density-Functional Theory of Atoms and Molecules}. International Series of Monographs on Chemistry Books, volume 16, 1989.
 
 \bibitem{FunctionalAnalysis} Erwin Kreyszig. \textit{Introductory Functional Analysis with Applications}. Wiley Classics Library edition, 1989.
+
+\bibitem{RKHS} Nachman Aronszajn. \textit{Theory of Reproducing Kernels}. Transactions of the American Mathematical Society, 686:337-404, 1950.
+
+\bibitem{Reproducing} H\`{a} Quang Minh, Vikas Sindhwani. \textit{Vector-valued Manifold regularization}. ICML'11: Proceedings of the 28th International Conference on International Conference on Machine Learning, pages 57-64, 2011.
 
 --- Check
 
