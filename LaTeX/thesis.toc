@@ -1,4 +1,4 @@
-\babel@toc {english}{}
+\babel@toc {english}{}\relax 
 \contentsline {section}{\numberline {1}Introduction}{2}{}%
 \contentsline {section}{\numberline {2}Neural Networks}{3}{}%
 \contentsline {subsection}{\numberline {2.1}Notation}{3}{}%
@@ -6,22 +6,17 @@
 \contentsline {section}{\numberline {3}Training in the Function Space}{13}{}%
 \contentsline {subsection}{\numberline {3.1}Motivation}{13}{}%
 \contentsline {subsection}{\numberline {3.2}Functional Derivative}{14}{}%
-\contentsline {subsection}{\numberline {3.3}Reproducing Kernel Hilbert Space}{21}{}%
-\contentsline {subsection}{\numberline {3.4}Kernel Gradient Descent}{23}{}%
-\contentsline {subsection}{\numberline {3.5}Kernel Approximation}{26}{}%
-\contentsline {subsection}{\numberline {3.6}Neural Tangent Kernel}{29}{}%
-\contentsline {section}{\numberline {4}Training in Low-Dimensional Subspaces}{34}{}%
-\contentsline {subsection}{\numberline {4.1}Approach}{34}{}%
-\contentsline {subsection}{\numberline {4.2}Theory}{35}{}%
-\contentsline {subsubsection}{\numberline {4.2.1}Singular Value Decomposition}{35}{}%
-\contentsline {subsubsection}{\numberline {4.2.2}Dynamic Linear Dimensionality Reduction}{36}{}%
-\contentsline {subsection}{\numberline {4.3}Methodology}{40}{}%
-\contentsline {subsubsection}{\numberline {4.3.1}Orthogonal Projections}{40}{}%
-\contentsline {subsubsection}{\numberline {4.3.2}Principal Component Analysis}{41}{}%
-\contentsline {subsubsection}{\numberline {4.3.3}Algorithm}{43}{}%
-\contentsline {section}{\numberline {5}Numerical Experiments}{44}{}%
-\contentsline {section}{\numberline {6}Conclusion}{45}{}%
-\contentsline {section}{\numberline {7}Training in the Function Space}{46}{}%
-\contentsline {subsection}{\numberline {7.1}Functional Gradient Descent}{46}{}%
-\contentsline {subsection}{\numberline {7.2}The Dual Space}{49}{}%
-\contentsline {section}{\numberline {8}Appendix}{54}{}%
+\contentsline {subsection}{\numberline {3.3}Reproducing Kernel Hilbert Space}{22}{}%
+\contentsline {subsection}{\numberline {3.4}Kernel Gradient Descent}{25}{}%
+\contentsline {subsection}{\numberline {3.5}Neural Tangent Kernel}{31}{}%
+\contentsline {section}{\numberline {4}Training in Low-Dimensional Subspaces}{37}{}%
+\contentsline {subsection}{\numberline {4.1}Approach}{37}{}%
+\contentsline {subsection}{\numberline {4.2}Theory}{38}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}Singular Value Decomposition}{38}{}%
+\contentsline {subsubsection}{\numberline {4.2.2}Dynamic Linear Dimensionality Reduction}{39}{}%
+\contentsline {subsection}{\numberline {4.3}Methodology}{43}{}%
+\contentsline {subsubsection}{\numberline {4.3.1}Orthogonal Projections}{43}{}%
+\contentsline {subsubsection}{\numberline {4.3.2}Principal Component Analysis}{44}{}%
+\contentsline {subsubsection}{\numberline {4.3.3}Algorithm}{46}{}%
+\contentsline {section}{\numberline {5}Numerical Experiments}{47}{}%
+\contentsline {section}{\numberline {6}Conclusion}{48}{}%
