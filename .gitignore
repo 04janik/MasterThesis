@@ -1,0 +1,6 @@
+.aux
+.log
+.gz
+.toc
+Experiments/data/**
+Experiments/wandb/**
