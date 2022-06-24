@@ -18,14 +18,53 @@ from models.resnet import ResNet8
 # monitoring tools
 from fastprogress import master_bar, progress_bar
 import wandb
+
+# helpers
 import os
+import random
+import argparse
+
+# parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('-bs', default=128, type=int, help='batch size')                    # batch size
+parser.add_argument('-dim', default=15, type=int, help='subspace dimension')            # subspace dimension
+parser.add_argument('-epochs', default=80, type=int, help='number of epochs')           # epochs
+parser.add_argument('-lr', default=0.1, type=float, help='learning rate')               # learning rate
+parser.add_argument('-mom', default=0.9, type=float, help='momentum for sgd')           # momentum
+parser.add_argument('-optimizer', default='sgd', type=str, help='choose sgd/psgd')      # optimizer
+parser.add_argument('-rs', default=22, type=int, help='random seed')                    # random seed
+parser.add_argument('-samples', default=30, type=int, help='number of sampling epochs') # sampling epochs
+parser.add_argument('-rpath', default='', type=str, help='result path')                 # result path
+parser.add_argument('-spath', default='', type=str, help='sampling path')               # sampling path
+parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')               # weight decay
+
+args = parser.parse_args()
+random.seed(args.rs)
+
+# check arguments
+if args.bs <= 0:
+    raise Exception('invalid batch size')
+elif args.dim <= 0:
+    raise Exception('invalid subspace dimension')
+elif args.epochs <= 0:
+    raise Exception('invalid epochs')
+elif args.lr <= 0:
+    raise exception('invalid learning rate')
+elif args.mom < 0 or args.mom > 1:
+    raise Exception('invalid momentum')
+elif not (args.optimizer == 'sgd' or args.optimizer == 'psgd'):
+    raise Exception('invalid optimizer')
+elif args.samples < args.dim:
+    raise exception('invalid sampling epochs')
+elif not os.path.exists(args.rpath):
+    raise Exception('invalid result path')
+elif args.optimizer == 'psgd' and not os.path.exists(args.spath):
+    raise Exception('invalid sampling path')
+elif args.wd < 0:
+    raise exception('invalid weight decay')
 
 # login to monitoring tool
 wandb.login(key='147686d07ab47cb770a0957694c8a6f896671f2c')
-
-# configure paths
-result_path = 'results/'
-sampling_path = 'results/ResNet-SGD-lr0.1-0/'
 
 # configure device
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -37,16 +76,8 @@ if device == 'cuda':
 
 # configure model
 model = ResNet8().to(device)
-
-# configure parameters
-epochs = 100
-batch_size_train = 128
-batch_size_test = 128
-learning_rate = 0.1
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
-sampling_epochs = 30
-dimension = 15
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
 
 # load CIFAR10 dataset
 cifar10_train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
@@ -62,8 +93,8 @@ train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=Tru
 test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
 
 # configure dataloaders
-train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size_train, shuffle=True)
-test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size_test, shuffle=False)
+train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.bs, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.bs, shuffle=False)
 
 
 def get_model_param_vec(model):
@@ -81,7 +112,7 @@ def get_model_grad_vec(model):
     vec = []
 
     for name, param in model.named_parameters():
-        vec.append(param.detach().reshape(-1))
+        vec.append(param.grad.detach().reshape(-1))
 
     return torch.cat(vec, 0)
 
@@ -103,33 +134,33 @@ def train_PSGD():
 
     # load sampled model parameters
     W = []
-    for i in range(sampling_epochs):
-        model.load_state_dict(torch.load(os.path.join(sampling_path, 'checkpoint_' + str(0))))
+    for i in range(args.samples):
+        model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(i))))
         W.append(get_model_param_vec(model))
     w = np.array(W)
 
     # obtain base variables via PCA
-    pca = PCA(dimension)
+    pca = PCA(args.dim)
     pca.fit_transform(W)
 
     P = np.array(pca.components_)
     P = torch.from_numpy(P).to(device)
 
     # start from initial model state
-    model.load_state_dict(torch.load(os.path.join(sampling_path, 'checkpoint_' + str(0))))
+    model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(0))))
 
     # construct name
     model_name = model.__class__.__name__
     optimizer_name = 'P' + optimizer.__class__.__name__
-    run_name = f'{model_name}-{optimizer_name}-lr{learning_rate}'
+    run_name = f'{model_name}-{optimizer_name}-lr{args.lr}-d{args.dim}'
 
     # check if same experiment was run before
-    run_path = os.path.join(result_path, run_name + '-' + str(0))
+    run_path = os.path.join(args.rpath, run_name + '-' + str(0))
     run_index = 0
 
     while os.path.exists(run_path):
         run_index += 1
-        run_path = os.path.join(result_path, run_name + '-' + str(run_index))
+        run_path = os.path.join(args.rpath, run_name + '-' + str(run_index))
 
     # save model state
     os.makedirs(run_path)
@@ -139,12 +170,12 @@ def train_PSGD():
     with wandb.init(project="ResNet8", name=run_name) as run:
 
         # log some info
-        run.config.learning_rate = learning_rate
+        run.config.learning_rate = args.lr
         run.config.optimizer = optimizer
         run.watch(model)
 
         # progress bar
-        mb = master_bar(range(epochs))
+        mb = master_bar(range(args.epochs))
 
         for epoch in mb:
 
@@ -187,15 +218,15 @@ def train_SGD():
     # construct name
     model_name = model.__class__.__name__
     optimizer_name = optimizer.__class__.__name__
-    run_name = f'{model_name}-{optimizer_name}-lr{learning_rate}'
+    run_name = f'{model_name}-{optimizer_name}-lr{args.lr}'
 
     # check if same experiment was run before
-    run_path = os.path.join(result_path, run_name + '-' + str(0))
+    run_path = os.path.join(args.rpath, run_name + '-' + str(0))
     run_index = 0
 
     while os.path.exists(run_path):
         run_index += 1
-        run_path = os.path.join(result_path, run_name + '-' + str(run_index))
+        run_path = os.path.join(args.rpath, run_name + '-' + str(run_index))
 
     # save model state
     os.makedirs(run_path)
@@ -205,12 +236,12 @@ def train_SGD():
     with wandb.init(project="ResNet8", name=run_name) as run:
 
         # log some info
-        run.config.learning_rate = learning_rate
+        run.config.learning_rate = args.lr
         run.config.optimizer = optimizer
         run.watch(model)
 
         # progress bar
-        mb = master_bar(range(epochs))
+        mb = master_bar(range(args.epochs))
 
         for epoch in mb:
 
@@ -279,10 +310,12 @@ def print_test_results():
     for acc, name in zip(per_class_accuracy, train_set.classes):
         print(f'{name:>10}: {acc:.2%}')
 
-train_SGD()
-print_test_results()
 
-train_PSGD()
+if args.optimizer == 'sgd':
+    train_SGD()
+elif args.optimizer == 'psgd':
+    train_PSGD()
+
 print_test_results()
 
 

@@ -4,3 +4,4 @@
 .toc
 Experiments/data/**
 Experiments/wandb/**
+Experiments/results/**
