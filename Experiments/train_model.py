@@ -4,20 +4,17 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-# dataset loading
-import torchvision
-import torchvision.transforms as transforms
-
 # matrix calculations
 from sklearn.decomposition import PCA
 import numpy as np
 
-# the objective model
-from models.resnet import ResNet8
+# utility functions
+from utils import get_datasets, get_model
 
 # monitoring tools
 from fastprogress import master_bar, progress_bar
 import wandb
+import time
 
 # helpers
 import os
@@ -26,16 +23,19 @@ import argparse
 
 # parse arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('-bs', default=128, type=int, help='batch size')                    # batch size
-parser.add_argument('-dim', default=15, type=int, help='subspace dimension')            # subspace dimension
-parser.add_argument('-epochs', default=80, type=int, help='number of epochs')           # epochs
-parser.add_argument('-lr', default=0.1, type=float, help='learning rate')               # learning rate
-parser.add_argument('-mom', default=0.9, type=float, help='momentum for sgd')           # momentum
-parser.add_argument('-optimizer', default='sgd', type=str, help='choose sgd/psgd')      # optimizer
-parser.add_argument('-rs', default=22, type=int, help='random seed')                    # random seed
-parser.add_argument('-samples', default=30, type=int, help='number of sampling epochs') # sampling epochs
-parser.add_argument('-rpath', default='', type=str, help='result path')                 # result path
-parser.add_argument('-spath', default='', type=str, help='sampling path')               # sampling path
+parser.add_argument('-bs', default=128, type=int, help='batch size')                        # batch size
+parser.add_argument('-data', default='CIFAR100', type=str, help='choose CIFAR10/CIFAR100')  # data set 
+parser.add_argument('-dim', default=40, type=int, help='subspace dimension')                # subspace dimension
+parser.add_argument('-epochs', default=200, type=int, help='number of epochs')              # epochs
+parser.add_argument('-lr', default=0.1, type=float, help='learning rate')                   # learning rate
+parser.add_argument('-model', default='vgg11', type=str, help='choose the model')           # model 
+parser.add_argument('-mom', default=0.9, type=float, help='momentum for sgd')               # momentum
+parser.add_argument('-optimizer', default='sgd', type=str, help='choose sgd/psgd')          # optimizer
+parser.add_argument('-rs', default=22, type=int, help='random seed')                        # random seed
+parser.add_argument('-samples', default=50, type=int, help='number of sampling epochs')     # sampling epochs
+parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
+parser.add_argument('-spath', default='', type=str, help='sampling path')                   # sampling path
+parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')                   # weight decay
 
 args = parser.parse_args()
 random.seed(args.rs)
@@ -69,29 +69,11 @@ wandb.login(key='147686d07ab47cb770a0957694c8a6f896671f2c')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Running on {device}')
 
-# configure model
-model = ResNet8().to(device)
+# define training task
 criterion = nn.CrossEntropyLoss()
+model = get_model(args).to(device)
+train_loader, test_loader = get_datasets(args)
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
-
-# load CIFAR10 dataset
-cifar10_train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
-cifar10_mean = np.mean(cifar10_train.data/256, axis=(0,1,2))
-cifar10_std = np.std(cifar10_train.data/256, axis=(0,1,2))
-
-transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomCrop(),
-    transforms.ToTensor(),
-    transforms.Normalize(cifar10_mean, cifar10_std),
-])
-
-train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-
-# configure dataloaders
-train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.bs, shuffle=True)
-test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.bs, shuffle=False)
 
 
 def get_model_param_vec(model):
@@ -129,6 +111,8 @@ def train_PSGD():
 
     model.train()
 
+    start = time.time()
+
     # load sampled model parameters
     W = []
     for i in range(args.samples):
@@ -142,6 +126,9 @@ def train_PSGD():
 
     P = np.array(pca.components_)
     P = torch.from_numpy(P).to(device)
+
+    end = time.time()
+    print("PCA time consumed:", end - start)
 
     # start from initial model state
     model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(0))))
@@ -164,7 +151,7 @@ def train_PSGD():
     torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(0)))
 
     # configure monitoring tool
-    with wandb.init(project="ResNet8", name=run_name) as run:
+    with wandb.init(project=model_name, name=run_name) as run:
 
         # log some info
         run.config.learning_rate = args.lr
@@ -230,7 +217,7 @@ def train_SGD():
     torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(0)))
 
     # configure monitoring tool
-    with wandb.init(project="ResNet8", name=run_name) as run:
+    with wandb.init(project=model_name, name=run_name) as run:
 
         # log some info
         run.config.learning_rate = args.lr
@@ -266,6 +253,14 @@ def train_SGD():
 
             # save model state after every epoch
             torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
+
+            # update learning rate
+            if args.optimizer == 'psgd' and epoch == 40:
+                args.lr = args.lr/10
+            elif args.optimizer == 'sgd' and epoch == 100 and args.data == 'CIFAR10':
+                args.lr = args.lr/10
+            elif args.optimizer == 'sgd' and epoch == 150 and args.data == 'CIFAR100':
+                args.lr = args.lr/10
 
 
 def test_model():
@@ -303,9 +298,6 @@ def print_test_results():
     print(f'Global accuracy{accuracy:.2%}')
     print('Confusion matrix:')
     print(confusion)
-    print('Per class accuracies:')
-    for acc, name in zip(per_class_accuracy, train_set.classes):
-        print(f'{name:>10}: {acc:.2%}')
 
 
 if args.optimizer == 'sgd':
