@@ -39,6 +39,9 @@ parser.add_argument('-spath', default='', type=str, help='sampling path')       
 
 args = parser.parse_args()
 random.seed(args.rs)
+np.random.seed(args.rs)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(args.seed)
 
 # check arguments
 if args.bs <= 0:
@@ -70,24 +73,33 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Running on {device}')
 
 # configure model
-model = ResNet8().to(device)
+model = ResNet8()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
 
+# move to gpu
+model.to(device)
+criterion.to(device)
+
 # load CIFAR10 dataset
 cifar10_train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
-cifar10_mean = np.mean(cifar10_train.data/256, axis=(0,1,2))
-cifar10_std = np.std(cifar10_train.data/256, axis=(0,1,2))
+cifar10_mean = np.mean(cifar10_train.data/255, axis=(0,1,2))
+cifar10_std = np.std(cifar10_train.data/255, axis=(0,1,2))
 
-transform = transforms.Compose([
+transform_train = transforms.Compose([
     transforms.RandomHorizontalFlip(),
     transforms.RandomCrop(),
     transforms.ToTensor(),
     transforms.Normalize(cifar10_mean, cifar10_std),
 ])
 
-train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+transfom_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize(cifar10_mean, cifar10_std),
+])
+
+train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
+test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
 
 # configure dataloaders
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.bs, shuffle=True)

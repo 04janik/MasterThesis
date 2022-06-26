@@ -11,18 +11,23 @@ def get_datasets(args):
 
         # load CIFAR10 dataset
         cifar10_train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
-        cifar10_mean = np.mean(cifar10_train.data/256, axis=(0,1,2))
-        cifar10_std = np.std(cifar10_train.data/256, axis=(0,1,2))
+        cifar10_mean = np.mean(cifar10_train.data/255, axis=(0,1,2))
+        cifar10_std = np.std(cifar10_train.data/255, axis=(0,1,2))
 
-        transform = transforms.Compose([
+        transform_train = transforms.Compose([
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, 4),
             transforms.ToTensor(),
             transforms.Normalize(cifar10_mean, cifar10_std),
         ])
 
-        train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-        test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(cifar10_mean, cifar10_std),
+        ])
+
+        train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform_train)
+        test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
 
         # configure dataloaders
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.bs, shuffle=True)
@@ -34,18 +39,23 @@ def get_datasets(args):
 
         # load CIFAR100 dataset
         cifar100_train = torchvision.datasets.CIFAR100(root='./data', train=True, download=True)
-        cifar100_mean = np.mean(cifar100_train.data/256, axis=(0,1,2))
-        cifar100_std = np.std(cifar100_train.data/256, axis=(0,1,2))
+        cifar100_mean = np.mean(cifar100_train.data/255, axis=(0,1,2))
+        cifar100_std = np.std(cifar100_train.data/255, axis=(0,1,2))
 
-        transform = transforms.Compose([
+        transform_train = transforms.Compose([
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(32, 4),
             transforms.ToTensor(),
             transforms.Normalize(cifar100_mean, cifar100_std),
         ])
 
-        train_set = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform)
-        test_set = torchvision.datasets.CIFAR100(root='./data', train=False, download=True, transform=transform)
+        transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(cifar100_mean, cifar100_std),
+        ])
+
+        train_set = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
+        test_set = torchvision.datasets.CIFAR100(root='./data', train=False, download=True, transform=transform_test)
 
         # configure dataloaders
         train_loader = torch.utils.data.DataLoader(train_set, batch_size=args.bs, shuffle=True)

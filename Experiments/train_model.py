@@ -39,6 +39,9 @@ parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')       
 
 args = parser.parse_args()
 random.seed(args.rs)
+np.random.seed(args.rs)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(args.seed)
 
 # check arguments
 if args.bs <= 0:
@@ -70,10 +73,14 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Running on {device}')
 
 # define training task
+model = get_model(args)
 criterion = nn.CrossEntropyLoss()
-model = get_model(args).to(device)
 train_loader, test_loader = get_datasets(args)
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
+
+# move to gpu
+model.to(device)
+criterion.to(device)
 
 
 def get_model_param_vec(model):
@@ -111,7 +118,8 @@ def train_PSGD():
 
     model.train()
 
-    start = time.time()
+    # schedule learning rate
+    lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30], gamma=0.1)
 
     # load sampled model parameters
     W = []
@@ -120,7 +128,8 @@ def train_PSGD():
         W.append(get_model_param_vec(model))
     w = np.array(W)
 
-    # obtain base variables via PCA
+    # obtain subspace via PCA
+    start = time.time()
     pca = PCA(args.dim)
     pca.fit_transform(W)
 
@@ -194,10 +203,19 @@ def train_PSGD():
             # save model state after every epoch
             torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
 
+            # schedule learning rate
+            lr_scheduler.step()
+
 
 def train_SGD():
 
     model.train()
+
+    # schedule learning rate
+    if args.data == 'CIFAR10':
+        lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[100,150], gamma=0.1)
+    elif args.data == 'CIFAR100':
+        lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[150], gamma=0.1)
 
     # construct name
     model_name = model.__class__.__name__
@@ -254,13 +272,8 @@ def train_SGD():
             # save model state after every epoch
             torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
 
-            # update learning rate
-            if args.optimizer == 'psgd' and epoch == 40:
-                args.lr = args.lr/10
-            elif args.optimizer == 'sgd' and epoch == 100 and args.data == 'CIFAR10':
-                args.lr = args.lr/10
-            elif args.optimizer == 'sgd' and epoch == 150 and args.data == 'CIFAR100':
-                args.lr = args.lr/10
+            # schedule learning rate
+            lr_scheduler.step()
 
 
 def test_model():
@@ -271,7 +284,7 @@ def test_model():
         model.eval()
 
     # set up confusion matrix
-    confusion = np.zeros((10,10), dtype=np.int32)
+    confusion = np.zeros((100,100), dtype=np.int32)
 
     # iterate test set
     for inputs, labels in iter(test_loader):
