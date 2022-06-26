@@ -13,7 +13,7 @@ from sklearn.decomposition import PCA
 import numpy as np
 
 # the objective model
-from models.resnet import ResNet8
+from models.resnet import make_ResNet8
 
 # monitoring tools
 from fastprogress import master_bar, progress_bar
@@ -40,8 +40,8 @@ parser.add_argument('-spath', default='', type=str, help='sampling path')       
 args = parser.parse_args()
 random.seed(args.rs)
 np.random.seed(args.rs)
-torch.manual_seed(seed)
-torch.cuda.manual_seed(args.seed)
+torch.manual_seed(args.rs)
+torch.cuda.manual_seed(args.rs)
 
 # check arguments
 if args.bs <= 0:
@@ -73,7 +73,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Running on {device}')
 
 # configure model
-model = ResNet8()
+model = make_ResNet8()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
 
@@ -107,22 +107,16 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.bs, shuffle=
 
 
 def get_model_param_vec(model):
-
     vec = []
-
     for name, param in model.named_parameters():
         vec.append(param.cpu().detach().numpy().reshape(-1))
-
     return np.concatenate(vec, 0)
 
 
 def get_model_grad_vec(model):
-
     vec = []
-
     for name, param in model.named_parameters():
         vec.append(param.grad.detach().reshape(-1))
-
     return torch.cat(vec, 0)
 
 

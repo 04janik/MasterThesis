@@ -124,31 +124,31 @@ def init_params(module):
             init.kaiming_normal_(module.weight)
 
 
-def ResNet8(num_classes=10):
+def make_ResNet8(num_classes=10):
     return ResNet([1, 1, 1], num_classes)
  
 
-def ResNet20(num_classes=10):
+def make_ResNet20(num_classes=10):
     return ResNet([3, 3, 3], num_classes)
 
 
-def ResNet32(num_classes=10):
+def make_ResNet32(num_classes=10):
     return ResNet([5, 5, 5], num_classes)
 
 
-def ResNet44(num_classes=10):
+def make_ResNet44(num_classes=10):
     return ResNet([7, 7, 7], num_classes)
 
 
-def ResNet56(num_classes=10):
+def make_ResNet56(num_classes=10):
     return ResNet([9, 9, 9], num_classes)
 
 
-def ResNet110(num_classes=10):
+def make_ResNet110(num_classes=10):
     return ResNet([18, 18, 18], num_classes)
 
 
-def ResNet1202(num_classes=10):
+def make_ResNet1202(num_classes=10):
     return ResNet([200, 200, 200], num_classes)
 
 
@@ -192,5 +192,5 @@ def count_params(net):
 if __name__ == "__main__":
     for net_name in ['ResNet8', 'ResNet20', 'ResNet32', 'ResNet44', 'ResNet56', 'ResNet110', 'ResNet1202']:
         print(net_name)
-        count_params(globals()[net_name]())
+        count_params(globals()['make_' + net_name]())
         print()

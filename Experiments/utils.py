@@ -69,13 +69,40 @@ def get_datasets(args):
 def get_model(args):
 
     if args.model == 'densenet121':
-        from models.densenet import DenseNet121
-        return DenseNet121()
+        from models.densenet import make_DenseNet121
+        return make_DenseNet121()
+    elif args.model == 'efficientnet':
+        from models.efficientnet import make_EfficientNet
+        return make_EfficientNet()
+    elif args.model == 'googlenet':
+        from models.googlenet import make_GoogLeNet
+        return make_GoogLeNet()
+    elif args.model == 'inceptionv3':
+        from models.inceptionv3 import make_Inceptionv3
+        return make_Inceptionv3
+    elif args.model == 'mobilenet':
+        from models.mobilenet import make_MobileNet
+        return make_MobileNet
+    elif args.model == 'nasnet':
+        from models.nasnet import make_NasNet
+        return make_NasNet
     elif args.model == 'resnet8':
-        from models.resnet import ResNet8
-        return ReNet8()
+        from models.resnet import make_ResNet8
+        return make_ResNet8()
+    elif args.model == 'seresnet18':
+        from models.seresnet import make_SEResNet18
+        make_SEResNet18()
+    elif args.model == 'shufflenetv2':
+        from shufflenetv2 import make_ShuffleNetv2
+        return make_ShuffleNetv2()
+    elif args.model == 'squeezenet':
+        from squeezenet import make_SqueezeNet
+        return make_SqueezeNet()
     elif args.model == 'vgg11':
-        from models.vgg import VGG11_bn
-        return VGG11_bn()
+        from models.vgg import make_VGG11_bn
+        return make_VGG11_bn()
+    elif args.model == 'xception':
+        from models.xception import make_Xception
+        make_Xception()
     
     raise exception('invalid model')
