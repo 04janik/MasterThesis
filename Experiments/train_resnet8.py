@@ -37,6 +37,7 @@ parser.add_argument('-samples', default=30, type=int, help='number of sampling e
 parser.add_argument('-rpath', default='', type=str, help='result path')                 # result path
 parser.add_argument('-spath', default='', type=str, help='sampling path')               # sampling path
 
+# set random seeds
 args = parser.parse_args()
 random.seed(args.rs)
 np.random.seed(args.rs)
@@ -62,24 +63,18 @@ elif not os.path.exists(args.rpath):
     raise Exception('invalid result path')
 elif args.optimizer == 'psgd' and not os.path.exists(args.spath):
     raise Exception('invalid sampling path')
-elif args.wd < 0:
-    raise exception('invalid weight decay')
 
 # login to monitoring tool
 wandb.login(key='147686d07ab47cb770a0957694c8a6f896671f2c')
 
-# configure device
+# check cuda access
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Running on {device}')
 
 # configure model
-model = make_ResNet8()
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
-
-# move to gpu
-model.to(device)
-criterion.to(device)
+model = make_ResNet8().cuda()
+criterion = nn.CrossEntropyLoss().cuda()
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
 
 # load CIFAR10 dataset
 cifar10_train = torchvision.datasets.CIFAR10(root='./data', train=True, download=True)
@@ -109,7 +104,7 @@ test_loader = torch.utils.data.DataLoader(test_set, batch_size=args.bs, shuffle=
 def get_model_param_vec(model):
     vec = []
     for name, param in model.named_parameters():
-        vec.append(param.cpu().detach().numpy().reshape(-1))
+        vec.append(param.detach().cpu().numpy().reshape(-1))
     return np.concatenate(vec, 0)
 
 
@@ -137,17 +132,23 @@ def train_PSGD():
 
     # load sampled model parameters
     W = []
-    for i in range(args.samples):
+    for i in range(args.sample_start, args.sample_start + args.samples):
         model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(i))))
         W.append(get_model_param_vec(model))
-    w = np.array(W)
+    W = np.array(W)
+    print('W:', W.shape)
 
-    # obtain base variables via PCA
+    # obtain subspace via PCA
+    start = time.time()
     pca = PCA(args.dim)
     pca.fit_transform(W)
 
     P = np.array(pca.components_)
-    P = torch.from_numpy(P).to(device)
+    P = torch.from_numpy(P).cuda()
+
+    end = time.time()
+    pca_time = end - start
+    print("PCA time consumed:", pca_time)
 
     # start from initial model state
     model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(0))))
@@ -155,7 +156,7 @@ def train_PSGD():
     # construct name
     model_name = model.__class__.__name__
     optimizer_name = 'P' + optimizer.__class__.__name__
-    run_name = f'{model_name}-{optimizer_name}-lr{args.lr}-d{args.dim}'
+    run_name = f'{model_name}-{optimizer_name}-lr{args.lr}-d{args.dim}-s{args.samples}'
 
     # check if same experiment was run before
     run_path = os.path.join(args.rpath, run_name + '-' + str(0))
@@ -173,6 +174,7 @@ def train_PSGD():
     with wandb.init(project="ResNet8", name=run_name) as run:
 
         # log some info
+        run.log({'PCA time consumption': pca_time})
         run.config.learning_rate = args.lr
         run.config.optimizer = optimizer
         run.watch(model)
@@ -180,22 +182,28 @@ def train_PSGD():
         # progress bar
         mb = master_bar(range(args.epochs))
 
+        # store max accuracy
+        acc_max = 0
+
         for epoch in mb:
+
+            start = time.time()
 
             for inputs, labels in progress_bar(iter(train_loader), parent=mb):
 
-                # move data to device
-                inputs, labels = inputs.to(device), labels.to(device)
+                # move data to cuda
+                inputs, labels = inputs.cuda() labels.cuda()
 
                 # forward pass
                 outputs = model.forward(inputs)
                 loss = criterion(outputs, labels)
 
-                # backward pass in subspace
+                # backward pass
                 optimizer.zero_grad()
                 loss.backward()
 
-                grad = get_model_grad_vec(model).double()
+                # parameter update in subspace
+                grad = get_model_grad_vec(model).float()
                 grad = torch.mm(P, grad.reshape(-1,1))
                 grad_pro = torch.mm(P.transpose(0,1), grad)
 
@@ -205,10 +213,12 @@ def train_PSGD():
                 # log the loss
                 run.log({'loss:': loss})
 
-            # evaluate the model after every epoch
-            accuracy, per_class_accuracy, confusion = test_model()
-            mb.main_bar.comment = f'val acc:{accuracy}'
-            run.log({'accuracy': accuracy, 'epoch': epoch})
+            end = time.time()
+
+            # evaluate the model
+            accuracy, per_class_accuracy, confusion = eval_model()
+            acc_max = acc_max if acc_max > accuracy else accuracy
+            run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
 
             # save model state after every epoch
             torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
@@ -246,12 +256,17 @@ def train_SGD():
         # progress bar
         mb = master_bar(range(args.epochs))
 
+        # store max accuracy
+        acc_max = 0
+
         for epoch in mb:
+
+            start = time.time()
 
             for inputs, labels in progress_bar(iter(train_loader), parent=mb):
 
-                # move data to device
-                inputs, labels = inputs.to(device), labels.to(device)
+                # move data to cuda
+                inputs, labels = inputs.cuda(), labels.cuda()
 
                 # forward pass
                 outputs = model.forward(inputs)
@@ -265,16 +280,18 @@ def train_SGD():
                 # log the loss
                 run.log({'loss:': loss})
 
-            # evaluate the model after every epoch
-            accuracy, per_class_accuracy, confusion = test_model()
-            mb.main_bar.comment = f'val acc:{accuracy}'
-            run.log({'accuracy': accuracy, 'epoch': epoch})
+            end = time.time()
+
+            # evaluate the model
+            accuracy, per_class_accuracy, confusion = eval_model()
+            acc_max = acc_max if acc_max > accuracy else accuracy
+            run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
 
             # save model state after every epoch
             torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
 
 
-def test_model():
+def eval_model():
 
     train_mode = model.training
 
@@ -287,7 +304,7 @@ def test_model():
     # iterate test set
     for inputs, labels in iter(test_loader):
 
-        inputs = inputs.to(device)
+        inputs = inputs.cuda()
         outputs = model(inputs)
 
         for label, output in zip(labels, outputs.cpu().detach().numpy()):
@@ -306,7 +323,7 @@ def test_model():
 
 def print_test_results():
     accuracy, per_class_accuracy, confusion = test_model()
-    print(f'Global accuracy{accuracy:.2%}')
+    print(f'Global accuracy: {accuracy:.2%}')
     print('Confusion matrix:')
     print(confusion)
     print('Per class accuracies:')
