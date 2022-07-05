@@ -79,30 +79,30 @@ def get_model(args):
         return make_GoogLeNet()
     elif args.model == 'inceptionv3':
         from models.inceptionv3 import make_Inceptionv3
-        return make_Inceptionv3
+        return make_Inceptionv3()
     elif args.model == 'mobilenet':
         from models.mobilenet import make_MobileNet
-        return make_MobileNet
+        return make_MobileNet()
     elif args.model == 'nasnet':
         from models.nasnet import make_NasNet
-        return make_NasNet
+        return make_NasNet()
     elif args.model == 'resnet8':
         from models.resnet import make_ResNet8
         return make_ResNet8()
     elif args.model == 'seresnet18':
         from models.seresnet import make_SEResNet18
-        make_SEResNet18()
+        return make_SEResNet18()
     elif args.model == 'shufflenetv2':
-        from shufflenetv2 import make_ShuffleNetv2
+        from models.shufflenetv2 import make_ShuffleNetv2
         return make_ShuffleNetv2()
     elif args.model == 'squeezenet':
-        from squeezenet import make_SqueezeNet
+        from models.squeezenet import make_SqueezeNet
         return make_SqueezeNet()
     elif args.model == 'vgg11':
         from models.vgg import make_VGG11_bn
         return make_VGG11_bn()
     elif args.model == 'xception':
         from models.xception import make_Xception
-        make_Xception()
+        return make_Xception()
     
-    raise exception('invalid model')
+    raise Exception('invalid model')

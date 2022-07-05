@@ -76,14 +76,9 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Running on {device}')
 
 # define training task
-model = get_model(args)
-criterion = nn.CrossEntropyLoss()
+model = get_model(args).cuda()
+criterion = nn.CrossEntropyLoss().cuda()
 train_loader, test_loader = get_datasets(args)
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
-
-# move to gpu
-model.to(device)
-criterion.to(device)
 
 
 def get_model_param_vec(model):
@@ -91,7 +86,7 @@ def get_model_param_vec(model):
     vec = []
 
     for name, param in model.named_parameters():
-        vec.append(param.cpu().detach().numpy().reshape(-1))
+        vec.append(param.detach().cpu().numpy().reshape(-1))
 
     return np.concatenate(vec, 0)
 
@@ -121,6 +116,9 @@ def train_PSGD():
 
     model.train()
 
+    # define optimizer
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
+
     # schedule learning rate
     lr_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30], gamma=0.1)
 
@@ -129,7 +127,8 @@ def train_PSGD():
     for i in range(args.sample_start, args.sample_start + args.samples):
         model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(i))))
         W.append(get_model_param_vec(model))
-    w = np.array(W)
+    W = np.array(W)
+    print('W:', W.shape)
 
     # obtain subspace via PCA
     start = time.time()
@@ -137,13 +136,13 @@ def train_PSGD():
     pca.fit_transform(W)
 
     P = np.array(pca.components_)
-    P = torch.from_numpy(P).to(device)
+    P = torch.from_numpy(P).cuda()
 
     end = time.time()
     print("PCA time consumed:", end - start)
 
-    # start from initial model state
-    model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(0))))
+    # start from specified model state
+    model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(args.sample_start))))
 
     # construct name
     model_name = model.__class__.__name__
@@ -180,7 +179,7 @@ def train_PSGD():
             for inputs, labels in progress_bar(iter(train_loader), parent=mb):
 
                 # move data to device
-                inputs, labels = inputs.to(device), labels.to(device)
+                inputs, labels = inputs.cuda(), labels.cuda()
 
                 # forward pass
                 outputs = model.forward(inputs)
@@ -190,7 +189,7 @@ def train_PSGD():
                 optimizer.zero_grad()
                 loss.backward()
 
-                grad = get_model_grad_vec(model).double()
+                grad = get_model_grad_vec(model).float()
                 grad = torch.mm(P, grad.reshape(-1,1))
                 grad_pro = torch.mm(P.transpose(0,1), grad)
 
@@ -205,7 +204,7 @@ def train_PSGD():
             # evaluate the model after every epoch
             accuracy, per_class_accuracy, confusion = test_model()
             mb.main_bar.comment = f'val acc:{accuracy}'
-            run.log({'accuracy': accuracy, 'epoch': epoch, time: end - start})
+            run.log({'accuracy': accuracy, 'epoch': epoch, 'time': end - start})
 
             # save model state after every epoch
             torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
@@ -217,6 +216,9 @@ def train_PSGD():
 def train_SGD():
 
     model.train()
+
+    # define optimizer
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
 
     # schedule learning rate
     if args.data == 'CIFAR10':
@@ -259,7 +261,7 @@ def train_SGD():
             for inputs, labels in progress_bar(iter(train_loader), parent=mb):
 
                 # move data to device
-                inputs, labels = inputs.to(device), labels.to(device)
+                inputs, labels = inputs.cuda(), labels.cuda()
 
                 # forward pass
                 outputs = model.forward(inputs)
@@ -300,7 +302,7 @@ def test_model():
     # iterate test set
     for inputs, labels in iter(test_loader):
 
-        inputs = inputs.to(device)
+        inputs = inputs.cuda()
         outputs = model(inputs)
 
         for label, output in zip(labels, outputs.cpu().detach().numpy()):
