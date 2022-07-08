@@ -132,6 +132,7 @@ def train_PSGD():
 
     P = np.array(pca.components_)
     P = torch.from_numpy(P).cuda()
+    print('P:', W.shape)
 
     end = time.time()
     pca_time = end - start
@@ -277,7 +278,7 @@ def train_SGD():
                 optimizer.step()
 
                 # log the loss
-                run.log({'loss:': loss})
+                run.log({'loss': loss})
 
             end = time.time()
 

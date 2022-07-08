@@ -211,7 +211,7 @@ def train_PSGD():
                 optimizer.step()
 
                 # log the loss
-                run.log({'loss:': loss})
+                run.log({'loss': loss})
 
             end = time.time()
 
@@ -278,7 +278,7 @@ def train_SGD():
                 optimizer.step()
 
                 # log the loss
-                run.log({'loss:': loss})
+                run.log({'loss': loss})
 
             end = time.time()
 

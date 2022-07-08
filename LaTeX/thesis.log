@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.16)  13 JUN 2022 17:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.16)  8 JUL 2022 11:51
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -544,25 +544,80 @@ LaTeX Font Info:    Redeclaring math symbol \braceru on input line 909.
 LaTeX Font Info:    Redeclaring math accent \widehat on input line 944.
 LaTeX Font Info:    Redeclaring math accent \widetilde on input line 946.
 ))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tabu/tabu.sty
+Package: tabu 2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)
+
+(/usr/local/texlive/2022/texmf-dist/tex/latex/tools/array.sty
+Package: array 2021/10/04 v2.5f Tabular extension package (FMi)
+\col@sep=\dimen160
+\ar@mcellbox=\box52
+\extrarowheight=\dimen161
+\NC@list=\toks30
+\extratabsurround=\skip66
+\backup@length=\skip67
+\ar@cellbox=\box53
+)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/varwidth/varwidth.sty
+Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
+\@vwid@box=\box54
+\sift@deathcycles=\count285
+\@vwid@loff=\dimen162
+\@vwid@roff=\dimen163
+)
+\c@taburow=\count286
+\tabu@nbcols=\count287
+\tabu@cnt=\count288
+\tabu@Xcol=\count289
+\tabu@alloc=\count290
+\tabu@nested=\count291
+\tabu@target=\dimen164
+\tabu@spreadtarget=\dimen165
+\tabu@naturalX=\dimen166
+\tabucolX=\dimen167
+\tabu@Xsum=\dimen168
+\extrarowdepth=\dimen169
+\abovetabulinesep=\dimen170
+\belowtabulinesep=\dimen171
+\tabustrutrule=\dimen172
+\tabu@thebody=\toks31
+\tabu@footnotes=\toks32
+\tabu@box=\box55
+\tabu@arstrutbox=\box56
+\tabu@hleads=\box57
+\tabu@vleads=\box58
+\tabu@cellskip=\skip68
+)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip69
+\multirow@cntb=\count292
+\multirow@dima=\skip70
+\bigstrutjot=\dimen173
+)
+(/usr/local/texlive/2022/texmf-dist/tex/latex/colortbl/colortbl.sty
+Package: colortbl 2020/01/04 v1.0e Color table columns (DPC)
+\everycr=\toks33
+\minrowclearance=\skip71
+)
 (/usr/local/texlive/2022/texmf-dist/tex/latex/algorithms/algorithm.sty
 Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
 nment
 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count285
-\float@exts=\toks30
-\float@box=\box52
-\@float@everytoks=\toks31
-\@floatcapt=\box53
+\c@float@type=\count293
+\float@exts=\toks34
+\float@box=\box59
+\@float@everytoks=\toks35
+\@floatcapt=\box60
 )
-\@float@every@algorithm=\toks32
-\c@algorithm=\count286
+\@float@every@algorithm=\toks36
+\c@algorithm=\count294
 )
 (/usr/local/texlive/2022/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count287
-\l__pdf_internal_box=\box54
+\l__color_backend_stack_int=\count295
+\l__pdf_internal_box=\box61
 )
 (./thesis.aux)
 \openout1 = `thesis.aux'.
@@ -618,17 +673,17 @@ LaTeX Font Info:    ... okay on input line 51.
 
 (/usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count288
-\scratchdimen=\dimen160
-\scratchbox=\box55
-\nofMPsegments=\count289
-\nofMParguments=\count290
-\everyMPshowfont=\toks33
-\MPscratchCnt=\count291
-\MPscratchDim=\dimen161
-\MPnumerator=\count292
-\makeMPintoPDFobject=\count293
-\everyMPtoPDFconversion=\toks34
+\scratchcounter=\count296
+\scratchdimen=\dimen174
+\scratchbox=\box62
+\nofMPsegments=\count297
+\nofMParguments=\count298
+\everyMPshowfont=\toks37
+\MPscratchCnt=\count299
+\MPscratchDim=\dimen175
+\MPnumerator=\count300
+\makeMPintoPDFobject=\count301
+\everyMPtoPDFconversion=\toks38
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 
@@ -1396,6 +1451,65 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [46]
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1412--1442
+
+ []
+
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -1423,7 +1537,16 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [49]
-Underfull \hbox (badness 10000) in paragraph at lines 1455--1537
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.59999pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.59999pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
+
+[50]
+Underfull \hbox (badness 10000) in paragraph at lines 1535--1617
 
  []
 
@@ -1435,7 +1558,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[50]
+[51]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -1444,19 +1567,19 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[51] (./thesis.aux)
+[52] (./thesis.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 7175 strings out of 478268
- 112649 string characters out of 5846347
- 457769 words of memory out of 5000000
- 25263 multiletter control sequences out of 15000+600000
+ 8147 strings out of 478268
+ 127630 string characters out of 5846347
+ 484196 words of memory out of 5000000
+ 26216 multiletter control sequences out of 15000+600000
  480516 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 108i,20n,106p,832b,341s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 108i,20n,106p,832b,427s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
@@ -1478,10 +1601,10 @@ ve/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive
 2022/texmf-dist/fonts/type1/public/mathabx-type1/mathb10.pfb></usr/local/texliv
 e/2022/texmf-dist/fonts/type1/public/mathabx-type1/mathx10.pfb></usr/local/texl
 ive/2022/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (51 pages, 476075 bytes).
+Output written on thesis.pdf (52 pages, 479923 bytes).
 PDF statistics:
- 279 PDF objects out of 1000 (max. 8388607)
- 179 compressed objects within 2 object streams
+ 282 PDF objects out of 1000 (max. 8388607)
+ 181 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

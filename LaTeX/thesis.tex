@@ -40,7 +40,7 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\E}{\mathbb{E}}
 
-\usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx}
+\usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx, tabu, multirow, colortbl}
 
 \usepackage[ruled]{algorithm}
 
@@ -1408,6 +1408,86 @@ For complexity ...
 
 \pagebreak
 \section{Numerical Experiments}
+
+\textbf{Experiment 1:} ResNet8 on CIFAR10 \\
+\ \\
+- Mention the preliminary work \\
+- Compare different space sizes \\
+\ \\
+$\Rightarrow$ Training is possible in tiny subspaces \\
+\ \\
+\textbf{Experiment 2:} 10 models on CIFAR100 \\
+\ \\
+- Reference results in paper \\
+- Compare with own results \\
+- Compare DLDR sampling time to SVD computation time \\
+\ \\
+$\Rightarrow$ Since SVD is only $\sim$ 10\% we focus to improve DLDR sampling \\
+\ \\
+\textbf{Experiment 3:} Iterative space refinement \\
+\ \\
+- Sample after k batches instead each epoch \\
+- Measures of distance: increase in accuracy / decrease in loss / ... \\
+- TBD \\
+\ \\
+$\Rightarrow$ Training algorithm that makes use of the low-dimensional landscape \\
+\ \\
+\textbf{Experiment 4:} \\
+\ \\
+- Application of second order methods \\
+\ \\
+$\Rightarrow$ Second order methods are applicable and efficient \\
+\ \\
+\pagebreak
+
+DLDR paper results:
+\renewcommand{\arraystretch}{1.1}
+\begin{center}
+\begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} &  \multicolumn{2}{c}{P-SGD} \\
+& & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
+& & 50 & 100 & 200 & 50 & 100 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+VGG11\_bn &  & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
+\rowcolor{black}
+EfficientNet-B0 & 4.14M & 62.53 & 63.68 & 72.94 & 71.68 & 72.64 \\
+MobileNet & 3.32M & 57.15 & 58.67 & 67.94 & 66.86 & 68.00 \\
+DenseNet121 & 7.05M & 65.39 & 64.57 & 76.76 & 74.25 & 76.34 \\
+Inceptionv3 & 22.32M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
+Xception & 21.01M & 64.57 & 65.81 & 75.47 & 75.68 & 75.56 \\
+GoogLeNet & !!6.20M & 62.32 & 66.32 & 76.88 & 75.66 & 77.27 \\
+ShuffleNetv2 & 1.36M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
+SqueezeNet & 0.78M & 59.52 & 58.56 & 70.29 & 69.89 & 70.60 \\
+SEResNet18 & !!11.40M & 64.74 & 64.68 & 74.95 & 74.33 & 75.09 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\end{center}
+\renewcommand{\arraystretch}{1}
+
+My results:
+\renewcommand{\arraystretch}{1.1}
+\begin{center}
+\begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} &  \multicolumn{2}{c}{P-SGD} \\
+& & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
+& & 50 & 100 & 200 & 50 & 100 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+VGG11\_bn &  & 59.51 & 61.72 & 68.58 & 69.06 & 70.35 \\
+EfficientNet-B0 & 4.14M & 61.69 & 63.74 & 72.80 & 71.52 & 73.52 \\
+MobileNet & 3.32M & 57.99 & 59.95 & 68.01 & 67.27 & 68.67 \\
+DenseNet121 & 7.05M & 66.15 & 67.39 & 77.62 & 75.34 & 76.22 \\
+Inceptionv3 & 22.32M & 65.75 & 67.58 & 76.53 & 76.33 & 76.39 \\
+Xception & 21.01M & 66.79 & 67.14 & 75.63 & 75.67 & 75.37 \\
+GoogLeNet & !!6.40M & 64.86 & 66.32 & 76.26 & 75.14 & 76.67 \\
+ShuffleNetv2 & 1.36M & 64.55 & 64.74 & 72.34 & 72.05 & 72.91 \\
+SqueezeNet & 0.78M & 60.91 & 62.44 & 71.38 & 69.82 & 71.32 \\
+SEResNet18 & !!11.31M & 66.30 & 67.22 & 75.20 & 74.80 & 75.13 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\end{center}
+\renewcommand{\arraystretch}{1}
 
 \pagebreak
 \section{Conclusion}
