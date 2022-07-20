@@ -43,7 +43,7 @@ def update_grad(model, grad_vec):
         idx += size
 
 
-def get_subspace(args, model):
+def get_subspace_cpu(args, model):
 
     W = []
 
@@ -66,6 +66,31 @@ def get_subspace(args, model):
 
     end = time.time()
     pca_time = end - start
+    print("PCA time consumed:", pca_time)
+
+    return Q, pca_time
+
+def get_subspace(args, model):
+
+    W = []
+
+    # load sampled model parameters
+    for i in range(args.sample_start, args.sample_start + args.samples):
+        model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(i))))
+        W.append(get_model_param_vec(model))
+
+    W = torch.tensor(np.array(W))
+    print('W:', W.shape)
+
+    # obtain subspace via PCA
+    start = time.time()
+    U, S, V = torch.pca_lowrank(W, q=args.dim, center=True)
+
+    Q = torch.transpose(U,0,1)
+    print('Q:', Q.shape)
+
+    end = time.time()
+    pca_time = end - start 
     print("PCA time consumed:", pca_time)
 
     return Q, pca_time
@@ -136,7 +161,7 @@ def train_PSGD(args, model, train_loader, test_loader):
             end = time.time()
 
             # evaluate the model
-            accuracy, confusion = eval_model(model, test_loader)
+            accuracy, confusion = eval_model(args, model, test_loader)
             acc_max = acc_max if acc_max > accuracy else accuracy
             run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
 
@@ -212,7 +237,7 @@ def train_SGD(args, model, train_loader, test_loader):
             end = time.time()
 
             # evaluate the model
-            accuracy, confusion = eval_model(model, test_loader)
+            accuracy, confusion = eval_model(args, model, test_loader)
             acc_max = acc_max if acc_max > accuracy else accuracy
             run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
 
@@ -223,7 +248,7 @@ def train_SGD(args, model, train_loader, test_loader):
             lr_scheduler.step()
 
 
-def eval_model(model, test_loader):
+def eval_model(args, model, test_loader):
 
     train_mode = model.training
 
@@ -231,7 +256,7 @@ def eval_model(model, test_loader):
         model.eval()
 
     # set up confusion matrix
-    dim = model.modules[-1].out_features
+    dim = 10 if args.data == 'CIFAR10' else 100
     confusion = np.zeros((dim,dim), dtype=np.int32)
 
     # iterate test set

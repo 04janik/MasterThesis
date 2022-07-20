@@ -45,11 +45,11 @@ elif args.mom < 0 or args.mom > 1:
     raise Exception('invalid momentum')
 
 if args.optimizer == 'psgd' or args.optimizer == 'pbfgs':
-    if args.dim <= 0:
+    if args.dim <= 0 or args.dim > args.sample_start + args.samples:
         raise Exception('invalid subspace dimension')
-    elif args.samples <= 0 or args.samples > args.dim:
+    elif args.samples <= 0:
         raise Exception('invalid number of samples')
-    elif args.sample_start <= 0 or args.sample_start + args.samples > args.dim:
+    elif args.sample_start < 0:
         raise Exception('invalid starting sample')
     elif not os.path.exists(args.spath):
         raise Exception('invalid sampling path')
@@ -79,6 +79,6 @@ elif args.optimizer == 'psgd':
     algorithms.train_PSGD(args, model, train_loader, test_loader)
 
 # print test results
-accuracy, confusion = algorithms.eval_model(model, test_loader)
+accuracy, confusion = algorithms.eval_model(args, model, test_loader)
 print(f'Global accuracy: {accuracy:.2%}')
 print(confusion)
