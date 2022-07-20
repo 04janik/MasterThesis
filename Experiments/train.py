@@ -1,0 +1,84 @@
+
+import argparse
+import os
+import torch
+import wandb
+
+import algorithms
+from utils import get_datasets, get_model
+
+# define parser
+parser = argparse.ArgumentParser()
+
+# parse arguments
+parser.add_argument('-model', default='', type=str, help='choose the model')                # model 
+parser.add_argument('-data', default='', type=str, help='choose CIFAR10/CIFAR100')          # data set
+parser.add_argument('-optimizer', default='', type=str, help='choose sgd/psgd')             # optimizer
+parser.add_argument('-epochs', default=0, type=int, help='number of epochs')                # epochs
+parser.add_argument('-lr', default=0, type=float, help='learning rate')                     # learning rate
+parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')                   # weight decay
+ 
+# parse arguments for psgd or pbfgs
+parser.add_argument('-dim', default=0, type=int, help='subspace dimension')                 # subspace dimension
+parser.add_argument('-samples', default=0, type=int, help='number of sampling epochs')      # sampling epochs
+parser.add_argument('-sample_start', default=0, type=int, help='first sample for PCA')      # first sample
+parser.add_argument('-spath', default='', type=str, help='sampling path')                   # sampling path
+
+# parse arguments for sgd
+parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
+
+# store arguments
+args = parser.parse_args()
+args.bs = 128
+args.mom = 0.9
+
+# check arguments
+if args.epochs <= 0:
+    raise Exception('invalid epochs')
+elif args.lr <= 0:
+    raise Exception('invalid learning rate')
+elif args.wd < 0:
+    raise Exception('invalid weight decay')
+elif args.bs <= 0:
+    raise Exception('invalid batch size')
+elif args.mom < 0 or args.mom > 1:
+    raise Exception('invalid momentum')
+
+if args.optimizer == 'psgd' or args.optimizer == 'pbfgs':
+    if args.dim <= 0:
+        raise Exception('invalid subspace dimension')
+    elif args.samples <= 0 or args.samples > args.dim:
+        raise Exception('invalid number of samples')
+    elif args.sample_start <= 0 or args.sample_start + args.samples > args.dim:
+        raise Exception('invalid starting sample')
+    elif not os.path.exists(args.spath):
+        raise Exception('invalid sampling path')
+
+elif args.optimizer == 'sgd':
+    if not os.path.exists(args.rpath):
+        raise Exception('invalid result path')
+
+else:
+    raise Exception('invalid optimizer')
+
+# login to monitoring tool
+wandb.login(key='147686d07ab47cb770a0957694c8a6f896671f2c')
+
+# check cuda accesss
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'Running on {device}')
+
+# define training task
+model = get_model(args).cuda()
+train_loader, test_loader = get_datasets(args)
+
+# train model
+if args.optimizer == 'sgd':
+    algorithms.train_SGD(args, model, train_loader, test_loader)
+elif args.optimizer == 'psgd':
+    algorithms.train_PSGD(args, model, train_loader, test_loader)
+
+# print test results
+accuracy, confusion = algorithms.eval_model(model, test_loader)
+print(f'Global accuracy: {accuracy:.2%}')
+print(confusion)
