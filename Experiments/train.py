@@ -16,6 +16,7 @@ parser.add_argument('-data', default='', type=str, help='choose CIFAR10/CIFAR100
 parser.add_argument('-optimizer', default='', type=str, help='choose sgd/psgd')             # optimizer
 parser.add_argument('-epochs', default=0, type=int, help='number of epochs')                # epochs
 parser.add_argument('-lr', default=0, type=float, help='learning rate')                     # learning rate
+parser.add_argument('-lr_scheduler', default=True, type=bool, help='lr scheduler')          # lr scheduler
 parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')                   # weight decay
  
 # parse arguments for psgd or pbfgs
@@ -25,6 +26,7 @@ parser.add_argument('-sample_start', default=0, type=int, help='first sample for
 parser.add_argument('-spath', default='', type=str, help='sampling path')                   # sampling path
 
 # parse arguments for sgd
+parser.add_argument('-freq', default=1, type=int, help='sampling frequency per epoch')      # sampling frequency
 parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
 
 # store arguments
@@ -55,7 +57,9 @@ if args.optimizer == 'psgd' or args.optimizer == 'pbfgs':
         raise Exception('invalid sampling path')
 
 elif args.optimizer == 'sgd':
-    if not os.path.exists(args.rpath):
+    if args.freq <=0:
+        raise Exception('invalid sampling frequency')
+    elif not os.path.exists(args.rpath):
         raise Exception('invalid result path')
 
 else:

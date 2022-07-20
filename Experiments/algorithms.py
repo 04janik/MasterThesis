@@ -1,5 +1,5 @@
 
-# neural network stuff
+import os
 import torch 
 
 # matrix calculations
@@ -13,9 +13,6 @@ from utils import get_datasets, get_model
 from fastprogress import master_bar, progress_bar
 import wandb
 import time
-
-# helpers
-import os
 
 
 def get_model_param_vec(model):
@@ -43,6 +40,7 @@ def update_grad(model, grad_vec):
         idx += size
 
 
+'''
 def get_subspace_cpu(args, model):
 
     W = []
@@ -69,6 +67,8 @@ def get_subspace_cpu(args, model):
     print("PCA time consumed:", pca_time)
 
     return Q, pca_time
+'''
+
 
 def get_subspace(args, model):
 
@@ -86,7 +86,7 @@ def get_subspace(args, model):
     start = time.time()
     U, S, V = torch.pca_lowrank(W, q=args.dim, center=True)
 
-    Q = torch.transpose(U,0,1)
+    Q = torch.transpose(V,0,1)
     print('Q:', Q.shape)
 
     end = time.time()
@@ -115,6 +115,9 @@ def train_PSGD(args, model, train_loader, test_loader):
     model_name = model.__class__.__name__
     run_name = f'{model_name}-PSGD-lr{args.lr}-d{args.dim}-s{args.samples}'
 
+    # storage
+    acc_max = 0 # max accuracy
+
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:
 
@@ -126,9 +129,6 @@ def train_PSGD(args, model, train_loader, test_loader):
 
         # progress bar
         mb = master_bar(range(args.epochs))
-
-        # store max accuracy
-        acc_max = 0
 
         for epoch in mb:
 
@@ -166,7 +166,8 @@ def train_PSGD(args, model, train_loader, test_loader):
             run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
 
             # schedule learning rate
-            lr_scheduler.step()
+            if args.lr_scheduler:
+                lr_scheduler.step()
 
 
 def train_SGD(args, model, train_loader, test_loader):
@@ -195,9 +196,16 @@ def train_SGD(args, model, train_loader, test_loader):
         run_index += 1
         run_path = os.path.join(args.rpath, run_name + '-' + str(run_index))
 
+    if args.freq > 1:
+        run_path = os.path.join(run_path, '-freq(' + args.freg + ')')
+
     # save model state
     os.makedirs(run_path)
     torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(0)))
+
+    # storage
+    acc_max = 0 # max accuracy
+    samples = 1 # number of sampled parameters
 
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:
@@ -210,14 +218,15 @@ def train_SGD(args, model, train_loader, test_loader):
         # progress bar
         mb = master_bar(range(args.epochs))
 
-        # store max accuracy
-        acc_max = 0
-
         for epoch in mb:
 
             start = time.time()
 
-            for inputs, labels in progress_bar(iter(train_loader), parent=mb):
+            # get sampling milestones
+            batch_count = len(train_loader)
+            milestones = [batch_count*i/args.freq for i in args.freq]
+
+            for batch, (inputs, labels) in progress_bar(enumerate(train_loader), parent=mb):
 
                 # move data to cuda
                 inputs, labels = inputs.cuda(), labels.cuda()
@@ -234,6 +243,10 @@ def train_SGD(args, model, train_loader, test_loader):
                 # log the loss
                 run.log({'loss': loss})
 
+                #save model state dict
+                if batch in milestones:
+                    torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(samples)))
+
             end = time.time()
 
             # evaluate the model
@@ -241,11 +254,9 @@ def train_SGD(args, model, train_loader, test_loader):
             acc_max = acc_max if acc_max > accuracy else accuracy
             run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
 
-            # save model state after every epoch
-            torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(epoch+1)))
-
             # schedule learning rate
-            lr_scheduler.step()
+            if args.lr_scheduler:
+                lr_scheduler.step()
 
 
 def eval_model(args, model, test_loader):
@@ -276,7 +287,3 @@ def eval_model(args, model, test_loader):
         model.train()
 
     return accuracy, confusion
-
-
-
-
