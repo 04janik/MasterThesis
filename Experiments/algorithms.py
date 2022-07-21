@@ -41,7 +41,7 @@ def update_grad(model, grad_vec):
 
 
 '''
-def get_subspace_cpu(args, model):
+def get_subspace(args, model):
 
     W = []
 
@@ -79,14 +79,14 @@ def get_subspace(args, model):
         model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(i))))
         W.append(get_model_param_vec(model))
 
-    W = torch.tensor(np.array(W))
+    W = torch.tensor(np.array(W)).cuda()
     print('W:', W.shape)
 
     # obtain subspace via PCA
     start = time.time()
     U, S, V = torch.pca_lowrank(W, q=args.dim, center=True)
 
-    Q = torch.transpose(V,0,1)
+    Q = torch.transpose(V,0,1).cuda()
     print('Q:', Q.shape)
 
     end = time.time()
@@ -188,16 +188,8 @@ def train_SGD(args, model, train_loader, test_loader):
     model_name = model.__class__.__name__
     run_name = f'{model_name}-SGD-lr{args.lr}'
 
-    # check if same experiment was run before
-    run_path = os.path.join(args.rpath, run_name + '-' + str(0))
-    run_index = 0
-
-    while os.path.exists(run_path):
-        run_index += 1
-        run_path = os.path.join(args.rpath, run_name + '-' + str(run_index))
-
-    if args.freq > 1:
-        run_path = os.path.join(run_path, '-freq(' + args.freg + ')')
+    # construct path for checkpoints
+    run_path = os.path.join(args.rpath, run_name + '-f' + str(args.freq))
 
     # save model state
     os.makedirs(run_path)
@@ -206,6 +198,10 @@ def train_SGD(args, model, train_loader, test_loader):
     # storage
     acc_max = 0 # max accuracy
     samples = 1 # number of sampled parameters
+
+    # get sampling milestones
+    batch_count = len(train_loader)
+    milestones = [int(batch_count*(i+1)/args.freq) for i in range(args.freq)]
 
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:
@@ -222,11 +218,12 @@ def train_SGD(args, model, train_loader, test_loader):
 
             start = time.time()
 
-            # get sampling milestones
-            batch_count = len(train_loader)
-            milestones = [batch_count*i/args.freq for i in args.freq]
+            batch = 0
 
-            for batch, (inputs, labels) in progress_bar(enumerate(train_loader), parent=mb):
+            for inputs, labels in progress_bar(iter(train_loader), parent=mb):
+
+                # count batches
+                batch = batch + 1
 
                 # move data to cuda
                 inputs, labels = inputs.cuda(), labels.cuda()
@@ -246,6 +243,7 @@ def train_SGD(args, model, train_loader, test_loader):
                 #save model state dict
                 if batch in milestones:
                     torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(samples)))
+                    samples = samples + 1
 
             end = time.time()
 
