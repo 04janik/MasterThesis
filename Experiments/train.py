@@ -1,6 +1,8 @@
 
 import argparse
+import numpy
 import os
+import random
 import torch
 import wandb
 
@@ -17,6 +19,7 @@ parser.add_argument('-optimizer', default='', type=str, help='choose sgd/psgd') 
 parser.add_argument('-epochs', default=0, type=int, help='number of epochs')                # epochs
 parser.add_argument('-lr', default=0, type=float, help='learning rate')                     # learning rate
 parser.add_argument('-lr_scheduler', default=True, type=bool, help='lr scheduler')          # lr scheduler
+parser.add_argument('-seed', default=None, type=int, help='random seed')                    # random seed
 parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')                   # weight decay
  
 # parse arguments for psgd or pbfgs
@@ -64,6 +67,12 @@ elif args.optimizer == 'sgd':
 
 else:
     raise Exception('invalid optimizer')
+
+# set random seed
+if args.seed is not None:
+    numpy.random.seed(args.seed)
+    random.seed(args.seed)
+    torch.manual_seed(args.seed)
 
 # login to monitoring tool
 wandb.login(key='147686d07ab47cb770a0957694c8a6f896671f2c')
