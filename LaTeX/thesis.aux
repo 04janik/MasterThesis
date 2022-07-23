@@ -17,17 +17,19 @@
 \newlabel{sec:Training}{{2.2}{5}}
 \citation{GD}
 \citation{ConvexOptimization}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Gradient Descent}}{6}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Gradient Descent \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{6}{}\protected@file@percent }
 \newlabel{lem:descent}{{2.8}{7}}
 \citation{ConvexOptimization}
 \newlabel{thm:descent}{{2.9}{8}}
-\citation{BFGS}
 \newlabel{lem:convexity}{{2.12}{9}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Broyden-Fletcher-Goldfarb-Shanno (BFGS)}}{10}{}\protected@file@percent }
+\citation{ConvexOptimization}
+\citation{BFGS}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Newton's Method \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{10}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Broyden-Fletcher-Goldfarb-Shanno (BFGS) \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{11}{}\protected@file@percent }
 \citation{SGD}
-\citation{Adam}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Stochastic Gradient Descent (SGD)}}{11}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Adaptive Moment Estimation (Adam)}}{12}{}\protected@file@percent }
+\citation{Armijo}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Stochastic Gradient Descent (SGD) \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{12}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Backtracking Linesearch \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{12}{}\protected@file@percent }
 \citation{NTK}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Training in the Function Space}{13}{}\protected@file@percent }
 \newlabel{sec:functionspace}{{3}{13}}
@@ -52,7 +54,7 @@
 \newlabel{sec:KGD}{{3.4}{25}}
 \newlabel{def:phi}{{3.15}{25}}
 \newlabel{lem:phi}{{3.16}{26}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Kernel Gradient Descent}}{27}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {6}{\ignorespaces Kernel Gradient Descent \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{27}{}\protected@file@percent }
 \newlabel{lem:form}{{3.19}{28}}
 \citation{Functionals}
 \citation{Features}
@@ -68,47 +70,62 @@
 \citation{NTK}
 \citation{NTK}
 \citation{NTK}
+\newlabel{thm:ntk}{{3.29}{36}}
+\citation{Paper}
 \citation{Paper}
 \citation{Paper}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Training in Low-Dimensional Subspaces}{37}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Approach}{37}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Low-dimensional parameter trajectory}}{37}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Motivation}{37}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Low-dimensional optimization trajectory}}{37}{}\protected@file@percent }
 \newlabel{fig:trajectory}{{4}{37}}
+\citation{Paper}
 \citation{SVD}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Theory}{38}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}Singular Value Decomposition}{38}{}\protected@file@percent }
+\citation{SVD}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Singular Value Decomposition}{38}{}\protected@file@percent }
 \newlabel{thm:svd}{{4.1}{38}}
 \newlabel{cor:svd}{{4.3}{38}}
 \citation{SVD}
-\newlabel{thm:eym}{{4.5}{39}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}Dynamic Linear Dimensionality Reduction}{39}{}\protected@file@percent }
-\newlabel{def:flow}{{4.6}{40}}
-\newlabel{lem:flow}{{4.7}{40}}
 \citation{SVD}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Methodology}{43}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}Orthogonal Projections}{43}{}\protected@file@percent }
-\newlabel{lem:orthProjection}{{4.8}{43}}
+\newlabel{def:rank}{{4.4}{39}}
+\newlabel{thm:eym}{{4.5}{39}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Low-Dimensional Trajectory Hypothesis}{40}{}\protected@file@percent }
+\newlabel{lem:orthProjection}{{4.6}{40}}
+\citation{Decay1}
+\citation{Decay2}
+\newlabel{eq:flow}{{{$\ast $}}{44}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Dynamic Linear Dimensionality Reduction}{44}{}\protected@file@percent }
 \citation{PCA}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}Principal Component Analysis}{44}{}\protected@file@percent }
-\newlabel{sec:PCA}{{4.3.2}{44}}
-\newlabel{thm:PCA}{{4.10}{45}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.3}Algorithm}{46}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {6}{\ignorespaces Dynamic Linear Dimensionality Reduction (DLDR)}}{46}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Numerical Experiments}{47}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{49}{}\protected@file@percent }
+\newlabel{thm:pca}{{4.8}{45}}
+\citation{Paper}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {7}{\ignorespaces Dynamic Linear Dimensionality Reduction (DLDR) \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{47}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}DLDR-based Training Algorithms}{47}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {8}{\ignorespaces Projected Stochastic Gradient Descent (P-SGD) \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{48}{}\protected@file@percent }
+\citation{Paper}
+\citation{Paper}
+\citation{Paper}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {9}{\ignorespaces Projected Broyden-Fletcher-Goldfarb-Shanno (P-BFGS) \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{49}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Numerical Experiments}{50}{}\protected@file@percent }
+\newlabel{sec:Experiments}{{5}{50}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Space size comparison}{50}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Verification on various architectures}{50}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Iterative space refinement}{50}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Application of second-order information}{50}{}\protected@file@percent }
+\citation{Functionals}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{54}{}\protected@file@percent }
 \bibcite{Paper}{1}
 \bibcite{GD}{2}
 \bibcite{ConvexOptimization}{3}
 \bibcite{BFGS}{4}
 \bibcite{SGD}{5}
 \bibcite{Adam}{6}
-\bibcite{NTK}{7}
-\bibcite{Functionals}{8}
-\bibcite{FunctionalAnalysis}{9}
-\bibcite{RKHS}{10}
-\bibcite{Features}{11}
-\bibcite{Stieltjes}{12}
-\bibcite{Linear}{13}
-\bibcite{SVD}{14}
-\bibcite{PCA}{15}
-\gdef \@abspage@last{52}
+\bibcite{Armijo}{7}
+\bibcite{NTK}{8}
+\bibcite{Functionals}{9}
+\bibcite{FunctionalAnalysis}{10}
+\bibcite{RKHS}{11}
+\bibcite{Features}{12}
+\bibcite{SVD}{13}
+\bibcite{Decay1}{14}
+\bibcite{Decay2}{15}
+\bibcite{PCA}{16}
+\gdef \@abspage@last{58}

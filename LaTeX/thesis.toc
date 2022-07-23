@@ -1,4 +1,4 @@
-\babel@toc {english}{}\relax 
+\babel@toc {english}{}
 \contentsline {section}{\numberline {1}Introduction}{2}{}%
 \contentsline {section}{\numberline {2}Neural Networks}{3}{}%
 \contentsline {subsection}{\numberline {2.1}Notation}{3}{}%
@@ -10,13 +10,14 @@
 \contentsline {subsection}{\numberline {3.4}Kernel Gradient Descent}{25}{}%
 \contentsline {subsection}{\numberline {3.5}Neural Tangent Kernel}{31}{}%
 \contentsline {section}{\numberline {4}Training in Low-Dimensional Subspaces}{37}{}%
-\contentsline {subsection}{\numberline {4.1}Approach}{37}{}%
-\contentsline {subsection}{\numberline {4.2}Theory}{38}{}%
-\contentsline {subsubsection}{\numberline {4.2.1}Singular Value Decomposition}{38}{}%
-\contentsline {subsubsection}{\numberline {4.2.2}Dynamic Linear Dimensionality Reduction}{39}{}%
-\contentsline {subsection}{\numberline {4.3}Methodology}{43}{}%
-\contentsline {subsubsection}{\numberline {4.3.1}Orthogonal Projections}{43}{}%
-\contentsline {subsubsection}{\numberline {4.3.2}Principal Component Analysis}{44}{}%
-\contentsline {subsubsection}{\numberline {4.3.3}Algorithm}{46}{}%
-\contentsline {section}{\numberline {5}Numerical Experiments}{47}{}%
-\contentsline {section}{\numberline {6}Conclusion}{49}{}%
+\contentsline {subsection}{\numberline {4.1}Motivation}{37}{}%
+\contentsline {subsection}{\numberline {4.2}Singular Value Decomposition}{38}{}%
+\contentsline {subsection}{\numberline {4.3}Low-Dimensional Trajectory Hypothesis}{40}{}%
+\contentsline {subsection}{\numberline {4.4}Dynamic Linear Dimensionality Reduction}{44}{}%
+\contentsline {subsection}{\numberline {4.5}DLDR-based Training Algorithms}{47}{}%
+\contentsline {section}{\numberline {5}Numerical Experiments}{50}{}%
+\contentsline {subsection}{\numberline {5.1}Space size comparison}{50}{}%
+\contentsline {subsection}{\numberline {5.2}Verification on various architectures}{50}{}%
+\contentsline {subsection}{\numberline {5.3}Iterative space refinement}{50}{}%
+\contentsline {subsection}{\numberline {5.4}Application of second-order information}{50}{}%
+\contentsline {section}{\numberline {6}Conclusion}{54}{}%

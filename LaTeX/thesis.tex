@@ -1,4 +1,3 @@
-
 \documentclass[11pt, a4paper]{article}
 \usepackage[left= 2.5cm, right = 3cm, bottom = 4 cm]{geometry}
 \usepackage[english]{babel}
@@ -15,6 +14,7 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{algorithm}[theorem]{Algorithm}
+\newtheorem*{hypothesis}{Low-Dimensional Trajectory Hypothesis}
 
 \usepackage{amssymb}
 \newcommand{\N}{\mathbb{N}}
@@ -158,7 +158,7 @@ Let $f: \R^n \to \R$ be differentiable. The gradient of $f$ is defined as
 Due to the complexity of the error function, in general there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first raised by Cauchy in \cite{GD}.
 
 \begin{algorithm}
-\caption{Gradient Descent} \ \\
+\caption{Gradient Descent \textcolor{white}{$\Big |$}} \ \\
 \textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and $\epsilon \geq 0$. \\
 \textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
 \textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
@@ -306,12 +306,47 @@ This completes the proof, since the backwards direction is trivial.
 
 Thus for lower bounded functions $f: \R^n \to \R$, that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. Unfortunately this does not apply to the empirical error function used for training neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:functionspace}. Next we will provide further iterative optimization methods. \\
 
-The gradient descent method is based on the first order Taylor expansion. Intuitively, inclusion of second order information should speed up the minimization process. This idea lead to the famous Newton's method, which requires the objective function to be twice differentiable. Furthermore, to apply Newton's method, we have to compute the Hessian matrix, leading to way more computation effort needed in comparison to gradient descent. In order to reduce this additional effort, one can approximate the inverse Hessian matrix instead of computing it exactly. One popular method, that pursues this approach is the following from \cite{BFGS}.
+Another approach to find local minima of some differentiable function $f: \R^n \to \R$ is to solve the equation $\nabla f(x) = 0$. For this purpose one can use the widely known Newton method, that is a technique to solve the problem of finding a root of a differentiable function. Hence, to apply this technique for minimization of $f$, we have to assume that $f$ is twice differentiable. In order to formally introduce the Newton method, we require the following definition.
+
+\begin{definition}
+Let $f: \R^n \to \R$ be twice differentiable. The Hessian of $f$ is defined as
+\[ H_f : \R^n \to \R^{n \times n} : x = (x_1, \dots, x_n) \mapsto \begin{bmatrix} \textcolor{white}{\bigg |} \frac{\partial}{\partial x_1 \partial x_1} f(x) & \cdots & \frac{\partial}{\partial x_1 \partial x_n} f(x) \\ \textcolor{white}{\bigg |} \vdots & \ddots & \vdots \\ \textcolor{white}{\bigg |} \frac{\partial}{\partial x_n \partial x_1} f(x) & \cdots & \frac{\partial}{\partial x_n \partial x_n} f(x) \end{bmatrix}. \]
+\end{definition}
+
+The basic idea of Newton's method consists of approximating
+\[ \nabla f(x+ \Delta x) \approx \nabla f(x) + H_f(x) \Delta x = 0. \]
+Based on this approximation, iterative updates $ \Delta x = - H_f^{-1}(x) \nabla f(x)$ provide the rule
+\[ x_{k+1} \leftarrow x_k - H_f^{-1}(x_k) \nabla f(x_k). \]
+According to section 1.2.4 of \cite{ConvexOptimization}, the technique's convergence rate is quadratic, such that convergence in a neighborhood of strict local minima is very fast. However, this method is cursed with two serious drawbacks. Firstly, the Hessian matrices $H(x_k)$ have to be invertible for every $k \in \N$. Secondly, the technique can diverge. In order to avoid possible divergence, we can slightly modify the update rule and introduce the Newton method as follows.
+
+%Similar to gradient descent, the Newton method iteratively approximates a solution $x^* \in \R^n$ of the problem. More precisely, the technique determines some $x^* + \Delta x \in \R^n$, such that
+%\[ x^* \approx x^* + \Delta x. \]
+%Based on the assumption of twice differentiability, we denote the Hessian of $f$ as $H(x) \in \R^{n \times n}$ for some $x \in \R^n$. The idea of the Newton method consists of approximating
+%\[ \nabla f(x+ \Delta x) \approx \nabla f(x) + H(x) \Delta x. \]
+%This linear approximation is based on the multi-dimensional Taylor expansion. In the case where the Hessian $H(x)$ is invertible, we can define $\Delta x$ as
+%\[ \Delta x \coloneq - H^{-1}(x) \nabla f(x). \]
+%Using this, we clearly observe that
+%\[ \nabla f(x + \Delta x) \approx \nabla f(x) - H(x) H^{-1}(x) \nabla f(x) = 0. \]
+%Thus, the iterative application of this approach provides the update rule
+%\[ x_{k+1} \leftarrow x_k - H^{-1}(x_k) \nabla f(x_k). \]
 
 \begin{algorithm}
-\caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS)} \ \\
-\textcolor{white}{$\Big |$}1: Requires twice-differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
-\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$, $B_0 \leftarrow I_n$. \\
+\caption{Newton's Method \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}1: Requires twice differentiable $f: \R^n \to \R$ with invertible Hessian $H_f(x)$ for $x \in \R^n$. \\
+\textcolor{white}{$\Big |$}2: Requires random initialization $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
+\textcolor{white}{$\Big |$}3: Initialize $k \leftarrow 0$. \\
+\textcolor{white}{$\Big |$}4: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
+\textcolor{white}{$\Big |$}5: \quad Choose a step size $\eta_k > 0$. \\
+\textcolor{white}{$\Big |$}6: \quad Set $x_{k+1} \leftarrow x_k - \eta_k H_f^{-1}(x_k) \nabla f(x_k)$ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}7: \textbf{end while}
+\end{algorithm}
+
+If $n$ is large, the Hessian matrix computation in Newton's method can become computationally very expensive. Since we are only in need of the inverse Hessians $H_f^{-1}(x_k)$, one approach to reduce the computational effort consists of approximating these inverse Hessians. One popular method, that pursues this approach is the following from \cite{BFGS}.
+
+\begin{algorithm}
+\caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS) \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}1: Requires twice differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
+\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$ and $B_0 \leftarrow I_n$. \\
 \textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
 \textcolor{white}{$\Big |$}4: \quad Choose a step size $\eta_k > 0$. \\
 \textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \eta_k B_k \nabla f(x_{k})$. \\
@@ -321,52 +356,65 @@ The gradient descent method is based on the first order Taylor expansion. Intuit
 \textcolor{white}{$\Big |$}9: \textbf{end while}
 \end{algorithm}
 
-With the initialization $B_0 = I_n$, the method starts with a simple gradient descent update and then iteratively minimizes the objective function by inverse Hessian matrix approximations. \\
+With the initialization $B_0 = I_n$, the method starts with a gradient descent update and then iteratively minimizes the objective function by inverse Hessian matrix approximations $B_k$. \\
 
-Unfortunately, Hessian matrix computation or Hessian matrix approximation is infeasible for deep neural networks due to the large number of parameters. However, later on we will introduce an approach to train neural networks in tiny subspaces, such that second order methods become applicable. \\
+So far we have seen three different approaches to iteratively minimize a twice differentiable function $f: \R^n \to \R$. With respect to our objective of minimizing the empirical error
+\[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
+however, we must note that due to the large number of parameters in deep neural networks in combination with the massive amount of training data needed, the proposed optimization algorithms are not applicable. Still, the approach of neural network training is to iteratively optimize the parameters via some update rule of the form
+\[ w_{k+1} \leftarrow w_k - \eta_k \cdot d_k, \]
+where $d_k \in \R^n$ denotes a direction of descent. Note that gradient descent, Newton's method as well as BFGS pursue exactly this approach. For the purpose of minimizing $E$ however, we need to find a computationally cheaper method to determine the descent directions. \\
 
-At this stage we are restricted to training neural networks via gradient descent on the empirical error function. Recalling its definition
- \[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
-we observe, that the computation effort needed to compute the gradient, depends on the number of training samples $m \in \N$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will introduce two of them. \\
+%At this stage we are restricted to training neural networks via gradient descent on the empirical error function. Recalling its definition
+ %\[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
+%we observe, that the computation effort needed to compute the gradient, depends on the number of training samples $m \in \N$. This is a severe problem for the gradient descent algorithm, since we have to train on a significant amount of data, to optimize the millions of parameters in deep neural networks. Thus, gradient descent on the empirical error function is computationally and time expensive, that even with heavy computing power it can be unfeasible to find good solutions in a reasonable period of time. However, there exist several other optimization methods, that apply the same concept of minimizing a function along the slope of its surface. These algorithms make a trade-off between the accuracy and the time needed for gradient computations. In the following we will introduce two of them. \\
 
-Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $\I_k \subset \{ 1, \dots, m \}$ of size $| \I_k | = b \in \N$ and uses
-\[ \nabla E(w_k,\I_k) \coloneq \frac{1}{b} \sum_{i \in \I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \big \| w_k \big \|_2^2 \]
+Stochastic gradient descent is a variation of gradient descent, that aims to approximate the gradient of the objective function instead of computing it exactly. The basic idea is to compute the gradient on a random fraction of the data set and use this as an estimation of the gradient on the whole data set. In each iteration $k \in \N$ one randomly draws a subset $\I_k \subset \{ 1, \dots, m \}$ of size $| \I_k | = b \in \N$ and uses $\nabla E(w_k,\I_k)$, defined via
+\[ E(w_k,\I_k) \coloneq \frac{1}{b} \sum_{i \in \I_k}^{} \ell \big ( f(x_i,w_k),y_i \big) + \lambda \big \| w_k \big \|_2^2, \]
 as an approximation of $\nabla E(w_k)$. Although only a small amount of data is used for one single parameter update, during training most of the data will be used to fit the model due to the large number of iterative updates. Formally stochastic gradient descent proceeds as follows.
 
-\begin{algorithm}
-\caption{Stochastic Gradient Descent (SGD)} \ \\
+\begin{algorithm} 
+\caption{Stochastic Gradient Descent (SGD) \textcolor{white}{$\Big |$}} \ \\
 \textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
-\textcolor{white}{$\Big |$}2: Requires a batch size $b \in \N$ and a number of epochs $K \in \N$. \\
-\textcolor{white}{$\Big |$}3: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}2: Requires a batch size $b \in \N$ and a number of epochs $N \in \N$. \\
+\textcolor{white}{$\Big |$}3: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
 \textcolor{white}{$\Big |$}4: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
 \textcolor{white}{$\Big |$}5: \quad Choose a step size $\eta_k > 0$. \\
 \textcolor{white}{$\Big |$}6: \quad Set $w_{k+1} \leftarrow w_k - \eta_k \cdot \nabla E(w_k,\I_k)$. \\
 \textcolor{white}{$\Big |$}7: \textbf{end for}
 \end{algorithm}
 
-In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training dataset. Thus on average each individual training sample will contribute $K$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this thesis. \\
+In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training dataset. Thus on average each individual training sample will contribute $N$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this thesis. \\
 
-So far we have not discussed how to choose the step sizes $\eta_k$. To simplify things, in practice one usually chooses a step size $\eta > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the stochastic gradient descent algorithm by including past gradients for the current parameter update is called adaptive moment estimation and was first raised in \cite{Adam}. \\
 
-\begin{algorithm}
-\caption{Adaptive Moment Estimation (Adam)} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$.  \\
-\textcolor{white}{$\Big |$}2: Requires constant step size $\eta > 0 \in \R$, batch size $b \in \N$ and number of epochs $K \in \N$. \\
-\textcolor{white}{$\Big |$}3: Requires momentum factors $\beta_1, \beta_2 \in [0,1)$ and a scalar $\epsilon > 0$. \\
-\textcolor{white}{$\Big |$}4: \textbf{for} $k=1, \dots, \frac{Km}{b}$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}5: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
-\textcolor{white}{$\Big |$}6: \quad Set $m_{k} \leftarrow \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,\I_k)$ and let $\hat{m}_k \coloneq \frac{m_k}{1-\beta_1^k}$. \\
-\textcolor{white}{$\Big |$}7: \quad Set $v_{k} \leftarrow \beta_2 v_{k-1} + (1-\beta_2) \cdot \nabla E(w_k,\I_k)^2$ and let $\hat{v}_k \coloneq \frac{v_k}{1-\beta_2^k}$. \\
-\textcolor{white}{$\Big |$}8: \quad Set $w_{k+1} \leftarrow w_k - \eta \cdot \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \epsilon}$. \\
-\textcolor{white}{$\Big |$}9: \textbf{end for}
+%So far we have not discussed how to choose the step sizes $\eta_k$. To simplify things, in practice one usually chooses a step size $\eta > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the stochastic gradient descent algorithm by including past gradients for the current parameter update is called adaptive moment estimation and was first raised in \cite{Adam}. \\
+
+%\begin{algorithm}
+%\caption{Adaptive Moment Estimation (Adam)} \ \\
+%\textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$.  \\
+%\textcolor{white}{$\Big |$}2: Requires constant step size $\eta > 0 \in \R$, batch size $b \in \N$ and number of epochs $N \in \N$. \\
+%\textcolor{white}{$\Big |$}3: Requires momentum factors $\beta_1, \beta_2 \in [0,1)$ and a scalar $\epsilon > 0$. \\
+%\textcolor{white}{$\Big |$}4: \textbf{for} $k=1, \dots, \frac{Nm}{b}$ \textbf{do}: \\
+%\textcolor{white}{$\Big |$}5: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
+%\textcolor{white}{$\Big |$}6: \quad Set $m_{k} \leftarrow \beta_1 m_{k-1} + (1-\beta_1) \cdot \nabla E(w_k,\I_k)$ and let $\hat{m}_k \coloneq \frac{m_k}{1-\beta_1^k}$. \\
+%\textcolor{white}{$\Big |$}7: \quad Set $v_{k} \leftarrow \beta_2 v_{k-1} + (1-\beta_2) \cdot \nabla E(w_k,\I_k)^2$ and let $\hat{v}_k \coloneq \frac{v_k}{1-\beta_2^k}$. \\
+%\textcolor{white}{$\Big |$}8: \quad Set $w_{k+1} \leftarrow w_k - \eta \cdot \frac{\hat{m}_k}{\sqrt{\hat{v}_k} + \epsilon}$. \\
+%\textcolor{white}{$\Big |$}9: \textbf{end for}
+%\end{algorithm}
+
+%In here, all operations on vectors are performed element-wise. The scalar $\epsilon$ is used to prevent division by zero. The default setup proposed by the authors is to choose $\epsilon = 10^{-8}$, $\beta_1 = 0.9$ and $\beta_2 = 0.999$. We will always apply this default setting when working with Adam. \\
+
+As of now we have not discussed the choice of step sizes $\eta_k$ in either of the four optimization methods proposed so far. In machine learning scenarios it is a common practice to choose a constant step size $\eta > 0$ for all parameter updates. Clearly there are better choices of step sizes rather than this naive approach. However, these often come with additional computational effort. A widely known technique for the choice of sophisticated step sizes is called backtracking linesearch and was first raised in \cite{Armijo}. The algorithm can be denoted as follows. 
+\begin{algorithm} 
+\caption{Backtracking Linesearch \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}1: Requires differentiable function $f: \R^n \to \R$ and $x \in \R^n$. \\
+\textcolor{white}{$\Big |$}2: Requires a factor $\beta \in (0,1)$ and a constant $c \in (0,1)$. \\ 
+\textcolor{white}{$\Big |$}3: Initialize $k \leftarrow 0$ and $\eta_0 \leftarrow 1$. \\
+\textcolor{white}{$\Big |$}4: \textbf{while} $f \big (x + \eta_k \cdot \nabla f(x) \big) > f(x) - c \cdot \eta_k \cdot \nabla f(x) \tr \nabla f(x)$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}5: \quad Set $\eta_{k+1} \leftarrow \beta \cdot \eta_k \cdot $ \\
+\textcolor{white}{$\Big |$}6: \textbf{end for}
 \end{algorithm}
 
-In here, all operations on vectors are performed element-wise. The scalar $\epsilon$ is used to prevent division by zero. The default setup proposed by the authors is to choose $\epsilon = 10^{-8}$, $\beta_1 = 0.9$ and $\beta_2 = 0.999$. We will always apply this default setting when working with Adam. \\
-
-This completes the necessary basics on notation and training of neural networks. Next we will investigate certain approaches on how to improve the training of neural networks in order prevent the curse of non-convexity and reduce the computation and time effort needed.  \\
-
-\textbf{Exploration:} Further second order method \\
-\textbf{Optional:} Backpropagation
+This completes the necessary basics on notation and training of neural networks. Next we will investigate certain approaches on how to improve the training of neural networks in order prevent the curse of non-convexity and reduce the computation and time effort needed. \\
 
 \pagebreak
 \section{Training in the Function Space} \label{sec:functionspace}
@@ -654,7 +702,7 @@ Kernel gradient descent is a method, that addresses this problem by minimizing t
 
 \subsection{Reproducing Kernel Hilbert Space}
 
-Reproducing kernel Hilbert spaces are widely used in machine learning scenarios. In the scalar case, their main application is to reduce the computation effort needed or to simplify infinite-dimensional optimization problems to finite-dimensional ones via the so kernel trick. In here, we will study a generalization of this concept to vector-valued reproducing kernel Hilbert spaces. These are based on the definition of multi-dimensional kernels from \cite{NTK}.
+Reproducing kernel Hilbert spaces are widely used in machine learning scenarios. In the scalar case, their main application is to reduce the computation effort needed or to simplify infinite-dimensional optimization problems to finite-dimensional ones via the kernel trick. In here, we will study a generalization of this concept to vector-valued reproducing kernel Hilbert spaces. These are based on the definition of multi-dimensional kernels from \cite{NTK}.
 
 \begin{definition}
 A multi-dimensional kernel over $\R^{n_0}$ is a measurable map
@@ -833,7 +881,7 @@ In contrast to a functional gradient $d|_{f_0} \in \F$, the kernel gradient is i
 Based on the uniqueness of the kernel gradient, we can finally generalize the gradient descent algorithm to kernel gradient descent, which is formalized as follows.
 
 \begin{algorithm}
-\caption{Kernel Gradient Descent} \ \\
+\caption{Kernel Gradient Descent \textcolor{white}{$\Big |$}} \ \\
 \textcolor{white}{$\Big |$}1: Requires kernel $K$, differentiable cost $C: \F \to \R$, random $f_0 \in \F$ and $\epsilon \geq 0$. \\
 \textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
 \textcolor{white}{$\Big |$}3: \textbf{while} $\big \| \nabla_K C |_{f_k} \big \|_{\D_x} > \epsilon$ \textbf{do}: \\
@@ -853,9 +901,7 @@ is said to follow the kernel gradient descent on $C$ with respect to K if it sat
 \[ \partial_tf(t) = - \nabla_KC|_{f(t)}. \]
 \end{definition}
 
-Roughly speaking, we can think of such a time dependent function as the continuous extension to the sequence $(f_k)_{k=0}^\infty$ in $\F$, produced by kernel gradient descent on $C$, when using an infinitely small step size. Hence $f(0) = f_0$ denotes the initialization of kernel gradient descent. \\
-
-Furthermore, the convergence analysis is based on the observation, that kernels induce symmetric bilinear forms with respect to $\D_x$. This is formulated in the following lemma.
+Roughly speaking, we can think of such a time dependent function as the continuous extension to the sequence $(f_k)_{k=0}^\infty$ in $\F$, produced by kernel gradient descent on $C$, when using an infinitely small step size. Hence $f(0) = f_0$ denotes the initialization of kernel gradient descent. Furthermore, the convergence analysis is based on the observation, that kernels induce symmetric bilinear forms with respect to $\D_x$. This is formulated in the following lemma.
 
 \begin{lemma} \label{lem:form}
 A kernel $K$ induces the symmetric bilinear form
@@ -952,12 +998,12 @@ As explained before, it is easy to ensure convexity of the cost $C$ in the funct
 
 The parameter training of neural networks via gradient descent is strongly connected to kernel gradient descent with respect to a special kernel, the neural tangent kernel. To motivate this connection, we start with a simple example, inspired by the approach of \cite{Features}, in which the objective function depends linear on its parameters. The example will be generalized, leading to the definition of the neural tangent kernel. The theory in here is based on \cite{NTK}. \\
 
-At first, we let $\D_{\F}$ be any probability distribution on the function space $\F$, whose support is given by a subset of the continuous functions on $\R^{n_0}$. Next, we choose an $n \in \N$ and draw random functions $f^{(k)} : \R^{n_0} \to \R^{n_l}$ for $k=1,\dots,n$ independently from the distribution $\D_{\F}$. Using these, we can define an objective function, which is parametrized via
-\[ F^\textit{lin}: \R^n \to \F : w \mapsto f_w \coloneq \frac{1}{\sqrt{n}} \sum_{k=1}^{n}w_kf^{(k)}. \]
+At first, we let $\D_{\F}$ be any probability distribution on the function space $\F$, whose support is given by a subset of the continuous functions on $\R^{n_0}$. Next, we choose an $n \in \N$ and draw random functions $f^{(i)} : \R^{n_0} \to \R^{n_l}$ for $i=1,\dots,n$ independently from the distribution $\D_{\F}$. Using these, we can define an objective function, which is parametrized via
+\[ F^\textit{lin}: \R^n \to \F : w \mapsto f_w \coloneq \frac{1}{\sqrt{n}} \sum_{i=1}^{n}w_if^{(i)}. \]
 Clearly, we observe for any $w, w' \in \R^n$, that
-\[ f_{w + w'} = \frac{1}{\sqrt{n}} \sum_{k=1}^{n}(w+ w')_kf^{(k)} = \frac{1}{\sqrt{n}} \sum_{k=1}^{n}w_kf^{(k)} + \frac{1}{\sqrt{n}} \sum_{k=1}^{n}w'_kf^{(k)} = f_w + f_{w'}. \]
+\[ f_{w + w'} = \frac{1}{\sqrt{n}} \sum_{i=1}^{n}(w+ w')_if^{(i)} = \frac{1}{\sqrt{n}} \sum_{i=1}^{n}w_if^{(i)} + \frac{1}{\sqrt{n}} \sum_{i=1}^{n}w'_if^{(i)} = f_w + f_{w'}. \]
 Moreover we have for any $w \in \R^n$ and $\lambda \in \R$, that 
-\[ f_{\lambda w} = \frac{1}{\sqrt{n}} \sum_{k=1}^{n}\lambda w_kf^{(k)} = \lambda \cdot \frac{1}{\sqrt{n}} \sum_{k=1}^{n} w_kf^{(k)} = \lambda f_w, \]
+\[ f_{\lambda w} = \frac{1}{\sqrt{n}} \sum_{i=1}^{n}\lambda w_if^{(i)} = \lambda \cdot \frac{1}{\sqrt{n}} \sum_{i=1}^{n} w_if^{(i)} = \lambda f_w, \]
 such that $F^\textit{lin}$ is linear in the parameters $w \in \R^n$. Given labeled training data, the objective function can be learned via gradient descent on the empirical error
 \[ E \coloneq C \circ F^\textit{lin}: \R^n \to \R, \]
 where $C: \F \to \R$ denotes a cost functional. Our goal is to construct a kernel $K$, such that gradient descent on $C \circ F^\textit{lin}$ is equivalent to kernel gradient descent on $C$ with respect to $K$. \\
@@ -985,14 +1031,14 @@ For $y, \hat{y} \in \R^{n_l}$ we define the outer product $y \otimes \hat{y}$ as
 \[ y \otimes \hat{y} \coloneq y \hat{y} \tr. \]
 \end{definition}
 
-For $k=1,\dots,n$, the partial derivatives $\partial_{w_{k}}F^\textit{lin}$ of the parametrization are given by
-\[ \partial_{w_{k}}F^\textit{lin} : \R^n \to \F: w \mapsto \frac{1}{\sqrt{n}}f^{(k)}. \]
+For $i=1,\dots,n$, the partial derivatives $\partial_{w_{i}}F^\textit{lin}$ of the parametrization are given by
+\[ \partial_{w_{i}}F^\textit{lin} : \R^n \to \F: w \mapsto \frac{1}{\sqrt{n}}f^{(i)}. \]
 
 Using these, we can introduce the so called tangent kernel $\tilde{K}$, which is defined as follows.
 
 \begin{definition}
-Given $n$ random functions $f^{(k)} : \R^{n_0} \to \R^{n_l}$ for $k=1,\dots,n$ drawn i.i.d. according to some distribution $\D_{\F}$ on the function space $\F$, the tangent kernel is defined as
-\[ \tilde{K} \coloneq \sum_{k=1}^{n} \partial_{w_k} F^\textit{lin}(w) \otimes \partial_{w_k} F^\textit{lin}(w) = \frac{1}{n} \sum_{k=1}^{n} f^{(k)} \otimes f^{(k)}. \]
+Given $n$ random functions $f^{(i)} : \R^{n_0} \to \R^{n_l}$ for $i=1,\dots,n$ drawn i.i.d. according to some distribution $\D_{\F}$ on the function space $\F$, the tangent kernel is defined as
+\[ \tilde{K} \coloneq \sum_{i=1}^{n} \partial_{w_i} F^\textit{lin}(w) \otimes \partial_{w_i} F^\textit{lin}(w) = \frac{1}{n} \sum_{i=1}^{n} f^{(i)} \otimes f^{(i)}. \]
 \end{definition}
 
 In other words, $\tilde{K}$ maps a tuple $(x,x') \in \R^{n_0} \times \R^{n_0}$ to the matrix $\tilde{K} \in \R^{n_l \times n_l}$ with entries 
@@ -1001,15 +1047,15 @@ In other words, $\tilde{K}$ maps a tuple $(x,x') \in \R^{n_0} \times \R^{n_0}$ t
 We will prove, that gradient descent on $C \circ F^\textit{lin}$ is equivalent to kernel gradient descent on the cost $C$ with respect to the tangent kernel $\tilde{K}$, which is based on the following result.
 
 \begin{lemma} \label{lem:evolution}
-Let $w: [0, \infty) \to \R^n$ be a time dependent function, that follows the gradient descent on $C \circ F^\textit{lin}$. For $k=1, \dots, n$, the change in $w_k$ during gradient descent is given by
-\[ \partial_tw_k(t) = - \frac{1}{\sqrt{n}} \big \langle d|_{f_{w(t)}}, f^{(k)} \big \rangle_{\D_x}, \]
+Let $w: [0, \infty) \to \R^n$ be a time dependent function, that follows the gradient descent on $C \circ F^\textit{lin}$. For $i=1, \dots, n$, the change in $w_i$ during gradient descent is given by
+\[ \partial_tw_i(t) = - \frac{1}{\sqrt{n}} \big \langle d|_{f_{w(t)}}, f^{(i)} \big \rangle_{\D_x}, \]
 where $d|_{f_{w(t)}} \in \F$ denotes the representer of $\partial_f C|_{f_{w(t)}} = \big \langle d|_{f_{w(t)}}, \cdot \big \rangle_{\D_x} \in \F^*$ for $t \in [0,\infty)$.
 \end{lemma}
 
 \begin{proof}
 According to the chain rule for functionals in Appendix A of \cite{Functionals}, we have
-\[ \partial_tw_k(t) = - \partial_{w_{k}} C|_{f_{w(t)}} = - \big \langle d|_{f_{w(t)}}, \partial_{w_k} f_{w(t)} \big \rangle_{\D_x} = - \big \langle d|_{f_{w(t)}}, \frac{1}{\sqrt{n}} f^{(k)} \big \rangle_{\D_x} \]
-for $k = 1, \dots, n$. Using the linearity of $\langle \cdot, \cdot \rangle_{\D_x}$ completes the proof.
+\[ \partial_tw_i(t) = - \partial_{w_{i}} C|_{f_{w(t)}} = - \big \langle d|_{f_{w(t)}}, \partial_{w_i} f_{w(t)} \big \rangle_{\D_x} = - \big \langle d|_{f_{w(t)}}, \frac{1}{\sqrt{n}} f^{(i)} \big \rangle_{\D_x} \]
+for $i = 1, \dots, n$. Using the linearity of $\langle \cdot, \cdot \rangle_{\D_x}$ completes the proof.
 \end{proof}
 
 Based on this, we can prove that the dynamics of gradient descent on $C \circ F^\textit{lin}$ and kernel gradient descent on $C$ with respect to the tangent kernel $\tilde{K}$ are governed by the same parameter curve $w(t)$ in $\R^n$. The corresponding result is formulated as follows.
@@ -1021,20 +1067,20 @@ Let $w: [0, \infty) \to \R^n$ be a time dependent function, that follows the gra
 
 \begin{proof}
 On one hand, we can use the definition of $F^\textit{lin}$ and apply lemma \ref{lem:evolution} to derive
-\[ \partial_tf_{w(t)} = \frac{1}{\sqrt{n}} \sum_{k=1}^{n} \partial_t w_k(t) \cdot f^{(k)} = - \frac{1}{n} \sum_{k=1}^{n} \big \langle d|_{f_{w(t)}}, f^{(k)} \big \rangle_{\D_x} \cdot f^{(k)}. \]
+\[ \partial_tf_{w(t)} = \frac{1}{\sqrt{n}} \sum_{i=1}^{n} \partial_t w_i(t) \cdot f^{(i)} = - \frac{1}{n} \sum_{i=1}^{n} \big \langle d|_{f_{w(t)}}, f^{(i)} \big \rangle_{\D_x} \cdot f^{(i)}. \]
 On the other hand, using the equation
-\[ \tilde{K}(x,x_i) = \frac{1}{n} \sum_{k=1}^{n}f^{(k)}(x) \otimes f^{(k)}(x_i) = \frac{1}{n} \sum_{k=1}^{n}f^{(k)}(x) f^{(k)}(x_i) \tr, \]
+\[ \tilde{K}(x,x_j) = \frac{1}{n} \sum_{i=1}^{n}f^{(i)}(x) \otimes f^{(i)}(x_j) = \frac{1}{n} \sum_{i=1}^{n}f^{(i)}(x) f^{(i)}(x_j) \tr, \]
 we can write the kernel gradient of $C$ at $f_{w(t)}$ with respect to $\tilde{K}$ as
 \[ \begin{split}
 \nabla_{\tilde{K}} C|_{f_{w(t)}}(x)
-&= \frac{1}{m} \sum_{i=1}^{m} \tilde{K}(x,x_i)d|_{f_{w(t)}}(x_i) \\\
-&= \frac{1}{m} \sum_{i=1}^{m} \frac{1}{n} \sum_{k=1}^{n}f^{(k)}(x) f^{(k)}(x_i) \tr d|_{f_{w(t)}}(x_i) \\\
-&= \frac{1}{n} \sum_{k=1}^{n} f^{(k)}(x) \cdot \frac{1}{m} \sum_{i=1}^{m} f^{(k)}(x_i) \tr  d|_{f_{w(t)}}(x_i) \\\
-&= \frac{1}{n} \sum_{k=1}^{n} f^{(k)}(x) \cdot \E_{x' \sim \D_x} \Big [ f^{(k)}(x')\tr  d|_{f_{w(t)}}(x') \Big ] \\\
-&= \frac{1}{n} \sum_{k=1}^{n} f^{(k)}(x) \cdot \big \langle f^{(k)}, d|_{f_{w(t)}} \big \rangle_{\D_x},
+&= \frac{1}{m} \sum_{j=1}^{m} \tilde{K}(x,x_j)d|_{f_{w(t)}}(x_j) \\\
+&= \frac{1}{m} \sum_{j=1}^{m} \frac{1}{n} \sum_{i=1}^{n}f^{(i)}(x) f^{(i)}(x_j) \tr d|_{f_{w(t)}}(x_j) \\\
+&= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \frac{1}{m} \sum_{j=1}^{m} f^{(i)}(x_j) \tr  d|_{f_{w(t)}}(x_j) \\\
+&= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \E_{x' \sim \D_x} \Big [ f^{(i)}(x')\tr  d|_{f_{w(t)}}(x') \Big ] \\\
+&= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \big \langle f^{(i)}, d|_{f_{w(t)}} \big \rangle_{\D_x},
 \end{split} \]
 Comparison of the two expressions results in
-\[ \partial_tf_{w(t)} = - \frac{1}{n} \sum_{k=1}^{n} \big \langle d|_{f_{w(t)}}, f^{(k)} \big \rangle_{\D_x} \cdot f^{(k)} = -\nabla_{\tilde{K}} C|_{f_{w(t)}}. \]
+\[ \partial_tf_{w(t)} = - \frac{1}{n} \sum_{i=1}^{n} \big \langle d|_{f_{w(t)}}, f^{(i)} \big \rangle_{\D_x} \cdot f^{(i)} = -\nabla_{\tilde{K}} C|_{f_{w(t)}}. \]
 In other words, $F^\textit{lin} \circ w$ follows the kernel gradient descent on $C$ with respect to $\tilde{K}$.
 \end{proof}
 
@@ -1050,10 +1096,10 @@ The training of neural networks behaves quite similar to the kernel gradient des
  
 \begin{definition} \label{def:ntk}
 Given parameters $w \in \R^n$, the neural tangent kernel is defined as
-\[ \Theta_w \coloneq \sum_{k=1}^{n} \partial_{w_k} F(w) \otimes \partial_{w_k} F(w). \]
+\[ \Theta_w \coloneq \sum_{i=1}^{n} \partial_{w_i} F(w) \otimes \partial_{w_i} F(w). \]
 \end{definition}
 
-In contrast to the previous example, the realization function $F$ is not linear, due to the nested construction of neural networks, so the partial derivatives $\partial_{w_k}F$ are no longer independent of the parameters $w$. Thus, in contrast to the tangent kernel, which is constant during training due to its independency of the parameters $w$, the neural tangent kernel is random at initialization and varies during training. As a result, the relationship between gradient descent and kernel gradient descent with respect to the neural tangent kernel is more complex. \\
+In contrast to the previous example, the realization function $F$ is not linear, due to the nested construction of neural networks, so the partial derivatives $\partial_{w_i}F$ are no longer independent of the parameters $w$. Thus, in contrast to the tangent kernel, which is constant during training due to its independency of the parameters $w$, the neural tangent kernel is random at initialization and varies during training. As a result, the relationship between gradient descent and kernel gradient descent with respect to the neural tangent kernel is more complex. \\
 
 Let us clarify this problem. For the same reasons as in lemma \ref{lem:tk}, during training via gradient descent on $C \circ F$, the network function $f_w$ evolves along the differential equation
 \[ \partial_tf_{w(t)} = -\nabla_{\Theta_w}C|_{f_{w(t)}}. \]
@@ -1094,12 +1140,12 @@ The theorem states, that for any initialization $w_0 \in \R^n$ and any  $x,x' \i
 \[ \forall \epsilon > 0 : \lim_{n_{l-1} \to \infty} \cdots \lim_{n_1 \to \infty} \mathbb{P} \Big ( \big | (\Theta_{w_0})_{i,j}(x,x') - \Theta_{\infty}(x,x') \big | > \epsilon \Big ) = 0, \quad i,j=1, \dots, n_l. \]
 
 The second key result in \cite{NTK} is that the neural tangent kernel stays asymptotically constant during training. To formalize this, we have to notate a slightly more general definition of training. More precisely, in the infinite width limit the parameter space is infinite-dimensional, such that it is in practical nonsense to speak of parameter training. Thus, instead of denoting objects in dependence of the parameters $w(t)$, we use a notation in dependence of time $t$. In contrast to lemma \ref{lem:evolution}, where a descent direction was denoted as $d|_{f_{w(t)}} \in \F$, such that 
-\[ \partial_tw_k(t) = - \big \langle d|_{f_{w(t)}}, \partial_{w_k} f_{w(t)} \big \rangle_{\D_x}, \]
+\[ \partial_tw_i(t) = - \big \langle d|_{f_{w(t)}}, \partial_{w_i} f_{w(t)} \big \rangle_{\D_x}, \]
 we denote a descent direction as $d|_{f_t} \in \F$, such that
-\[ \partial_tw_k(t) = - \big \langle d|_{f_t}, \partial_{w_k} f_t \big \rangle_{\D_x}. \]
+\[ \partial_tw_i(t) = - \big \langle d|_{f_t}, \partial_{w_k} f_t \big \rangle_{\D_x}. \]
 Furthermore, we denote the neural tangent kernel at time $t \in [0, \infty)$ as $\Theta_t$, instead of $\Theta_{w(t)}$. Based on this, we can formalize the asymptotic behavior of the neural tangent kernel.
 
-\begin{theorem}
+\begin{theorem} \label{thm:ntk}
 Let $f: \R^{n_0} \to \R^{n_l}$ be a neural network of depth $l$, with a twice differentiable non-linear activation function $\sigma : \R \to \R$ at each layer, whose second derivative is bounded. Then, for any $T>0$, such that in the limit as the layer widths $n_1, \dots, n_{l-1} \to \infty$ sequentially, the integral $\int_{0}^{T} \| d_t \|_{\D_x}dt$ stays stochastically bounded, we have uniformly for $t \in [0,T]$, that
 \[ \Theta_t \to \Theta_{\infty} \otimes I_{n_l}. \]
 As a consequence, in this limit, the dynamics of $f_t$ is described by the differential equation
@@ -1118,28 +1164,31 @@ This concludes the necessary theory on the neural tangent kernel. Next we will u
 \pagebreak
 \section{Training in Low-Dimensional Subspaces}
 
-This section is dedicated to the theoretical considerations on how to efficiently reduce the computation effort needed, to train deep neural networks. If not otherwise specified, the following results stem from \cite{Paper}. The authors approach is based on the hypothesis, that deep neural networks can be trained in low-dimensional subspaces. They argue, that the parameter optimization trajectory could be embedded in a tiny subspace. We will start by motivating this hypothesis based on the previous seen properties of the neural tangent kernel. Afterwards we will introduce an efficient method for the subspace extraction, that enables us to train the network in a tiny subspace. Finally we can construct a second order optimization method training the parameters in the lower-dimensional space.
+This section analyzes the training dynamics of deep neural networks, especially the occurring parameter training sequences.
+If not otherwise specified, the following work is based on \cite{Paper}, in which the hypothesis, that deep neural network can be trained in low-dimensional subspaces, is raised. We start by giving an illustration of this hypothesis, followed by theoretical considerations on the existence of low-dimensional optimization trajectories. Finally, this leads to an algorithm for subspace extraction, which offers the possibility to train deep neural networks in subspaces, such small, that second order-methods become applicable.
 
-\subsection{Approach}
+\subsection{Motivation}
 
-In the following we will denote the parameter training sequence by $(w_k)_{k=0, \dots, K}$ after $K \in \N$ iterations. This sequence naturally arises during any of the proposed optimization methods in section \ref{sec:Training}. The low-dimensional landscape hypothesis from \cite{Paper} assumes that, there exists a low-dimensional affine set which approximately contains the optimization trajectory. This can be simply illustrated by the following example.
+In the following, we denote a deep neural network's parameter training sequence after $t \in \N$ iterations as $(w_k)_{k=0}^t$ in $\R^n$. Such a sequence naturally arises during training of the neural network via some reasonable iterative optimization method, such like stochastic gradient descent. \\
+
+In \cite{Paper} it is argued, that based on the nested construction of deep neural networks and the training of networks via error backpropagation, there has to be a lot of dependence and redundancy within the parameters of a deep neural network. This leads to the low-dimensional trajectory hypothesis, claiming that there exists a low-dimensional affine set which approximately covers the optimization trajectory $(w_k)_{k=0}^t$. An illustration of this hypothesis is given in figure \ref{fig:trajectory}, which was originally published in \cite{Paper} as figure 1.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.45\linewidth]{images/trajectory.png}
-\caption{Low-dimensional parameter trajectory}
+\includegraphics[width=0.5\linewidth]{images/trajectory.png}
+\caption{Low-dimensional optimization trajectory}
 \label{fig:trajectory}
 \end{figure}  
 
-Figure \ref{fig:trajectory} visualizes a three-dimensional space containing the three optimizable parameters $w(1), w(2), w(3)$. However, the training trajectory $(w_k)_{k=0, \dots, 3}$ could be embedded in a two-dimensional hyperplane, spanned by the orthogonal vectors $e_1$ and $e_2$. Note that none of the optimizable variables could be left out to reduce the dimension, but rather one has to construct new independent variables to obtain the lower-dimensional subspace that approximately contains the optimization trajectory. \\
+Figure \ref{fig:trajectory} visualizes a three-dimensional space containing three variables $w(1)$, $w(2)$, $w(3)$. These refer to the optimizable parameters of a very basic neural network. By training this network for three iterations, one achieves an optimization trajectory $(w_k)_{k=0}^3$, that could be embedded in a two-dimensional hyperplane, spanned by the orthogonal vectors $e_1$ and $e_2$. \\
 
-In the following we will investigate this hypothesis from a theoretical background and conduct several experiments indicating that deep neural networks can be well trained in tiny subspaces of approximately dimension 50. This enables us to efficiently use second order information in the training process and improves robustness against label noise. 
+Theoretically, this basic idea could translate to higher-dimensional models and more complex affine sets as well. Note that none of the optimizable variables could be left out to reduce the dimension, but rather one has to construct new independent variables to obtain the lower-dimensional affine set that approximately contains the optimization trajectory.  \\
 
-\subsection{Theory}
+If the low-dimensional trajectory hypothesis holds true, it would provide a new understanding of neural networks, both from a theoretical and practical perspective. According to \cite{Paper}, this includes generalization capability, implicit regularization, efficient learning algorithms and much more. Furthermore there would be benefits like the possibility to use second-order methods for optimization in case the optimization trajectory's dimension is small enough. \\
 
-To effectively reduce the dimensionality we need some background knowledge on the singular value decomposition (SVD) and low-rank approximations.
+We start by investigating the low-dimensional trajectory hypothesis from a theoretical perspective. This is based on the following background knowledge on the singular value decomposition (SVD) and low-rank approximations.
 
-\subsubsection{Singular Value Decomposition}
+\subsection{Singular Value Decomposition}
 
 The following result is denoted and proven as theorem 2.5.2 in \cite{SVD}.
 
@@ -1150,15 +1199,18 @@ with $p \coloneq \text{min} \{ m,n \}$ and singular values $\sigma_1 \geq \sigma
 \[ A = U \Sigma V\tr . \]
 \end{theorem}
 
+Note that orthogonal matrices refer to real square matrices, whose columns are orthogonal unit vectors. Some authors call these kind of matrices orthonormal and do not demand the unity of columns for a matrix to be orthogonal. However we will stick to the notation in \cite{SVD}. In other words, $Q \in \R^{n \times n}$ is called an orthogonal matrix, if and only if 
+\[ Q \tr Q = I_n = Q Q \tr. \]
+
 The SVD decomposes any real valued matrix in a product of three special matrices. This representation yields the singular values which, like eigenvalues, characterize important properties of a matrix. For the further course we need the following definition.
 
 \begin{definition}
 The columns of the matrix $U = [u_1, \dots, u_m]$ are referred to as left singular vectors and the columns of the matrix $V = [v_1, \dots, v_n]$ are referred to as right singular vectors.
 \end{definition}
 
-Theorem \ref{thm:svd} shows that the sequence of singular values is unique, since they are sorted in descending order. However, the matrices $U$ and $V$ do not have to be unique. For example, the corresponding singular vectors can be interchanged if there are two identical singular values. Therefore, a matrix can have several singular value decompositions. \\
+Theorem \ref{thm:svd} shows that the sequence of singular values is unique, since they are sorted in descending order. However, the matrices $U$ and $V$ do not have to be unique. For example, the corresponding singular vectors can be interchanged if there are two identical singular values, such that a matrix can have several singular value decompositions. \\
 
-As a simple implication of theorem \ref{thm:svd} we denote the following corollary.
+As a simple implication of theorem \ref{thm:svd}, we can denote the following corollary to establish a useful connection between the left and right singular vectors. 
 
 \begin{corollary} \label{cor:svd}
 Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V\tr $, such that $p \coloneq \text{min}\{m,n\}$ and $\sigma_1 \geq \dots \geq \sigma_r > \sigma_{r+1} = \dots = \sigma_p = 0$ for $r \leq p$.
@@ -1184,105 +1236,24 @@ Using $\Sigma\tr  \Sigma = \text{diag}(\sigma_1^2, \dots, \sigma_r^2, 0, \dots, 
 
 The SVD is an excellent tool to find low-rank approximations of a matrix $A \in \R^{m \times n}$, that is to find a matrix $B \in \R^{m \times n}$ with $\text{rank}(B) < \text{rank}(A)$ such that $\|A -B\|$ is small for some given matrix norm. We can generate such a low-rank approximation by simply reducing the number of singular values in the singular value decomposition.
 
-\begin{definition}
-Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V\tr $. For $k < r = \text{rank}(A)$ we define an approximation of $A$ as
-\[ A^k \coloneq \sum_{i=1}^{k} u_i \sigma_i v_i\tr  = \tilde{U} \tilde{\Sigma} \tilde{V}\tr , \]
-where $\tilde{U} \coloneq [u_1, \dots, u_k]$, $\tilde{V} \coloneq [v_1, \dots, v_k]$ and $\tilde{\Sigma} \coloneq \text{diag}(\sigma_1, \dots, \sigma_k)$.
+\begin{definition} \label{def:rank}
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A=U \Sigma V\tr $. For $d < r = \text{rank}(A)$ we define an approximation of $A$ as
+\[ A_d \coloneq \sum_{i=1}^{d} u_i \sigma_i v_i\tr  = U_d \Sigma_d V_d \tr , \]
+where $U_d \coloneq [u_1, \dots, u_d]$, $V_d \coloneq [v_1, \dots, v_d]$ and $\Sigma_d \coloneq \text{diag}(\sigma_1, \dots, \sigma_d)$.
 \end{definition}
 
-In terms of the spectral norm $\| \cdot \|_2$, the matrix $A^k$ is the best possible rank-$k$ approximation. The underlying theorem is the following, which is denoted and proven as theorem 2.5.3 in \cite{SVD}.
+In terms of the spectral norm $\| \cdot \|_2$, the matrix $A_d$ is the best possible rank-$d$ approximation. The underlying result is the following, which is denoted and proven as theorem 2.5.3 in \cite{SVD}.
 
 \begin{theorem}[Eckart-Young-Mirsky] \label{thm:eym}
-Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U \Sigma V\tr $. For every $k < r = \text{rank}(A)$ it holds, that
-\[ \min_{\text{rank}(B)=k} \big \| A-B \big \|_2 = \big \| A - A^k \big \|_2 = \sigma_{k+1}. \]
+Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U \Sigma V\tr $. For every $d < r = \text{rank}(A)$ it holds, that
+\[ \min_{\text{rank}(B)=d} \big \| A-B \big \|_2 = \big \| A - A_d \big \|_2 = \sigma_{d+1}. \]
 \end{theorem}
 
-This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will be useful for the subspace extraction.
+This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will play an important role for the subspace extraction.
 
-\subsubsection{Dynamic Linear Dimensionality Reduction}
+\subsection{Low-Dimensional Trajectory Hypothesis}
 
-Next, we investigate a single output neural network architecture 
-\[ f: \R^d \times \R^n \to \R : (x,w) \mapsto f(x,w). \]
-As seen in section \ref{sec:Training} the neural network architecture $f$ induces a function space
-\[ \F \coloneq \Big \{ f_w : \R^d \to \R : x \mapsto f(x,w) \mid w \in \R^n \Big \}. \]
-In order to train the neural network we let
-\[ \X = \big \{ (x_i,y_i) \mid i=1, \dots, m \big \} \subset \R^d \times \R \] 
-denote a training set of size $m \in \N$. Recall that training of $f$ refers to finding the optimal parameter vector $w$, which is accomplished by minimizing the empirical error function
-\[ E : \R^n \to \R_+ : w \mapsto \sum_{i=1}^{m} \ell \big (f(x_i,w), y_i \big ). \]
-Note that in comparison to the formulation given in section \ref{sec:Training}, we removed the constant factor $1/m$ in front of the sum, which has no influence on the minimum. Furthermore we assumed $\lambda = 0$, that is we do not penalize the complexity of $w$. \\
-
-Under the assumption, that all activation functions in $f$ are differentiable, thus $f$ is differentiable itself, the choice of a differentiable loss function $\ell$ enables us to minimize $E$ via gradient descent. In order to analyze this optimization process we define the cost functionals
-\[ \L_i: \F \to \R : f_w \mapsto \ell(f_w(x_i),y_i) \]
-for $i=1, \dots,m$, such that the empirical error $E$ can be written as
-\[ E(w) = \sum_{i=1}^{m} \ell \big (f(x_i,w), y_i \big ) = \sum_{i=1}^{m} \ell \big (f_w(x_i), y_i \big ) = \sum_{i=1}^{m} \L_i(f_w). \]
-To investigate the parameter evolution during gradient descent on $E$ we will use the concept of gradient flows.
-
-\begin{definition} \label{def:flow}
-The gradient flow according to $E$ is a time dependent function
-\[ w: [0, \infty) \to \R^n : t \mapsto w_t, \]
-that suffices the ordinary differential equation
-\[ \partial_t w_t = - \nabla E(w_t). \]
-\end{definition}
-
-Since gradient descent performs parameter updates with regard to the update rule
-\[ w_{k+1} \leftarrow w_k - \eta \cdot \nabla E(w_k), \]
-we can let $\eta \to 0$, to derive the equation
-\[ \lim_{\eta \to 0} \frac{w_{k+1} - w_k}{\eta} = - \nabla E(w_k). \]
-Thus, the gradient flow $w$ covers the parameter dynamics during gradient descent on $E$.
-
-\begin{lemma} \label{lem:flow}
-In the case of a single output neural network architecture, the gradient flow according to $E$ suffices the ordinary differential equation
-\[ \partial_tw_t = - \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
-where 
-\[ \nabla_w f(\X, w_t)\tr  \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
-denotes the gradients of $f$ at $w_t$ on the training data set $\X$ and 
-\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} \coloneq \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]\tr  \in \R^m \]
-denotes the functional gradients of the costs $\L_i$ at $f_{w_t}$ evaluated on $x_i$ for $i=1,\dots,m$.
-\end{lemma}
-
-\begin{proof}
-By definition \ref{def:flow} we need to show, that
-\[ \partial_t w_t = - \nabla E(w_t) = - \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
-For arbitrary $w \in \R^n$ we can apply the chain rule to derive the gradient
-\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w \ell \big ( f(x_i,w), y_i \big ) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i). \]
-Using the definitions from the lemma, this is equivalent to
-\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i) = \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
-This completes the proof, since $w$ was chosen arbitrary.
-\end{proof}
-
-In the infinite width limit, we can apply theorem \ref{thm:linear} to approximate the neural network architecture $f$ as a linear model
-\[ f^\textit{lin}(x, w_t) \approx f(x, w_0) + \nabla_wf(\X,w_0)(w_t-w_0). \]
-This is nothing else than a first order Taylor expansion. However, the key observation is, that in the infinite width limit, the error term converges to zero. Based on this, the differential equation in lemma \ref{lem:flow} can be rewritten as
-\[ \partial_tw_t = -\nabla_wf(\X,w_0)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
-where the first factor is a constant matrix and the second factor changes over time $t$. \\
-
-At this stage we can explain the main idea of how to reduce the dimensionality of the parameter space. If $\nabla_wf(\X,w_0)$ can be approximated by a low-rank matrix, the training trajectory $(w_k)_{k=0, \dots, K}$ would only depend on this low-rank constant matrix and the functional gradient of $C$, which will enable us to effectively reduce the dimensionality. To clarify this, we apply singular value decomposition on $\nabla_wf(\X,w_0)$ and derive
-\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0\tr , \]
-where $U_0 \in \R^{m \times m}$ and $V_0 \in \R^{n \times n}$ are orthogonal and $\Sigma_0 = \text{diag}(\sigma_1, \dots, \sigma_m)$ is positive semidefinite. Using the notation
-\[ \tilde{f}: \R^n \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]\tr , \]
-we can apply definition \ref{def:ntk} to derive the neural tangent kernel
-\[ \Theta_{w_0} = \sum_{k=1}^{n} \partial_{w_k} \tilde{f}(w_0) \otimes \partial_{w_k} \tilde{f}(w_0) = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)\tr  = U_0 \Sigma_0 \Sigma_0\tr  U_0\tr . \]
-This is nothing else than the spectral decomposition of $\Theta_0$. By theorem \ref{thm:stieltjes} $\cdots$ . Thus by theorem \ref{thm:eym} we can approximate $\Sigma_0$ by a low-rank matrix $\tilde{\Sigma}_0 = \text{diag}(\sigma_1, \dots, \sigma_d)$, such that
-\[ \Sigma_0 \approx \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr , \]
-where $\tilde{U}_0 \in \R^{m \times d}$ contains the first $d$ columns of an $m-$dimensional identity matrix and $\tilde{V}_0 \in \R^{n \times d}$ contains the first $d$ columns of an $n-$dimensional identity matrix. Using this approximation we can derive
-\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0\tr  \approx U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr  V_0\tr . \]
-Thus, the dynamics of gradient flow are approximately governed by
-\[ \partial_t w_t \approx -\nabla_wf(\X,w_0)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \approx - V_0 \tilde{V}_0 \Big ( \tilde{\Sigma}_0 \tilde{U}_0\tr  U_0\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}} \Big ) \]
-The clasped part yields the projected gradient in the $d-$dimensional subspace and the variables $V_0 \tilde{V}_0$ establish a projection from the lower-dimensional space back to the $n-$dimensional parameter space. \\
-
-This concludes the theoretical motivation of the subspace extraction. Based on this approach we could effectively train neural networks in the lower-dimensional subspace. However, the previous discussion holds only in the infinite width limit for training in the lazy regime. The rest of this thesis is dedicated to numerical experiments indicating that deep neural networks indeed can be trained in low-dimensional subspaces, although the theoretical conditions do not hold in practice. \\
-
-\textbf{Problem:} Chain rule for functionals. \\
-\textbf{Problem:} Reference and existence of gradient flow
-
-\pagebreak
-\subsection{Methodology}
-
-The key issue of dimensionality reduction consist of finding a suitable dimension $d \in \N$ and a $d-$dimensional subspace that approximately covers the optimization trajectory. We will address this problem via principal component analysis (PCA), which is based on the concept of orthogonal projections.
-
-\subsubsection{Orthogonal Projections}
-
-The results of this subsection are denoted in section 2.6.1 in \cite{SVD}.
+To provide a mathematical formulation of the low-dimensional trajectory hypothesis, we need the concept of orthogonal projections. The following result is based on section 2.6.1 in \cite{SVD}.
 
 \begin{lemma} \label{lem:orthProjection}
 Let $S \subseteq \R^n$ be a subspace. There exists a unique matrix $P \in \R^{n \times n}$, such that
@@ -1291,22 +1262,22 @@ Let $S \subseteq \R^n$ be a subspace. There exists a unique matrix $P \in \R^{n 
 \end{lemma}
 
 \begin{proof}
-To prove the existence of an orthogonal projection, we let $d \coloneq \text{dim}(S)$ denote the dimension of $S$ and $V := [v_1, \dots, v_d] \in \R^{n \times d}$ denote an orthonormal basis of $S$. We define
-\[ P \coloneq VV\tr  \in \R^{n \times n} \]
-and observe by the orthonormality of $V$, that $V\tr V = I_d$. Thus $P$ is idempotent, this is
-\[ P^2 = VV\tr  VV\tr  = V I_d V\tr  = VV\tr  = P. \]
+To prove the existence of an orthogonal projection, we let $d \coloneq \text{dim}(S)$ denote the dimension of $S$ and $Q \coloneq [q_1, \dots, q_d] \in \R^{n \times d}$ denote an orthonormal basis of $S$. We define
+\[ P \coloneq QQ\tr  \in \R^{n \times n} \]
+and observe by the orthonormality of $Q$, that $Q\tr Q = I_d$. Thus $P$ is idempotent, this is
+\[ P^2 = QQ\tr QQ\tr = Q I_d Q\tr = QQ\tr = P. \]
 Furthermore $P$ is symmetric, since 
-\[ P\tr  = (VV\tr )\tr  = VV\tr  = P. \]
-By the orthonormality of $V$, for arbitrary $s \in S$ there exists $a = (a_1, \dots, a_d)\tr  \in \R^d$ with
-\[ s = a_1v_1 + \dots + a_dv_d = Va. \]
+\[ P\tr = (QQ\tr)\tr = QQ\tr = P. \]
+By the orthonormality of $Q$, for arbitrary $s \in S$ there exists $\alpha = (\alpha_1, \dots, \alpha_d)\tr \in \R^d$ with
+\[ s = \alpha_1q_1 + \dots + \alpha_dq_d = Q\alpha. \]
 Based on this we derive $S \subseteq \text{Im}(P)$ since
-\[ Ps = VV\tr s = VV\tr Va = VI_da = Va =s. \]
-Additionally $\text{Im}(P) \subseteq S$ due to the fact, that for $y \in \R^n$, we have $\tilde{a} \coloneq V\tr y \in \R^d$, so
-\[ Py = VV\tr y = V\tilde{a} \in S. \]
+\[ Ps = QQ\tr s = QQ\tr Q\alpha = QI_d\alpha = Q\alpha =s. \]
+Additionally $\text{Im}(P) \subseteq S$ due to the fact, that for $x \in \R^n$, we have $\tilde{\alpha} \coloneq Q\tr x \in \R^d$, so
+\[ Px = QQ\tr x = Q\tilde{\alpha} \in S. \]
 Thus $\text{Im}(P) = S$. This proves the existence of an orthogonal projection $P$ onto $S$. To prove uniqueness of $P$, we should first note that based on $P^2 = P = P\tr $ we have
 \[ \forall x,y \in \R^n : (Px)\tr (y-Py) = x\tr P\tr y - x\tr P\tr Py = x\tr Py - x\tr Py = 0. \]
 Using $Px \in S$ for every $x \in \R^n$, we can conclude that 
-\[ \forall y \in \R^n : y - Py \in S^\perp := \big \{ a \in \R^n \mid \forall b \in S : a\tr b = 0 \big \}. \]
+\[ \forall y \in \R^n : y - Py \in S^\perp \coloneq \big \{ z \in \R^n \mid \forall s \in S : z\tr s = 0 \big \}. \]
 Next we let $P_1$ and $P_2$ denote orthogonal projections onto $S$, then for any $z \in \R^n$ we derive
 \[ \begin{split}
 \big \| (P_1-P_2)z \big \|_2^2 
@@ -1326,26 +1297,154 @@ Using $\text{Im}(P_1) = S = \text{Im}(P_2)$, we observe that
 Thus the right-hand side of the equality is zero and by the positive definiteness of the norm we conclude $P_1 - P_2 = 0$. This implies $P_1 = P_2$ showing the uniqueness of $P$.
 \end{proof}
 
-In our setting, the $d$-dimensional subspace $S \subseteq \R^n$ is unknown, which is why the following definition will be needed.
+Based on this we can formulate the low-dimensional trajectory hypothesis mathematically.
+
+\begin{hypothesis}
+Given a training trajectory $(w_k)_{k=0}^{t}$ in $\R^n$, there exists $d \ll n$ and a $d$-dimensional subspace $S \subset \R^n$ with an orthonormal basis $Q \in \R^{n \times d}$, such that there is a low-dimensional trajectory $(\alpha_k)_{k=0}^{t}$ in $\R^d$, satisfying 
+\[ w_{k+1} - w_k \approx Q(\alpha_{k+1} - \alpha_k), \quad k=0, \dots, t-1. \]
+\end{hypothesis}
+The hypothesis can be explained as follows. Recalling the illustration in figure \ref{fig:trajectory}, low-dimensional trajectory hypothesis claims the existence of a $d$-dimensional affine set, that approximately covers the parameter trajectory $(w_k)_{k=0}^{t}$ in $\R^n$. More precisely, it claims the existence of some $d$-dimensional subspace $S \subset \R^n$ and some $x \in \R^n$, defining the affine set
+\[ x + S \coloneq \big \{ y \in \R^n \mid x - y \in S \big \}, \]
+such that the distance between $x + S$ and any of the parameters $w_k$ is very small, that is
+\[ \exists s_k \in x + S : \big \| w_k - s_k \big \|_2 \approx 0, \quad k=0, \dots, t. \]
+By lemma \ref{lem:orthProjection}, there exists a unique orthogonal projection $P \in \R^{n \times n}$ onto the subspace, so
+\[ w_{k+1} - w_k \approx P(w_{k+1} - w_k), \quad k=0, \dots, t-1. \]
+Thus we can define the projected low-dimensional trajectory $(s_k)_{k=0}^{t} \coloneq (Pw_k)_{k=0}^{t}$, satisfying
+\[ w_{k+1} - w_k \approx P(w_{k+1} - w_k) = s_{k+1} - s_k, \quad k=0, \dots, t-1. \]
+Given an orthonormal basis $Q \in \R^{n \times d}$ of $S$, each element of the low-dimensional trajectory can be expressed in terms of its coefficients with regard to the basis $Q$, that is
+\[ \exists \alpha_k \in \R^{d}: s_k = V\alpha_k, \quad k=0, \dots, t. \]
+As a consequence, the low-dimensional trajectory hypothesis claims, that
+\[ w_{k+1} - w_k \approx s_{k+1} - s_k = Q(\alpha_{k+1} - \alpha_k), \quad k=0, \dots, t-1. \]
+
+%Recall, that in contrast to this mathematical formulation, figure \ref{fig:trajectory} illustrated the low-dimensional trajectory in an affine set. Nonetheless, this can be easily obtained by adding an adequate translation to the low-dimensional trajectory $(s_k)_{k=0}^{t}$ in the subspace.
+
+To motivate the low-dimensional trajectory hypothesis from a theoretical perspective, we investigate a single output neural network
+\[ f: \R^{n_0} \times \R^n \to \R : (x,w) \mapsto f(x,w). \]
+As seen in section \ref{sec:Training} the neural network architecture $f$ induces a function space
+\[ \F |_{f} \coloneq \Big \{ f_w : \R^{n_0} \to \R : x \mapsto f(x,w) \mid w \in \R^n \Big \}. \]
+In order to train the neural network we let
+\[ \X = \big \{ (x_i,y_i) \mid i=1, \dots, m \big \} \subset \R^{n_0} \times \R \] 
+denote a training set of size $m \in \N$. Recall that training of $f$ refers to finding an optimal parameter vector $w$, which is accomplished by minimizing the empirical error function
+\[ E : \R^n \to \R_+ : w \mapsto \sum_{i=1}^{m} \ell \big (f(x_i,w), y_i \big ), \]
+where $\ell$ is a loss function of the form
+\[ \ell: \R \times \R \to \R_+ : (x,y) \mapsto \ell(x,y). \]
+Note that in comparison to the formulation given in section \ref{sec:Training}, we removed the constant factor $1/m$ in front of the sum, which has no influence on the minimum. Furthermore we chose $\lambda = 0$, that is we do not penalize the complexity of $w$. \\
+
+Under the assumption, that all activation functions in $f$ are differentiable, thus $f$ is differentiable itself, the choice of a differentiable loss function $\ell$ enables us to minimize $E$ via gradient descent. Recall, that based on definition \ref{def:follow} we can analyze the training dynamics with a continuous function $w : [0, \infty) \to \R^n : t \mapsto w_t$, that follows the gradient descent on $E$. To clarify this, since gradient descent performs parameter updates with regard to the rule
+\[ w_{k+1} \leftarrow w_k - \eta \cdot \nabla E(w_k), \]
+we can let $\eta \to 0$, to derive the equation
+\[ \lim_{\eta \to 0} \frac{w_{k+1} - w_k}{\eta} = - \nabla E(w_k). \]
+As a consequence, the training dynamics are governed by the differential equation
+\[ \partial_tw_t = -\nabla E (w_t ). \]
+A basic application of the chain rule yields
+\[ \partial_t w_t = -\nabla E (w_t ) = \sum_{i=1}^{m} \nabla_w f(x_i,w_t) \cdot \partial_x \ell \big ( f(x_i,w_t), y_i \big ), \]
+where $\partial_x \ell$ denotes the partial derivative of the loss function with respect to the first argument. Note that we are still in the one-dimensional setting, such that $\partial_x \ell$ can equivalently be interpreted as the gradient $\nabla_x \ell$. To explain the main idea of dimensionality reduction, we have to present this gradient flow in terms of vectors and matrices. Therefore we let
+\[ \nabla_w f(\X, w_t)\tr \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
+denote the gradients of $f$ at $w_t$ on the training data set $\X$ and
+\[ \nabla_{f(\X,w_t)} E \coloneq \Big [ \nabla_x \ell \big ( f(x_1,w_t), y_1 \big ), \dots, \nabla_x \ell \big ( f(x_m,w_t), y_m \big ) \Big ]\tr \in \R^m \]
+denote the gradients of $\ell$ with respect to the first argument. This yields the gradient flow
+\[ \partial_tw_t = - \nabla_w f(\X, w_t)\tr \cdot \nabla_{f(\X,w_t)} E. \]
+
+%In order to analyze this optimization  process we define the cost functionals
+%\[ \L_i: \F|_f \to \R : f_w \mapsto \ell \big (f_w(x_i),y_i \big ) \]
+%for $i=1, \dots,m$, such that the empirical error $E$ can be written as
+%\[ E(w) = \sum_{i=1}^{m} \ell \big (f(x_i,w), y_i \big ) = \sum_{i=1}^{m} \ell \big (f_w(x_i), y_i \big ) = \sum_{i=1}^{m} \L_i(f_w). \]
+
+
+%To investigate the parameter evolution during gradient descent on $E we will use the concept of gradient flows.
+
+%\begin{definition} \label{def:flow}
+%The gradient flow according to $E$ is a time dependent function
+%\[ w: [0, \infty) \to \R^n : t \mapsto w_t, \]
+%that suffices the ordinary differential equation
+%\[ \partial_t w_t = - \nabla E(w_t). \]
+%\end{definition}
+
+%Since gradient descent performs parameter updates with regard to the update rule
+%\[ w_{k+1} \leftarrow w_k - \eta \cdot \nabla E(w_k), \]
+%we can let $\eta \to 0$, to derive the equation
+%\[ \lim_{\eta \to 0} \frac{w_{k+1} - w_k}{\eta} = - \nabla E(w_k). \]
+%Thus, the gradient flow $w$ covers the parameter dynamics during gradient descent on $E$.
+
+%\begin{lemma} \label{lem:flow}
+%Let $f: \R^{n_0} \times \R^n \to \R$ be a single-output neural network. During training via gradient descent on $E$, the parameters of $f$ evolve along the differential equation
+%\[ \partial_tw_t = - \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
+%where 
+%\[ \nabla_w f(\X, w_t)\tr  \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
+%denotes the gradients of $f$ at $w_t$ on the training data set $\X$ and 
+%\[ \nabla_{f(\X,w)} \L|_{f_{w_t}} \coloneq \Big [ \nabla \L_1|_{f_{w_t}}(x_1), \dots, \nabla \L_m|_{f_{w_t}}(x_m) \Big ]\tr  \in \R^m \]
+%denotes the functional gradients of the costs $\L_i$ at $f_{w_t}$ evaluated on $x_i$ for $i=1,\dots,m$.
+%\end{lemma}
+
+%\begin{proof}
+%By definition \ref{def:follow} we need to show, that
+%\[ \partial_t w_t = - \nabla E(w_t) = - \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
+%For arbitrary $w \in \R^n$ we can apply the chain rule to derive the gradient
+%\[ \begin{split}
+%\nabla E(w) &= \sum_{i=1}^{m} \nabla \ell \big ( f(x_i,w), y_i \big ) \\\
+%&= \sum_{i=1}^{m} \nabla f(x_i,w) \cdot \nabla \ell \big ( f(x_i,w), y_i \big ) \\\
+%&= \sum_{i=1}^{m} \nabla f(x_i,w) \cdot \nabla \ell \big ( f_w(x_i), y_i \big ) \\\
+%&= \sum_{i=1}^{m} \nabla f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i). 
+%\end{split} \]
+%Using the definitions from the lemma, this is equivalent to
+%\[ \nabla E(w) = \sum_{i=1}^{m} \nabla_w f(x_i,w) \cdot \nabla \L_i |_{f_w}(x_i) = \nabla_wf(\X, w_t)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}. \]
+%This completes the proof, since $w$ was chosen arbitrary.
+%\end{proof}
+
+%In the infinite width limit, we can apply theorem \ref{thm:linear} to approximate the neural network architecture $f$ as a linear model
+%\[ f^\textit{lin}(x, w_t) \approx f(x, w_0) + \nabla_wf(\X,w_0)(w_t-w_0). \]
+%This is nothing else than a first order Taylor expansion. However, the key observation is, that in the infinite width limit, the error term converges to zero. Based on this, the differential equation in lemma \ref{lem:flow} can be rewritten as
+%\[ \partial_tw_t = -\nabla_wf(\X,w_0)\tr  \cdot \nabla_{f(\X,w)} \L|_{f_{w_t}}, \]
+%where the first factor is a constant matrix and the second factor changes over time $t$. \\
+
+Based on this differential equation we can use the previous seen properties of the neural tangent kernel to motivate the existence of low-dimensional optimization trajectories and to explain the approach of dimensionality reduction. For this we notate the parallelized outputs
+\[ \tilde{f}: \R^{n} \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]\tr , \]
+such that for given $w \in \R^n$, by definition \ref{def:ntk} the neural tangent kernel translates to
+\[ \Theta_{w} = \sum_{i=1}^{n} \partial_{w_i} \tilde{f}(w) \otimes \partial_{w_i} \tilde{f}(w) = \nabla_wf(\X,w) \cdot \nabla_wf(\X,w)\tr. \]
+In the setting of theorem \ref{thm:ntk}, we have seen that, in the infinite width limit, the neural tangent kernel converges to a deterministic limiting kernel. Thus, in this limit, we have
+\[ \nabla_wf(\X,w_t) \cdot \nabla_wf(\X,w_t)\tr = \Theta_t = \Theta_0 = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)\tr, \] 
+such that ideally the dynamics of gradient flow are governed by
+\[ \partial_tw_t = - \nabla_w f(\X, w_0)\tr \cdot \nabla_{f(\X,w_t)} E, \]
+where the first factor is a constant matrix and the second factor changes over time $t$. Thus, if the neural tangent kernel $\Theta_0$ is low-rank, $\nabla_wf(\X,w_0)$ could be approximated by a low-rank matrix, such that the optimization trajectory would be embedded in a low-dimensional affine set. To clarify this, we apply singular value decomposition on $\nabla_wf(\X,w_0)$, such that 
+\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0\tr , \]
+where $U_0 \in \R^{m \times m}$ and $V_0 \in \R^{n \times n}$ are orthogonal and $\Sigma_0 = \text{diag}(\sigma_1, \dots, \sigma_m)$ is positive semidefinite. Based on this, the neural tangent kernel can be rewritten as
+\[ \Theta_0 = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)\tr  = U_0 \Sigma_0 \Sigma_0\tr  U_0\tr, \]
+which gives the spectral decomposition of $\Theta_0$. More precisely, we could define
+\[ \Sigma^\text{NTK} \coloneq \Sigma_0 \Sigma_0 \tr = \text{diag}(\sigma_1^2, \dots, \sigma_m^2), \]
+such that the eigenvalues of $\Theta_0$ are given by $\lambda_i = \sigma_i^2$ for $i=1, \dots, m$.
+
+If $\Theta_0$ is low-rank, we could approximate $\Sigma_0$ by a low-rank matrix $\tilde{\Sigma}_0 = \text{diag}(\sigma_1, \dots, \sigma_d)$, so
+\[ \Sigma_0 \approx \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr , \]
+where $\tilde{U}_0 \in \R^{m \times d}$ contains the first $d$ columns of an $m \times m$ identity matrix and $\tilde{V}_0 \in \R^{n \times d}$ contains the first $d$ columns of an $n \times n$ identity matrix. Using this approximation, we have
+\[ \nabla_wf(\X,w_0) = U_0 \Sigma_0 V_0\tr \approx U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr  V_0\tr . \]
+This is exactly the rank-$d$ approximation from definition \ref{def:rank}. As a consequence, the dynamics of gradient flow are approximately governed by
+\begin{equation} \label{eq:flow} \tag{$\ast$}
+\partial_t w_t = -\nabla_wf(\X,w_0)\tr  \cdot \nabla_{f(\X,w_t)} E \approx - V_0 \tilde{V}_0 \Big ( \tilde{\Sigma}_0 \tilde{U}_0\tr  U_0\tr  \cdot \nabla_{f(\X,w_t)} E \Big ).
+\end{equation}
+This gives rise to the low-dimensional trajectory hypothesis. The term $V_0\tilde{V}_0 \in \R^{n \times d}$ refers to the orthonormal basis $Q$ of the $d$-dimensional subspace $S$ and the remaining term in parenthesis describes the projected gradient in terms of its coefficients with regard to the basis $Q$ of $S$. \\
+
+By the Eckart-Young-Mirsky theorem \ref{thm:eym}, the used rank-$d$ approximation in (\ref{eq:flow}) is the best possible and the approximation error in terms of the spectral norm is given by
+\[ \Big \| \nabla_wf(\X,w_0) - U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr  V_0\tr \Big \|_2 = \sigma_{d+1}. \] 
+The approximation error in (\ref{eq:flow}) is therefore determined by the singular value decay of the matrix $\nabla_wf(\X,w_0)$ or equivalently, the eigenvalue decay of the neural tangent kernel $\Theta_0$. An extensive analysis of this eigenvalue decay can be found in \cite{Decay1} and \cite{Decay2}. These papers show, that in the infinite width limit, the NTK is indeed low-rank, which theoretically motivates the claim of low-dimensional trajectory hypothesis. \\
+
+From a practical perspective however, the previous discussion is too theoretical since it holds true only in the infinite width limit. Of course, this pre-condition is never given in practical applications. This is why section \ref{sec:Experiments} contains various numerical experiments, that investigate the low-dimensional trajectory with regard to finite width deep neural networks.
+
+\subsection{Dynamic Linear Dimensionality Reduction}
+
+For the practical investigation of low-dimensional trajectory hypothesis we have to provide a method to efficiently extract the low-dimensional optimization trajectory. The key issue in here, consist of finding a suitable dimension $d \in \N$ and an orthonormal basis $Q$ of the $d$-dimensional subspace $S \subset \R^n$ whose translation approximately covers the optimization trajectory. This problem will be addressed via principal component analysis (PCA), which operates based on the following definition.
 
 \begin{definition}
 For $d \in \N$ we define the set of rank-$d$ orthogonal projection matrices
 \[ \P_d \coloneq \Big \{ P \in \R^{n \times n} \mid \text{rank}(P) = d \ \wedge \ P^2 = P = P\tr  \Big \}. \]
 \end{definition}
 
-Having this background knowledge on orthogonal projections in mind, we can proceed with the theory on principal component analysis.
-
-\subsubsection{Principal Component Analysis} \label{sec:PCA}
-
-The results of this subsection can be found in chapter 15.1 of \cite{PCA}. In the following we fix $d \leq n$ and let $W = [w_1, \dots, w_t] \in \R^{n \times t}$ be a mean-centered data matrix, that is $\sum_{i=1}^{t}w_i=0$. \\
-
-Principal component analysis consists of finding the orthogonal projection matrix $P^* \in \P_d$, that minimizes the reconstruction error
-\[ \P_d \to \R : P \mapsto \sum_{i=1}^{t} \big \| Pw_i - w_i \big \|_2^2. \]
-Equivalently PCA can be formulated as finding the solution $P^* \in \P_d$, such that
+In the following we fix $d \leq n$ and let $W = [w_1, \dots, w_t] \in \R^{n \times t}$ be a mean-centered data matrix, that is $\sum_{k=1}^{t}w_k=0$. Principal component analysis (PCA) consists of finding the orthogonal projection matrix $P^* \in \P_d$, that minimizes the reconstruction error
+\[ \P_d \to \R : P \mapsto \sum_{k=1}^{t} \big \| Pw_k - w_k \big \|_2^2. \]
+Equivalently, PCA can be formulated as finding the solution $P^* \in \P_d$, such that
 \[ P^* \coloneq \argmin_{P \in \P_d} \big \| PW - W \big \|_F^2, \]
-where $\| \cdot \|_F$ denotes the Frobenius norm. Casually speaking, principal component analysis aims to project the original data to a lower-dimensional space while preserving as much information as possible. The following theorem provides a method on solving the PCA problem via singular value decomposition.
+where $\| \cdot \|_F$ denotes the Frobenius norm. Casually speaking, principal component analysis aims to project the original data to a lower-dimensional space while preserving as much information as possible. The following theorem provides a method to solve the PCA problem via singular value decomposition. It can be found as theorem 15.1 in \cite{PCA}.
 
-\begin{theorem} \label{thm:PCA}
+\begin{theorem} \label{thm:pca}
 The PCA solution $P^* \in \P_d$ can be decomposed as
 \[ P^* = U_dU_d\tr , \]
 where $U_d \in \R^{n \times d}$ is the matrix formed by the first $d$ left singular vectors of $W$.
@@ -1361,53 +1460,118 @@ Let $P \in \P_d$ be arbitrary. By the linearity of the trace, we observe that
 \end{split} \]
 since $P\tr =P=P^2$ by definition. Using that $\text{Tr} \big [ W\tr W\big ]$ is independent of $P$, we derive
 \[ \argmin_{P \in \P_d} = \big \| PW-W \big \|_F^2 = \argmax_{P \in \P_d} \text{Tr} \big [ W\tr PW\big ]. \]
-By the proof of lemma \ref{lem:orthProjection}, there exists an orthonormal basis $Q = [q_1, \dots, q_d] \in \R^{n \times d}$, such that $P$ can be decomposed as $P=QQ\tr $. Using the invariance of the trace under cyclic permutation and the orthonormality of $Q$, we have
+By the proof of lemma \ref{lem:orthProjection}, there exists an orthonormal basis $Q = [q_1, \dots, q_d] \in \R^{n \times d}$ of $\R^d$, such that $P$ can be decomposed as $P=QQ\tr $. Using the invariance of the trace under cyclic permutation and the orthogonality of $Q$, we observe that
 \[ \text{Tr} \big [ W\tr PW \big ] = \text{Tr} \big [ W\tr QQ\tr W \big ] = \text{Tr} \big [ Q\tr WW\tr Q \big ] = \sum_{i=1}^{d} q_i\tr WW\tr q_i. \]
 To maximize the rightmost expression we perform SVD on $W = U \Sigma V\tr $, such that
 \[ WW\tr  = U \Sigma V\tr  V \Sigma\tr  U\tr  = U \Sigma \Sigma\tr  U\tr . \]
 Using the notation $Z = U\tr QQ\tr U$ we derive by the invariance under cyclic permutation, that
 \[ \text{Tr} \big [ Q\tr WW\tr Q \big ] = \text{Tr} \big [ Q\tr U \Sigma \Sigma\tr  U\tr Q \big ] = \text{Tr} \big [ U\tr QQ\tr U\Sigma \Sigma\tr  \big ] = \text{Tr} \big [ Z \Sigma \Sigma\tr  \big ]. \]
-As $Z$ is orthogonal as a product of three orthogonal matrices we conclude (why orthogonal?)
-\[  \text{Tr} \big [ W\tr PW \big ] = \text{Tr} \big [ Z \Sigma \Sigma\tr  ] = \sum_{i=1}^{d} z_{i,i} \sigma_i^2 \leq \sum_{i=1}^{d} \sigma_i^2. \]
-The upper bound is attained in the case where $Q = U_d = [u_1, \dots, u_d]$ contains the first $d$ columns of $U$, such that based on corollary \ref{cor:svd} we can use $W\tr u_i = \sigma_iv_i$ to conclude
+Furthermore, we can conclude that $|Z_{i,j} | \leq 1$ for $i,j=1,\dots,n$, since $Z$ is orthogonal as a product of four orthogonal matrices. This implies the inequality
+\[ \text{Tr} \big [ W\tr PW \big ] = \text{Tr} \big [ Z \Sigma \Sigma\tr  ] = \sum_{i=1}^{d} z_{i,i} \sigma_i^2 \leq \sum_{i=1}^{d} \sigma_i^2. \]
+The upper bound is attained in the case where $Q = U_d = [u_1, \dots, u_d]$ contains the first $d$ columns of $U$. This follows from corollary \ref{cor:svd}, namely the identity $W\tr u_i = \sigma_iv_i$, providing
 \[ \text{Tr} \big [ W\tr PW \big ] = \sum_{i=1}^{d} q_i\tr WW\tr q_i = \sum_{i=1}^{d} u_i\tr WW\tr u_i = \sum_{i=1}^{d} u_i\tr W v_i \sigma_i = \sum_{i=1}^{d} \sigma_i^2. \]
-This completes the proof.
+As a consequence, the PCA solution is given by $P^* = U_dU_d\tr$.
 \end{proof}
 
-Using principal component analysis we can finally construct an effective method for dimensionality reduction.
+In oder to extract the low-dimensional optimization trajectory it is sufficient to determine the $d$-dimensional subspace $S \subset \R^n$. This can be effectively achieved by the procedure provided in the proof of theorem \ref{thm:pca}. The idea is to sample $t \geq d$ parameter vectors along the optimization trajectory and to determine the orthogonal projection $P$ onto $S$ by PCA. By lemma \ref{lem:orthProjection} this also provides an orthonormal basis of the lower-dimensional subspace. \\
 
-\subsubsection{Algorithm}
-
-To find the lower-dimensional subspace, that approximately covers the optimization trajectory we first need to sample $t \in \N$ parameter vectors along the optimization trajectory, which can be achieved by training the network with one of the proposed algorithms in section \ref{sec:Training}. \\
-
-The idea of dimensionality reduction consists of applying PCA to the parameters $\{ w_1, \dots, w_t \}$. For this we need to centralize these samples as $\bar{w} \coloneq\sum_{i=1}^{t} w_i$ and define
-\[ W \coloneq \big [ w_1 - \bar{w}, \dots, w_t - \bar{w} \big ] \in \R^{n \times t}. \]
-This enables us to apply PCA on the mean-centered data matrix $W$. As seen in section \ref{sec:PCA}, for $d \in \N$, the orthogonal projection on the $d-$dimensional subspace, that covers the parameter trajectory best, is induced by
+The sampling of $t \geq d$ parameters $\{ w_1, \dots, w_t \}$ along the optimization trajectory can be achieved by training the network via some reasonable iterative optimization method such like SGD. The application of PCA to this data requires centralization. Therefore we let
+\[ \overline{w} \coloneq \frac{1}{t} \sum_{i=1}^{t} w_i \]
+denote the mean of the samples and define the mean-centered data matrix
+\[ W \coloneq \big [ w_1 - \overline{w}, \dots, w_t - \overline{w} \big ] \in \R^{n \times t}. \]
+Recall that PCA consists of finding the orthogonal projection matrix $P^* \in \P_d$ defined as
 \[ P^* \coloneq \argmin_{P \in \P_d} \big \| PW - W \big \|_F^2. \]
-By theorem \ref{thm:PCA} we can construct $P^*$ from the left singular vectors of $W$. For this we apply corollary \ref{cor:svd} to compute the right singular vectors $v_i$ for $i=1,\dots,d$ by the spectral decomposition of $W\tr W \in \R^{t \times t}$. These can then be used to derive the left singular vectors
+The construction of $P^*$ in the proof of theorem \ref{thm:pca} is straight-forward and also provides an orthonormal basis of the $d$-dimensional subspace $S$. At first we need to determine the right singular vectors $v_1, \dots, v_d$ of $W$. Since $t \ll n$ we apply the second statement of corollary \ref{cor:svd} to efficiently compute $v_1, \dots, v_d$ by the spectral decomposition of $W\tr W \in \R^{t \times t}$. According to the first statement of corollary \ref{cor:svd} these can then be used to derive
 \[ u_i = \frac{1}{\sigma_i} Wv_i, \quad i=1, \dots, d. \]
-
-Thus we have found an orthonormal basis $U_d = [u_1, \dots, u_d]$ of the $d$-dimensional subspace, that covers the optimization trajectory best. The orthogonal projection onto this subspace is given by
+By theorem \ref{thm:pca}, the PCA solution is then given by $P^* = U_dU_d \tr$, where $U_d = [u_1, \dots, u_d]$ is an orthonormal basis of $S$, according to the proof of lemma \ref{lem:orthProjection}. Furthermore, the corresponding orthogonal projection onto the $d$-dimensional subspace $S$ is given by the map
 \[ P : \R^n \to \R^n : w \mapsto U_dU_d\tr w. \]
+With regard to the illustration in figure \ref{fig:trajectory} one could reverse the centralization to define
+\[ \tilde{P} : \R^n \to \R^n : w \mapsto \overline{w} + U_dU_d\tr w, \]
+projecting the optimization trajectory onto the lower-dimensional affine set $\overline{w} + S$. Speaking in terms of the low-dimensional trajectory hypothesis, it claims that the optimization trajectory is nearly invariant under transformation with $\tilde{P}$. That is 
+\[ \forall t>0: \tilde{P}w_t \approx w_t. \]
 
-In summary, the algorithm for dimensionality reduction can be notated as follows.
+In summary, we denote the following algorithm for dimensionality reduction from \cite{Paper}.
 
 \begin{algorithm}
-\caption{Dynamic Linear Dimensionality Reduction (DLDR)} \ \\
-\textcolor{white}{$\Big |$}1: Sample parameter trajectory $\{ w_1, \dots, w_t\}$ along the training. \\
-\textcolor{white}{$\Big |$}2: Compute the mean $\bar{w} \coloneq\sum_{i=1}^{t} w_i$. \\
-\textcolor{white}{$\Big |$}3: Centralize the samples as $W = [w_1-\bar{w}, \dots, w_t - \bar{w}]$. \\
-\textcolor{white}{$\Big |$}4: Perform spectral decomposition such that $W\tr W = V \Sigma^2 V^{-1}$.  \\
-\textcolor{white}{$\Big |$}5: Choose suitable subspace dimension $d \in \N$. \\
-\textcolor{white}{$\Big |$}6: Obtain the $d$ largest eigenvalues $ \big [\sigma_1^2, \dots, \sigma_d^2 \big ]$ with eigenvectors $ \big [v_1, \dots, v_d \big ]$. \\
-\textcolor{white}{$\Big |$}7: Determine the singular vectors $u_i = 1/\sigma_iWv_i$ for $i=1, \dots, d$. \\
-\textcolor{white}{$\Big |$}8: Return the orthonormal basis $ \big [u_1, \dots, u_d \big ]$.
+\caption{Dynamic Linear Dimensionality Reduction (DLDR) \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}1: Requires dimensionality of the subspace $d$ and number of samples $t \geq d$. \\
+\textcolor{white}{$\Big |$}2: Sample parameter trajectory $\{ w_1, \dots, w_t\}$ along the optimization trajectory. \\
+\textcolor{white}{$\Big |$}3: Compute the mean $\overline{w} \coloneq \sum_{i=1}^{t} w_i$. \\
+\textcolor{white}{$\Big |$}4: Centralize the samples as $W = [w_1-\overline{w}, \dots, w_t - \overline{w}]$. \\
+\textcolor{white}{$\Big |$}5: Perform spectral decomposition such that $W\tr W = V \Sigma^2 V^{-1}$.  \\
+\textcolor{white}{$\Big |$}6: Obtain the $d$ largest eigenvalues $\big [\sigma_1^2, \dots, \sigma_d^2 \big ]$ with eigenvectors $ \big [v_1, \dots, v_d \big ]$. \\
+\textcolor{white}{$\Big |$}7: Determine the singular vectors $u_i = \frac{1}{\sigma_i}Wv_i$ for $i=1, \dots, d$. \\
+\textcolor{white}{$\Big |$}8: Return the orthonormal basis $ \big [u_1, \dots, u_d \big ]$ of the subspace.
 \end{algorithm}
 
-For complexity ...
+The complexity of the algorithm is determined by lines 5 and 7. In line 5 we calculate the matrix product $W \tr W$ which is of complexity $\O(t^2n)$ and the complexity of the spectral decomposition is $\O(t^3)$, since $W\tr W \in \R^{t \times t}$. Line 7 contains $d$ products $Wv_i$ which is of complexity $\O(dtn)$. Using $d\leq t$ the total complexity of DLDR is $\O(t^3 + 2t^2n)$. Since $t \ll n$ the time consumption is negligible in comparison to the complexity of training.
+
+\subsection{DLDR-based Training Algorithms}
+
+Assuming that the low-dimensional trajectory hypothesis holds true, not only in the infinite width limit but also for finite wide deep neural networks, we could adopt the training algorithms from section \ref{sec:Training} to perform parameter updates in the lower-dimensional subspace. \\
+
+Recall, that all of the proposed training algorithms operate in a similar manner, which consist of iterative parameter updates. This is achieved by computing a descent direction $d_k \in \R^n$, choosing a learning rate $\eta > 0$ and updating the parameters according to the rule
+\[ w_{k+1} \leftarrow w_k - \eta \cdot d_k. \]
+Note that the training algorithms differ only in determining the descent directions. The basic idea of an parameter update in the  lower-dimensional subspace $S \subset \R^n$ at step $k \in \N$ is to project the parameters $w_k$ and the descent direction $d_k$ onto $S$ and apply the update rule in the subspace $S$. Given an orthonormal basis $Q$ of $S$ the update rule translates to
+\[ w_{k+1} \leftarrow Q \big ( Q \tr w_k - \eta \cdot Q \tr d_k \big ). \]
+Using the fact, that $S$ is a subspace, this procedure results in a parameter vector $w_{k+1} \in S$, such that an iterative application can be simplified to the update rule
+\[ w_{k+1} \leftarrow w_k - \eta \cdot Q Q \tr d_k. \]
+If the dimension of the subspace is small enough, training should happen a lot faster than in the original space. Also, since there are only a few variables to optimize, second-order methods become applicable. Another benefit is, that training in the lower-dimensional space should prevent overfitting and improve robustness to label noises. \\
+
+Based on the stochastic gradient descent algorithm, we can introduce its projected version, performing the parameter updates in a lower-dimensional space as follows.
+
+\begin{algorithm}
+\caption{Projected Stochastic Gradient Descent (P-SGD) \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}1: Requires orthonormal basis $Q \in \R^{n \times d}$ of the $d$-dimensional subspace. \\
+\textcolor{white}{$\Big |$}2: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
+\textcolor{white}{$\Big |$}3: Requires a batch size $b \in \N$ and a number of epochs $N \in \N$. \\
+\textcolor{white}{$\Big |$}4: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}5: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
+\textcolor{white}{$\Big |$}6: \quad Choose a step size $\eta_k > 0$. \\
+\textcolor{white}{$\Big |$}7: \quad Set $w_{k+1} \leftarrow  w_k - \eta_k \cdot QQ\tr \nabla E(w_k,\I_k)$. \\
+\textcolor{white}{$\Big |$}8: \textbf{end for}
+\end{algorithm}
+
+The convergence of stochastic gradient descent will be extensively investigated in section \ref{sec:Experiments}. \\
+
+If the dimension of the subspace covering the optimization trajectory is small enough, we could probably use second order information for the training of deep neural networks. To clarify this, we have to recall that in Newton's method, the descent direction was defined as
+\[ d_k = - H_E^{-1}(x_k) \nabla E(x_k). \]
+As discussed, for large $n$ it is computationally impractical to determine the inverse Hessian. However, based on the low-dimensional trajectory hypothesis, for any $x_k$ there could exist some lower-dimensional version of the Hessian, call it $H_0(x_k) \in \R^{d \times d}$, such that
+\[ H_E(x_k) \approx Q H_0(x_k) Q \tr. \]
+For small $d$ we could effectively compute the inverse Hessian as
+\[ H_E^{-1}(x_k) \approx ( Q H_0(x_k) Q \tr )^\dagger = Q H_0^{-1}(x_k) Q \tr, \]
+where $\dagger$ denotes the Moore-Penrose inverse. Doing so would enable us to perform the Newton update in the lower-dimensional subspace via the update rule
+\[ w_{k+1} \leftarrow w_k - \eta_k \cdot Q \big (H_0^{-1}(x_k) Q \tr \nabla E(x_k) \big ). \]
+The problem with that approach however, is that we are still confronted with the determination of $H_0$. To clarify this, although we only need to optimize $d$ independent variables, this optimization is based on the gradients of parameters in the $n$-dimensional space. As a consequence, we still have to approximate the lower-dimensional inverse Hessians $H_0^{-1}$. One method for this purpose, namely BFGS was already introduced in section \ref{sec:Training}. Finally we can denote the following algorithm, which is a slight modification of algorithm 2 in \cite{Paper}.
+
+\begin{algorithm}
+\caption{Projected Broyden-Fletcher-Goldfarb-Shanno (P-BFGS) \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$1}1: Requires orthonormal basis $Q \in \R^{n \times d}$ of the $d$-dimensional subspace. \\
+\textcolor{white}{$\Big |$1}2: Requires twice differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
+\textcolor{white}{$\Big |$1}3: Requires a batch size $b \in \N$ and a number of epochs $N \in \N$. \\
+\textcolor{white}{$\Big |$1}4: Initialize $B_0 \leftarrow I_n$. \\
+\textcolor{white}{$\Big |$1}5: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$1}6: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
+\textcolor{white}{$\Big |$1}7: \quad Compute a step size $\eta_k > 0$ using backtracking line search. \\
+\textcolor{white}{$\Big |$1}8: \quad Set $x_{k+1} \leftarrow x_k - \eta_k \cdot Q B_k Q^T \nabla E(w_k,\I_k)$. \\
+\textcolor{white}{$\Big |$1}9: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
+\textcolor{white}{$\Big |$}10: \quad Let $\rho_k = (y_k\tr s_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k\tr $. \\
+\textcolor{white}{$\Big |$}11: \quad Set $B_{k+1} \leftarrow V_k\tr B_{k}V_k + \rho_k s_k s_k\tr $ and $k \leftarrow k+1$. \\
+\textcolor{white}{$\Big |$}12: \textbf{end for}
+\end{algorithm}
+
+Note that the backtracking linesearch in here has to be performed with respect to the gradient in the lower-dimensional subspace. Denoting this lower-dimensional descent direction as
+\[ d_k \coloneq Q^T \nabla E \big (w_k,\I_k \big), \] 
+the adopted version of backtracking linesearch iteratively searches for some $\eta_k > 0$ satisfying 
+\[ E \big (w_k - \eta_k \cdot Q B_k d_k, \I_k \big) \leq E \big (w_k, \I_k \big ) - c \cdot \eta_k \cdot d_k \tr B_k d_k. \]
+In this equation we used the minor definition from section \ref{sec:Training}, namely 
+\[ E(w_k,\I_k) \coloneq \frac{1}{b} \sum_{i \in \I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \big \| w_k \big \|_2^2. \]
+According to \cite{Paper}, the step size choice via this adopted version of backtracking linesearch ensures $y_k \tr s_k > 0$, which guarantees the positive definiteness of the inverse Hessian approximation $B_{k+1}$. As a consequence, the proposed P-BFGS algorithm is well-defined. Similar to the choice in \cite{Paper}, we always use $c = 0.4$ and $\beta = 0.55$ to perform the  backtracking linesearch.
 
 \pagebreak
-\section{Numerical Experiments}
+\section{Numerical Experiments} \label{sec:Experiments}
+
+\subsection{Space size comparison}
 
 \textbf{Experiment 1:} ResNet8 on CIFAR10 \\
 \ \\
@@ -1415,7 +1579,9 @@ For complexity ...
 - Compare different space sizes \\
 \ \\
 $\Rightarrow$ Training is possible in tiny subspaces \\
-\ \\
+
+\subsection{Verification on various architectures}
+
 \textbf{Experiment 2:} 10 models on CIFAR100 \\
 \ \\
 - Reference results in paper \\
@@ -1423,21 +1589,50 @@ $\Rightarrow$ Training is possible in tiny subspaces \\
 - Compare DLDR sampling time to SVD computation time \\
 \ \\
 $\Rightarrow$ Since SVD is only $\sim$ 10\% we focus to improve DLDR sampling \\
-\ \\
+
+\subsection{Iterative space refinement}
+
 \textbf{Experiment 3:} Iterative space refinement \\
 \ \\
 - Sample after k batches instead each epoch \\
 - Measures of distance: increase in accuracy / decrease in loss / ... \\
 - TBD \\
 \ \\
-$\Rightarrow$ Training algorithm that makes use of the low-dimensional landscape \\
-\ \\
+$\Rightarrow$ Training algorithm that makes use of the low-dimensional trajectory \\
+
+\subsection{Application of second-order information}
+
 \textbf{Experiment 4:} \\
 \ \\
 - Application of second order methods \\
 \ \\
 $\Rightarrow$ Second order methods are applicable and efficient \\
 \ \\
+
+\pagebreak
+\renewcommand{\arraystretch}{1.1}
+\begin{center}
+\begin{tabu} to \textwidth { r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] }
+\hline \hline \multicolumn{10}{c}{} \\ [-2.5ex]
+& \multicolumn{10}{c}{\#samples} \\
+dim & 30 & 60 & 90 & 120 & 150 & 300 & 600 & 900 & 1200 & 1500  \\
+\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+    5 &  &  &  &  &  &  &  &  &  &  \\
+  10 &  &  &  &  &  &  &  &  &  &  \\
+  15 &  &  &  &  &  &  &  &  &  &  \\
+  25 &  &  &  &  &  &  &  &  &  &  \\
+  50 & - &  &  &  &  &  &  &  &  &  \\
+  75 & - & - &  &  &  &  &  &  &  &  \\
+ 100 & - & - & - &  &  &  &  &  &  &  \\
+ 250 & - & - & - & - & - &  &  &  &  &  \\
+ 500 & - & - & - & - & - & - &  &  &  &  \\
+ 750 & - & - & - & - & - & - & - &  &  &  \\
+1000 & - & - & - & - & - & - & - & - &  &  \\
+\multicolumn{11}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\end{center}
+\renewcommand{\arraystretch}{1}
+
 \pagebreak
 
 DLDR paper results:
@@ -1445,21 +1640,21 @@ DLDR paper results:
 \begin{center}
 \begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
 \hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} &  \multicolumn{2}{c}{P-SGD} \\
+\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} & \multicolumn{2}{c}{P-SGD} \\
 & & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
 & & 50 & 100 & 200 & 50 & 100 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-VGG11\_bn &  & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
+VGG11\_bn & 28.5M & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
 \rowcolor{black}
 EfficientNet-B0 & 4.14M & 62.53 & 63.68 & 72.94 & 71.68 & 72.64 \\
-MobileNet & 3.32M & 57.15 & 58.67 & 67.94 & 66.86 & 68.00 \\
-DenseNet121 & 7.05M & 65.39 & 64.57 & 76.76 & 74.25 & 76.34 \\
-Inceptionv3 & 22.32M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
-Xception & 21.01M & 64.57 & 65.81 & 75.47 & 75.68 & 75.56 \\
-GoogLeNet & !!6.20M & 62.32 & 66.32 & 76.88 & 75.66 & 77.27 \\
-ShuffleNetv2 & 1.36M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
+MobileNet & 3.3M & 57.15 & 58.67 & 67.94 & 66.86 & 68.00 \\
+DenseNet121 & 7.0M & 65.39 & 64.57 & 76.76 & 74.25 & 76.34 \\
+Inceptionv3 & 22.3M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
+Xception & 21.0M & 64.57 & 65.81 & 75.47 & 75.68 & 75.56 \\
+GoogLeNet & 6.2M & 62.32 & 66.32 & 76.88 & 75.66 & 77.27 \\
+ShuffleNetv2 & 1.3M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
 SqueezeNet & 0.78M & 59.52 & 58.56 & 70.29 & 69.89 & 70.60 \\
-SEResNet18 & !!11.40M & 64.74 & 64.68 & 74.95 & 74.33 & 75.09 \\
+SEResNet18 & 11.4M & 64.74 & 64.68 & 74.95 & 74.33 & 75.09 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \end{center}
@@ -1470,20 +1665,68 @@ My results:
 \begin{center}
 \begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
 \hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} &  \multicolumn{2}{c}{P-SGD} \\
+\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} & \multicolumn{2}{c}{P-SGD} \\
 & & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
 & & 50 & 100 & 200 & 50 & 100 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-VGG11\_bn &  & 59.51 & 61.72 & 68.58 & 69.06 & 70.35 \\
-EfficientNet-B0 & 4.14M & 61.69 & 63.74 & 72.80 & 71.52 & 73.52 \\
-MobileNet & 3.32M & 57.99 & 59.95 & 68.01 & 67.27 & 68.67 \\
-DenseNet121 & 7.05M & 66.15 & 67.39 & 77.62 & 75.34 & 76.22 \\
-Inceptionv3 & 22.32M & 65.75 & 67.58 & 76.53 & 76.33 & 76.39 \\
-Xception & 21.01M & 66.79 & 67.14 & 75.63 & 75.67 & 75.37 \\
-GoogLeNet & !!6.40M & 64.86 & 66.32 & 76.26 & 75.14 & 76.67 \\
-ShuffleNetv2 & 1.36M & 64.55 & 64.74 & 72.34 & 72.05 & 72.91 \\
-SqueezeNet & 0.78M & 60.91 & 62.44 & 71.38 & 69.82 & 71.32 \\
-SEResNet18 & !!11.31M & 66.30 & 67.22 & 75.20 & 74.80 & 75.13 \\
+VGG11\_bn & 28.52M & 59.51 & 61.72 & 68.58 & & \\
+EfficientNet-B0 & 4.14M & 61.69 & 63.74 & 72.80 & & \\
+MobileNet & 3.32M & 57.99 & 59.95 & 68.01 & & \\
+DenseNet121 & 7.05M & 66.15 & 67.39 & 77.62 & & \\
+Inceptionv3 & 22.32M & 65.75 & 67.58 & 76.53 & & \\
+Xception & 21.01M & 66.79 & 67.14 & 75.63 & & \\
+GoogLeNet & 6.40M & 64.86 & 66.32 & 76.26 & & \\
+ShuffleNetv2 & 1.36M & 64.55 & 64.74 & 72.34 & & \\
+SqueezeNet & 0.78M & 60.91 & 62.44 & 71.38 & & \\
+SEResNet18 & 11.31M & 66.30 & 67.22 & 75.20 & & \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\end{center}
+\renewcommand{\arraystretch}{1}
+
+Comparison to BFGS:
+\renewcommand{\arraystretch}{1.1}
+\begin{center}
+\begin{tabu} to \textwidth { c | r | X[c] | X[c] X[c] | X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{1}{c|}{SGD} & \multicolumn{2}{c|}{P-SGD} & \multicolumn{2}{c}{P-BFGS} \\
+& & \multicolumn{1}{c|}{\#epochs} & \multicolumn{2}{c|}{\#sampling epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
+& & 200 & 50 & 100 & 50 & 100 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+VGG11\_bn & 28.52M & 68.58 & 69.06 & 70.35 & & \\
+EfficientNet-B0 & 4.14M & 72.80 & 71.52 & 73.52 & & \\
+MobileNet & 3.32M & 68.01 & 67.27 & 68.67 & & \\
+DenseNet121 & 7.05M & 77.62 & 75.34 & 76.22 & & \\
+Inceptionv3 & 22.32M & 76.53 & 76.33 & 76.39 & & \\
+Xception & 21.01M & 75.63 & 75.67 & 75.37 & & \\
+GoogLeNet & 6.40M & 76.26 & 75.14 & 76.67 & & \\
+ShuffleNetv2 & 1.36M & 72.34 & 72.05 & 72.91 & & \\
+SqueezeNet & 0.78M & 71.38 & 69.82 & 71.32 & & \\
+SEResNet18 & 11.31M & 75.20 & 74.80 & 75.13 & & \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\end{center}
+\renewcommand{\arraystretch}{1}
+
+Time consumption:
+\renewcommand{\arraystretch}{1.1}
+\begin{center}
+\begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{Training time (s/epoch)} & \multicolumn{2}{c}{DLDR time (s)} \\
+& & \multicolumn{3}{c|}{optimizer} & \multicolumn{2}{c}{\#samples} \\
+& & SGD & P-SGD & P-BFGS & 50 & 100 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+VGG11\_bn & 28.52M &  &  &  &  & \\
+EfficientNet-B0 & 4.14M &  &  &  &  & \\
+MobileNet & 3.32M &  &  &  &  & \\
+DenseNet121 & 7.05M &  &  &  &  & \\
+Inceptionv3 & 22.32M &  &  &  &  & \\
+Xception & 21.01M &  &  &  &  & \\
+GoogLeNet & 6.40M &  &  &  &  & \\
+ShuffleNetv2 & 1.36M &  &  &  &  & \\
+SqueezeNet & 0.78M &  &  &  &  & \\
+SEResNet18 & 11.31M &  &  &  &  & \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \end{center}
@@ -1491,6 +1734,19 @@ SEResNet18 & !!11.31M & 66.30 & 67.22 & 75.20 & 74.80 & 75.13 \\
 
 \pagebreak
 \section{Conclusion}
+
+According to Appendix 8 of \cite{Functionals}, more precisely equation (A.26), we have the following chain rule for functionals.
+
+\begin{lemma}
+Let $f \in \F$ be differentiable at $x \in \R^{n_0}$ and $\mu : \F \to \R$ be differentiable at $f$. The functional chain rule states, that
+\[ \partial_x \mu[f(x)] = \partial_f \mu[\partial_xf(x)] \]
+\end{lemma}
+
+To Do: Check $l$, $\ell$, $\L$. \\
+
+To Do: Double Check NTK Theorems \\
+
+To Do: Check why Z is orthogonal in pca \\
 
 In conclusion...
 
@@ -1509,6 +1765,8 @@ In conclusion...
 
 \bibitem{Adam} Diederik P. Kingma, Jimmy Lei Ba. \textit{Adam: A Method for Stochastic Optimization}. International Conference on Learning Representations (ICLR), 2015.
 
+\bibitem{Armijo} Larry Armijo. \textit{Minimization of Functions Having Lipschitz Continuous First Partial Derivatives}. Pacific Journal of Mathematics, volume 16, no. 1, pages 1-3, 1966.
+
 \bibitem{NTK} Arthur Jacot, Franck Gabriel, Cl\'{e}ment Holger. \textit{Neural Tangent Kernel: Convergence and Generalization in Neural Networks}. Advances in Neural Information Processing Systems, volume 31, pages 8571-8580, 2018.
 
 \bibitem{Functionals} Robert G. Parr, Weitao Yang. \textit{Density-Functional Theory of Atoms and Molecules}. International Series of Monographs on Chemistry Books, volume 16, 1989.
@@ -1518,14 +1776,12 @@ In conclusion...
 \bibitem{RKHS} Charles A. Micchelli, Massimiliano Pontil. \textit{On Learning Vector-Valued Functions}. Neural Computation, 17:177-204, 2005.
 
 \bibitem{Features} Ali Rahimi, Ben Recht. \textit{Random Features for Large-Scale Kernel Machines}. Advances in Neural Information Processing Systems, volume 20, pages 1177-1184, 2017.
- 
---- Check
-
-\bibitem{Stieltjes} Zhou Fan, Zhichao Wang. \textit{Spectra of the Conjugate Kernel and Neural Tangent Kernel for Linear-Width Neural Networks}. Advances in Neural Information Processing Systems, volume 33, pages 7710-7721, 2020.
-
-\bibitem{Linear} Jaehoon Lee, Lechao Xiao, Samuel S. Schoenholz, Yasaman Bahri, Roman Novak, Jascha Sohl-Dickstein, Jeffrey Pennington. \textit{Wide Neural Networks of Any Depth Evolve as Linear Models Under Gradient Descent}. Journal of Statistical Mechanics: Theory and Experiment. 2020(12):124002, 2020.
 
 \bibitem{SVD} Gene H. Golub, Charles F. Van Loan. \textit{Matrix Computations}. Third edition, 1996.
+
+\bibitem{Decay1} Zhou Fan, Zhichao Wang. \textit{Spectra of the Conjugate Kernel and Neural Tangent Kernel for Linear-Width Neural Networks}. Advances in Neural Information Processing Systems, volume 33, pages 7710-7721, 2020.
+
+\bibitem{Decay2} Amnon Geifman, Abhay Yadav, Yoni Kasten, Meirav Galun, David Jacobs, Ronen Basri. \textit{On the Similarity between the Laplace and Neural Tangent Kernels}. Advances in Neural Information Processing Systems, volume 33,  pages 1451–1461, 2020.
 
 \bibitem{PCA} Mehryar Mohri, Afshin Rostamizadeh, Ameet Talwalkar. \textit{Foundations of Machine Learning}. Second edition, 2018.
 
@@ -1538,8 +1794,9 @@ $\w:$ weight vector \\
 $a:$ element of $\A$ \\
 $b:$ batch size \\
 $c_i:$ constants \\
-$d:$ descent direction \\
-$d_{\F}$ pseudo metric on $\F$ \\
+$d:$ dimension of subspace \\
+$d_f:$ descent direction \\
+$d_{\F}:$ pseudo metric on $\F$ \\
 $d_{\X}:$ metric on input space \\
 $d_{\Y}:$ metric on output space \\
 $e_i:$ basis elements \\
@@ -1559,7 +1816,11 @@ $n_l:$ output dimension of neural network \\
 $n_x:$ input dimension of layer \\
 $n_y:$ output dimension of layer \\
 $n:$ number of parameters in neural network \\
-$s:$ real valued vector in BFGS \\
+$p:$ $min\{ n, m\}$ in SVD \\
+$r:$ rank in SVD \\
+$s:$ real valued vector in BFGS, element of subspace $S$ \\
+$s_k:$ low-dimensional trajectory \\
+$t:$ time \\
 $v_k:$ vector in Adam \\
 $w:$ parameter vector in neural network \\
 $x:$ real valued vector (input) \\
@@ -1579,24 +1840,33 @@ $\phi:$ direction in functional derivative \\
 $\psi:$ real valued helper function \\
 $\rho:$ real value in BFGS\\
 $\sigma:$ activation function \\
+$\sigma_i:$ singular values \\
 - \\
+$A:$ real valued matrix \\
+$B:$ real valued matrix \\
 $C:$ cost functional \\
 $B:$ inverse hessian matrix approximation \\
 $E:$ empirical error \\
 $F:$ realization function \\
 $I_n:$ identity matrix \\
 $J:$ riesz mapping \\
-$K:$ number of epochs / kernel \\
+$K:$ kernel \\
 $L:$ lipschitz constant \\
 $M:$ real valued matrix \\
+$N$: number of epochs \\
+$P:$ orthogonal projection \\
 $R:$ generalization error \\
+$S:$ subspace \\
 $T:$ linear operator \\
-$V:$ matrix in BFGS \\
-$W:$ weight matrix in layer \\
+$U:$ orthogonal matrix \\
+$V:$ orthogonal matrix, matrix in BFGS \\
+$Q:$ orthogonal matrix \\
+$W:$ weight matrix in layer, data matrix in pca \\
+$Z:$ orthogonal matrix \\
 - \\
 $\Phi_K:$ mapping to Hilbert space \\ 
 $\Theta:$ neural tangent kernel \\
-$\Sigma:$ covariance matrix \\
+$\Sigma:$ covariance matrix, diagonal matrix in SVD \\
 - \\
 $\A:$ subset of $\F$ \\
 $\F:$ function space \\
@@ -1607,6 +1877,7 @@ $\D_x:$ marginal probability distribution \\
 $\I:$ set of indices \\
 $\H:$ hilbert space \\
 $\mathcal{N}:$ normal distribution \\
+$\P$: set of projection matrices \\
 $\X:$ input space \\
 $\Y:$ output space \\
 - \\
