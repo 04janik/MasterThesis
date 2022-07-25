@@ -81,25 +81,24 @@ Let $n_x, n_y \in \N$, $W = [\w_1, \dots, \w_{n_y}] \in \R^{n_x \times n_y}$, $\
 where the activation function $\sigma$ is applied element-wise.
 \end{definition}
 
-To provide a better understanding, these basic concepts can be visualized as graphs. \\
+To provide a better understanding, these basic concepts can be visualized as graphs.
 
 \begin{figure}[!h]
 	\begin{minipage}[c]{0.5\linewidth}
 	\centering
-	\includegraphics{images/neuron.png}
+	\includegraphics[width=0.9\linewidth]{images/neuron.png}
       		\caption{Illustration of a neuron as graph.}
 	\end{minipage}
 	\hfill
 	\begin{minipage}[c]{0.5\linewidth}
 	\centering
-	\includegraphics{images/neuron.png}
+	\includegraphics[width=0.9\linewidth]{images/layer.png}
       		\caption{Illustration of a layer as graph.}
 	\end{minipage}
 \end{figure}
 
-In the following we will no longer distinguish between weights and biases and simply refer to them as parameters. Logically one can use the output of a layer as input for another layer. Iteratively doing so will construct specific functions known as neural networks. In order to formalize this idea we denote the following definition. \\
+In the following we will no longer distinguish between weights and biases and simply refer to them as parameters. Logically one can use the output of a layer as input for another layer. Iteratively doing so will construct specific functions known as neural networks. In order to formalize this idea we denote the following definition. \\ \\
 
-\pagebreak
 \begin{definition} \label{def:network}
 Let $l \in \N$ and $n_0, \dots, n_l \in \N$. A neural network is defined as a function
 \[ f : \R^{n_0} \to \R^{n_l} : x \mapsto f^{(l)} \circ f^{(l-1)} \circ \cdots \circ f^{(1)} (x),\]
@@ -110,7 +109,7 @@ Just like neurons and layers, neural networks can also be visualized as graphs.
 
 \begin{figure}[!h]
 \centering
-\includegraphics{images/neuron.png}
+\includegraphics[width=0.6\linewidth]{images/network.png}
 \caption{Illustration of a neural network as graph.}
 \label{fig:neuron}
 \end{figure}  
@@ -341,7 +340,7 @@ According to section 1.2.4 of \cite{ConvexOptimization}, the technique's converg
 \textcolor{white}{$\Big |$}7: \textbf{end while}
 \end{algorithm}
 
-If $n$ is large, the Hessian matrix computation in Newton's method can become computationally very expensive. Since we are only in need of the inverse Hessians $H_f^{-1}(x_k)$, one approach to reduce the computational effort consists of approximating these inverse Hessians. One popular method, that pursues this approach is the following from \cite{BFGS}.
+If $n$ is large, the Hessian matrix computation in Newton's method can become computationally very expensive. Since we are only in need of the inverse Hessians $H_f^{-1}(x_k)$, one approach to reduce the computational effort consists of approximating these inverse Hessians. A widely known method, that pursues this approach is the following from \cite{BFGS}.
 
 \begin{algorithm}
 \caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS) \textcolor{white}{$\Big |$}} \ \\
@@ -359,8 +358,8 @@ If $n$ is large, the Hessian matrix computation in Newton's method can become co
 With the initialization $B_0 = I_n$, the method starts with a gradient descent update and then iteratively minimizes the objective function by inverse Hessian matrix approximations $B_k$. \\
 
 So far we have seen three different approaches to iteratively minimize a twice differentiable function $f: \R^n \to \R$. With respect to our objective of minimizing the empirical error
-\[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
-however, we must note that due to the large number of parameters in deep neural networks in combination with the massive amount of training data needed, the proposed optimization algorithms are not applicable. Still, the approach of neural network training is to iteratively optimize the parameters via some update rule of the form
+\[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2 \]
+however, we must note that due to the large number of parameters in deep neural networks in combination with the massive amount of training data needed, the proposed optimization algorithms are impractical. Still, the approach of neural network training is to iteratively optimize the parameters via some update rule of the form
 \[ w_{k+1} \leftarrow w_k - \eta_k \cdot d_k, \]
 where $d_k \in \R^n$ denotes a direction of descent. Note that gradient descent, Newton's method as well as BFGS pursue exactly this approach. For the purpose of minimizing $E$ however, we need to find a computationally cheaper method to determine the descent directions. \\
 
@@ -1532,7 +1531,7 @@ Based on the stochastic gradient descent algorithm, we can introduce its project
 \textcolor{white}{$\Big |$}8: \textbf{end for}
 \end{algorithm}
 
-The convergence of stochastic gradient descent will be extensively investigated in section \ref{sec:Experiments}. \\
+The convergence of projected stochastic gradient descent will be investigated in section \ref{sec:Experiments}. \\
 
 If the dimension of the subspace covering the optimization trajectory is small enough, we could probably use second order information for the training of deep neural networks. To clarify this, we have to recall that in Newton's method, the descent direction was defined as
 \[ d_k = - H_E^{-1}(x_k) \nabla E(x_k). \]
