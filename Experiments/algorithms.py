@@ -170,6 +170,153 @@ def train_PSGD(args, model, train_loader, test_loader):
                 lr_scheduler.step()
 
 
+def train_BSGD(args, model, train_loader, test_loader):
+
+    model.train()
+
+    # configure training
+    criterion = torch.nn.CrossEntropyLoss().cuda()
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
+
+    # construct name
+    model_name = model.__class__.__name__
+    run_name = f'{model_name}-PSGD-lr{args.lr}-d{args.dim}-s{args.samples}'
+
+    # storage
+    k = 0 # number of epochs
+    W = [] # sampled parameters
+    acc_max = 0 # max accuracy
+
+    # get sampling milestones
+    batch_count = len(train_loader)
+    milestones = [int(batch_count*(i+1)/args.freq) for i in range(args.freq)]
+
+    # configure monitoring tool
+    with wandb.init(project=model_name, name=run_name) as run:
+
+        run.config.learning_rate = args.lr
+        run.config.optimizer = optimizer
+        run.watch(model)
+
+        for i in range(args.rho):
+
+            for j in range(args.dim/(args.freq*(args.rho+1))):
+
+                batch = 0
+
+                for inputs, labels in iter(train_loader):
+
+                    # count batches
+                    batch = batch + 1
+
+                    # move data to cuda
+                    inputs, labels = inputs.cuda(), labels.cuda()
+
+                    # forward pass
+                    outputs = model.forward(inputs)
+                    loss = criterion(outputs, labels)
+
+                    # backward pass
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+
+                    # log the loss
+                    run.log({'loss': loss})
+
+                    # sample parameters
+                    if batch in milestones:
+                        W = torch.cat((W, get_model_param_vec(model).unsqueeze(1)), dim = 1)
+
+                # evaluate the model
+                accuracy, confusion = eval_model(args, model, test_loader)
+                acc_max = acc_max if acc_max > accuracy else accuracy
+                run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
+
+                k = k+1
+
+            # obtain subspace via PCA
+            dim = args.dim*(i+1)/(args.rho+1)
+
+            print('W:', W.shape)
+            print('dim:', dim)
+
+            U, S, V = torch.pca_lowrank(W, q=dim, center=True)
+
+            Q = torch.transpose(V,0,1).cuda()
+            print('Q:', Q.shape)
+
+            # configure training
+            optimizer = torch.optim.SGD(model.parameters(), lr=10*args.lr, momentum=args.mom, weight_decay=args.wd)
+
+            j = 0
+
+            while j<3:
+
+                for inputs, labels in iter(train_loader):
+
+                    # move data to cuda
+                    inputs, labels = inputs.cuda(), labels.cuda()
+
+                    # forward pass
+                    outputs = model.forward(inputs)
+                    loss = criterion(outputs, labels)
+
+                    # backward pass
+                    optimizer.zero_grad()
+                    loss.backward()
+
+                    # parameter update in subspace
+                    grad = get_model_grad_vec(model).float()
+                    grad = torch.mm(Q, grad.reshape(-1,1))
+                    grad_pro = torch.mm(Q.transpose(0,1), grad)
+
+                    update_grad(model, grad_pro)
+                    optimizer.step()
+
+                    # log the loss
+                    run.log({'loss': loss})
+
+                # evaluate the model
+                accuracy, confusion = eval_model(args, model, test_loader)
+
+                if accuracy > acc_max:
+                    acc_max = accuracy
+                else:
+                    j = j+1
+
+                run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
+
+                k = k+1
+        
+        # configure training
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1*args.lr, momentum=args.mom, weight_decay=args.wd)
+
+        for i in range(args.epochs - k):
+
+            for inputs, labels in iter(train_loader):
+
+                # move data to cuda
+                inputs, labels = inputs.cuda(), labels.cuda()
+
+                # forward pass
+                outputs = model.forward(inputs)
+                loss = criterion(outputs, labels)
+
+                # backward pass
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                # log the loss
+                run.log({'loss': loss})
+
+            # evaluate the model
+            accuracy, confusion = eval_model(args, model, test_loader)
+            acc_max = acc_max if acc_max > accuracy else accuracy
+            run.log({'accuracy': accuracy, 'max accuracy': acc_max, 'epoch': epoch, 'epoch time consumption': end - start})
+
+
 def train_SGD(args, model, train_loader, test_loader):
 
     model.train()
@@ -240,7 +387,7 @@ def train_SGD(args, model, train_loader, test_loader):
                 # log the loss
                 run.log({'loss': loss})
 
-                #save model state dict
+                # sample parameters
                 if batch in milestones:
                     torch.save(model.state_dict(), os.path.join(run_path + '/checkpoint_' + str(samples)))
                     samples = samples + 1
