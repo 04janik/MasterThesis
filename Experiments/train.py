@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 # parse arguments
 parser.add_argument('-model', default='', type=str, help='choose the model')                # model 
 parser.add_argument('-data', default='', type=str, help='choose CIFAR10/CIFAR100')          # data set
-parser.add_argument('-optimizer', default='', type=str, help='choose sgd/psgd')             # optimizer
+parser.add_argument('-optimizer', default='', type=str, help='choose sgd/psgd/bsgd')        # optimizer
 parser.add_argument('-epochs', default=0, type=int, help='number of epochs')                # epochs
 parser.add_argument('-lr', default=0, type=float, help='learning rate')                     # learning rate
 parser.add_argument('-lr_scheduler', default=True, type=bool, help='lr scheduler')          # lr scheduler
@@ -31,6 +31,10 @@ parser.add_argument('-spath', default='', type=str, help='sampling path')       
 # parse arguments for sgd
 parser.add_argument('-freq', default=1, type=int, help='sampling frequency per epoch')      # sampling frequency
 parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
+
+# parse arguments for bsgd
+parser.add_argument('-xi', default=3, type=int, help='sampling frequency per epoch')        # sampling frequency
+parser.add_argument('-rho', default=0, type=int, help='number of space refinements')        # space refinements
 
 # store arguments
 args = parser.parse_args()
@@ -65,6 +69,12 @@ elif args.optimizer == 'sgd':
     elif not os.path.exists(args.rpath):
         raise Exception('invalid result path')
 
+elif args.optimizer == 'bsgd':
+    if args.xi <= 0:
+        raise Exception('invalid sampling frequency')
+    if args.rho < 0:
+        raise Exception('invalid subspace refinements')
+
 else:
     raise Exception('invalid optimizer')
 
@@ -90,6 +100,8 @@ if args.optimizer == 'sgd':
     algorithms.train_SGD(args, model, train_loader, test_loader)
 elif args.optimizer == 'psgd':
     algorithms.train_PSGD(args, model, train_loader, test_loader)
+elif args.optimizer == 'bsgd':
+    algorithms.train_BSGD(args, model, train_loader, test_loader)
 
 # print test results
 accuracy, confusion = algorithms.eval_model(args, model, test_loader)

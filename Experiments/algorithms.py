@@ -189,7 +189,7 @@ def train_BSGD(args, model, train_loader, test_loader):
 
     # get sampling milestones
     batch_count = len(train_loader)
-    milestones = [int(batch_count*(i+1)/args.freq) for i in range(args.freq)]
+    milestones = [int(batch_count*(i+1)/args.xi) for i in range(args.xi)]
 
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:
@@ -200,11 +200,16 @@ def train_BSGD(args, model, train_loader, test_loader):
 
         for i in range(args.rho):
 
-            for j in range(args.dim/(args.freq*(args.rho+1))):
+            print('subspace refinement: ', i)
+
+            # progress bar
+            mb = master_bar(range(args.dim/(args.xi*(args.rho+1))))
+
+            for epoch in mb:
 
                 batch = 0
 
-                for inputs, labels in iter(train_loader):
+                for inputs, labels in progress_bar(iter(train_loader), parent=mb):
 
                     # count batches
                     batch = batch + 1
@@ -251,6 +256,8 @@ def train_BSGD(args, model, train_loader, test_loader):
 
             j = 0
 
+            print('Training low-dimensional subspace...')
+
             while j<3:
 
                 for inputs, labels in iter(train_loader):
@@ -292,9 +299,12 @@ def train_BSGD(args, model, train_loader, test_loader):
         # configure training
         optimizer = torch.optim.SGD(model.parameters(), lr=0.1*args.lr, momentum=args.mom, weight_decay=args.wd)
 
-        for i in range(args.epochs - k):
+        # progressbar 
+        mb = master_bar(range(k,args.epochs))
 
-            for inputs, labels in iter(train_loader):
+        for epoch in mb:
+
+            for inputs, labels in progress_bar(iter(train_loader), parent=mb):
 
                 # move data to cuda
                 inputs, labels = inputs.cuda(), labels.cuda()
