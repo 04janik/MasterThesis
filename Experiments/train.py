@@ -22,10 +22,9 @@ parser.add_argument('-lr_scheduler', default=True, type=bool, help='lr scheduler
 parser.add_argument('-seed', default=None, type=int, help='random seed')                    # random seed
 parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')                   # weight decay
  
-# parse arguments for psgd or pbfgs
+# parse arguments for psgd
 parser.add_argument('-dim', default=0, type=int, help='subspace dimension')                 # subspace dimension
 parser.add_argument('-samples', default=0, type=int, help='number of sampling epochs')      # sampling epochs
-parser.add_argument('-sample_start', default=0, type=int, help='first sample for PCA')      # first sample
 parser.add_argument('-spath', default='', type=str, help='sampling path')                   # sampling path
 
 # parse arguments for sgd
@@ -33,8 +32,7 @@ parser.add_argument('-freq', default=1, type=int, help='sampling frequency per e
 parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
 
 # parse arguments for bsgd
-parser.add_argument('-xi', default=3, type=int, help='sampling frequency per epoch')        # sampling frequency
-parser.add_argument('-rho', default=1, type=int, help='number of space refinements')        # space refinements
+parser.add_argument('-xi', default=1, type=int, help='sampling frequency per epoch')        # sampling frequency
 
 # store arguments
 args = parser.parse_args()
@@ -54,12 +52,10 @@ elif args.mom < 0 or args.mom > 1:
     raise Exception('invalid momentum')
 
 if args.optimizer == 'psgd' or args.optimizer == 'pbfgs':
-    if args.dim <= 0 or args.dim > args.sample_start + args.samples:
+    if args.dim <= 0 or args.dim > args.samples:
         raise Exception('invalid subspace dimension')
     elif args.samples <= 0:
         raise Exception('invalid number of samples')
-    elif args.sample_start < 0:
-        raise Exception('invalid starting sample')
     elif not os.path.exists(args.spath):
         raise Exception('invalid sampling path')
 
@@ -72,8 +68,6 @@ elif args.optimizer == 'sgd':
 elif args.optimizer == 'bsgd':
     if args.xi <= 0:
         raise Exception('invalid sampling frequency')
-    if args.rho < 0:
-        raise Exception('invalid subspace refinements')
 
 else:
     raise Exception('invalid optimizer')
