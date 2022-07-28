@@ -16,8 +16,9 @@
 \contentsline {subsection}{\numberline {4.4}Dynamic Linear Dimensionality Reduction}{44}{}%
 \contentsline {subsection}{\numberline {4.5}DLDR-based Training Algorithms}{47}{}%
 \contentsline {section}{\numberline {5}Numerical Experiments}{50}{}%
-\contentsline {subsection}{\numberline {5.1}Space size comparison}{50}{}%
-\contentsline {subsection}{\numberline {5.2}Verification on various architectures}{50}{}%
-\contentsline {subsection}{\numberline {5.3}Iterative space refinement}{50}{}%
-\contentsline {subsection}{\numberline {5.4}Application of second-order information}{50}{}%
-\contentsline {section}{\numberline {6}Conclusion}{54}{}%
+\contentsline {subsection}{\numberline {5.1}Verification on Various Architectures}{51}{}%
+\contentsline {subsection}{\numberline {5.2}Subspace exploration}{54}{}%
+\contentsline {subsection}{\numberline {5.3}Verification on various architectures}{57}{}%
+\contentsline {subsection}{\numberline {5.4}Iterative space refinement}{57}{}%
+\contentsline {subsection}{\numberline {5.5}Application of second-order information}{58}{}%
+\contentsline {section}{\numberline {6}Conclusion}{64}{}%

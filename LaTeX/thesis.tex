@@ -40,7 +40,7 @@
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\E}{\mathbb{E}}
 
-\usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx, tabu, multirow, colortbl}
+\usepackage{graphicx, scrextend, algorithmic, xcolor, mathabx, tabu, multirow, colortbl, subfigure}
 
 \usepackage[ruled]{algorithm}
 
@@ -84,17 +84,16 @@ where the activation function $\sigma$ is applied element-wise.
 To provide a better understanding, these basic concepts can be visualized as graphs.
 
 \begin{figure}[!h]
-	\begin{minipage}[c]{0.5\linewidth}
-	\centering
-	\includegraphics[width=0.9\linewidth]{images/neuron.png}
-      		\caption{Illustration of a neuron as graph.}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[c]{0.5\linewidth}
-	\centering
-	\includegraphics[width=0.9\linewidth]{images/layer.png}
-      		\caption{Illustration of a layer as graph.}
-	\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{images/neuron.png}
+      	\caption{Illustration of a neuron as graph.}
+\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{images/layer.png}
+      	\caption{Illustration of a layer as graph.}
+\end{minipage}
 \end{figure}
 
 In the following we will no longer distinguish between weights and biases and simply refer to them as parameters. Logically one can use the output of a layer as input for another layer. Iteratively doing so will construct specific functions known as neural networks. In order to formalize this idea we denote the following definition. \\ \\
@@ -158,12 +157,12 @@ Due to the complexity of the error function, in general there is no easy way to 
 
 \begin{algorithm}
 \caption{Gradient Descent \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and $\epsilon \geq 0$. \\
-\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
-\textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\eta_k > 0$. \\
-\textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \eta_k \cdot \nabla f(x_k)$ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}6: \textbf{end while}
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $f: \R^n \to \R$, $x_0 \in \R^n$, $\epsilon \geq 0$ \\
+\textcolor{white}{$\Big |$}1: Initialize $k \leftarrow 0$; \\
+\textcolor{white}{$\Big |$}2: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}:\\
+\textcolor{white}{$\Big |$}3: \quad Choose a step size $\eta_k > 0$; \\
+\textcolor{white}{$\Big |$}4: \quad Set $x_{k+1} \leftarrow x_k - \eta_k \cdot \nabla f(x_k)$ and $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}5: \textbf{end while}
 \end {algorithm}
 
 We will see, that in the case where $f$ is bounded from below and $\nabla f$ is Lipschitz continuous, we can guarantee the  convergence of gradient descent to a stationary point.
@@ -331,28 +330,29 @@ According to section 1.2.4 of \cite{ConvexOptimization}, the technique's converg
 
 \begin{algorithm}
 \caption{Newton's Method \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires twice differentiable $f: \R^n \to \R$ with invertible Hessian $H_f(x)$ for $x \in \R^n$. \\
-\textcolor{white}{$\Big |$}2: Requires random initialization $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
-\textcolor{white}{$\Big |$}3: Initialize $k \leftarrow 0$. \\
-\textcolor{white}{$\Big |$}4: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
-\textcolor{white}{$\Big |$}5: \quad Choose a step size $\eta_k > 0$. \\
-\textcolor{white}{$\Big |$}6: \quad Set $x_{k+1} \leftarrow x_k - \eta_k H_f^{-1}(x_k) \nabla f(x_k)$ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}7: \textbf{end while}
+\textcolor{white}{$\Big |$}\textbf{Input:} Twice differentiable $f: \R^n \to \R$ with invertible Hessian matrices, $x_0 \in \R^n$, $\epsilon \geq 0$ \\
+%\textcolor{white}{$\Big |$}2: Requires random initialization $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
+\textcolor{white}{$\Big |$}1: Initialize $k \leftarrow 0$; \\
+\textcolor{white}{$\Big |$}2: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
+\textcolor{white}{$\Big |$}3: \quad Choose a step size $\eta_k > 0$; \\
+\textcolor{white}{$\Big |$}4: \quad Set $x_{k+1} \leftarrow x_k - \eta_k H_f^{-1}(x_k) \nabla f(x_k)$ and $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}5: \textbf{end while}
 \end{algorithm}
+\ \\
 
-If $n$ is large, the Hessian matrix computation in Newton's method can become computationally very expensive. Since we are only in need of the inverse Hessians $H_f^{-1}(x_k)$, one approach to reduce the computational effort consists of approximating these inverse Hessians. A widely known method, that pursues this approach is the following from \cite{BFGS}.
+If $n$ is large, the Hessian matrix computation in Newton's method can become computationally very expensive. Since we are only in need of the inverse Hessian matrices $H_f^{-1}(x_k)$, one approach to reduce the computational effort consists of approximating these inverse Hessians. A widely known method, that pursues this approach is the following from \cite{BFGS}.
 
 \begin{algorithm}
 \caption{Broyden-Fletcher-Goldfarb-Shanno (BFGS) \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires twice differentiable $f: \R^n \to \R$, random $x_0 \in \R^n$ and  $\epsilon \geq 0$. \\
-\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$ and $B_0 \leftarrow I_n$. \\
-\textcolor{white}{$\Big |$}3: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\eta_k > 0$. \\
-\textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \eta_k B_k \nabla f(x_{k})$. \\
-\textcolor{white}{$\Big |$}6: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
-\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k\tr s_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k\tr $. \\
-\textcolor{white}{$\Big |$}8: \quad Set $B_{k+1} \leftarrow V_k\tr B_{k}V_k + \rho_k s_k s_k\tr $ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}9: \textbf{end while}
+\textcolor{white}{$\Big |$}\textbf{Input:} Twice differentiable $f: \R^n \to \R$, $x_0 \in \R^n$, $\epsilon \geq 0$ \\
+\textcolor{white}{$\Big |$}1: Initialize $k \leftarrow 0$ and $B_0 \leftarrow I_n$; \\
+\textcolor{white}{$\Big |$}2: \textbf{while} $ \big \| \nabla f(x_k) \big \|_2 > \epsilon $ \textbf{do}: \\
+\textcolor{white}{$\Big |$}3: \quad Choose a step size $\eta_k > 0$; \\
+\textcolor{white}{$\Big |$}4: \quad Set $x_{k+1} \leftarrow x_k - \eta_k B_k \nabla f(x_{k})$; \\
+\textcolor{white}{$\Big |$}5: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$; \\
+\textcolor{white}{$\Big |$}6: \quad Let $\rho_k = (y_k\tr s_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k\tr $; \\
+\textcolor{white}{$\Big |$}7: \quad Set $B_{k+1} \leftarrow V_k\tr B_{k}V_k + \rho_k s_k s_k\tr $ and $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}8: \textbf{end while}
 \end{algorithm}
 
 With the initialization $B_0 = I_n$, the method starts with a gradient descent update and then iteratively minimizes the objective function by inverse Hessian matrix approximations $B_k$. \\
@@ -373,16 +373,15 @@ as an approximation of $\nabla E(w_k)$. Although only a small amount of data is 
 
 \begin{algorithm} 
 \caption{Stochastic Gradient Descent (SGD) \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
-\textcolor{white}{$\Big |$}2: Requires a batch size $b \in \N$ and a number of epochs $N \in \N$. \\
-\textcolor{white}{$\Big |$}3: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
-\textcolor{white}{$\Big |$}5: \quad Choose a step size $\eta_k > 0$. \\
-\textcolor{white}{$\Big |$}6: \quad Set $w_{k+1} \leftarrow w_k - \eta_k \cdot \nabla E(w_k,\I_k)$. \\
-\textcolor{white}{$\Big |$}7: \textbf{end for}
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, $w_0 \in \R^n$ \\
+\textcolor{white}{$\Big |$}1: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}2: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$; \\
+\textcolor{white}{$\Big |$}3: \quad Choose a step size $\eta_k > 0$; \\
+\textcolor{white}{$\Big |$}4: \quad Set $w_{k+1} \leftarrow w_k - \eta_k \cdot \nabla E(w_k,\I_k)$; \\
+\textcolor{white}{$\Big |$}5: \textbf{end for}
 \end{algorithm}
 
-In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training dataset. Thus on average each individual training sample will contribute $N$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this thesis. \\
+In here, an epoch describes the use of a number of samples for parameter updates, that equals the size of the whole training data set. Thus on average each individual training sample will contribute $N$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD}, but would exceed the scope of this thesis. \\
 
 
 %So far we have not discussed how to choose the step sizes $\eta_k$. To simplify things, in practice one usually chooses a step size $\eta > 0$, that stays constant across each iteration. Unfortunately a constant step size does not adapt to the specific local properties of the error surface at iteration $k \in \N$. One method that aims to improve the stochastic gradient descent algorithm by including past gradients for the current parameter update is called adaptive moment estimation and was first raised in \cite{Adam}. \\
@@ -405,12 +404,11 @@ In here, an epoch describes the use of a number of samples for parameter updates
 As of now we have not discussed the choice of step sizes $\eta_k$ in either of the four optimization methods proposed so far. In machine learning scenarios it is a common practice to choose a constant step size $\eta > 0$ for all parameter updates. Clearly there are better choices of step sizes rather than this naive approach. However, these often come with additional computational effort. A widely known technique for the choice of sophisticated step sizes is called backtracking linesearch and was first raised in \cite{Armijo}. The algorithm can be denoted as follows. 
 \begin{algorithm} 
 \caption{Backtracking Linesearch \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires differentiable function $f: \R^n \to \R$ and $x \in \R^n$. \\
-\textcolor{white}{$\Big |$}2: Requires a factor $\beta \in (0,1)$ and a constant $c \in (0,1)$. \\ 
-\textcolor{white}{$\Big |$}3: Initialize $k \leftarrow 0$ and $\eta_0 \leftarrow 1$. \\
-\textcolor{white}{$\Big |$}4: \textbf{while} $f \big (x + \eta_k \cdot \nabla f(x) \big) > f(x) - c \cdot \eta_k \cdot \nabla f(x) \tr \nabla f(x)$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}5: \quad Set $\eta_{k+1} \leftarrow \beta \cdot \eta_k \cdot $ \\
-\textcolor{white}{$\Big |$}6: \textbf{end for}
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $f: \R^n \to \R$, $x \in \R^n$, $\beta \in (0,1)$, $c \in (0,1)$ \\ 
+\textcolor{white}{$\Big |$}1: Initialize $k \leftarrow 0$ and $\eta_0 \leftarrow 1$; \\
+\textcolor{white}{$\Big |$}2: \textbf{while} $f \big (x + \eta_k \cdot \nabla f(x) \big) > f(x) - c \cdot \eta_k \cdot \nabla f(x) \tr \nabla f(x)$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}3: \quad Set $\eta_{k+1} \leftarrow \beta \cdot \eta_k$; \\
+\textcolor{white}{$\Big |$}4: \textbf{end for}
 \end{algorithm}
 
 This completes the necessary basics on notation and training of neural networks. Next we will investigate certain approaches on how to improve the training of neural networks in order prevent the curse of non-convexity and reduce the computation and time effort needed. \\
@@ -661,7 +659,7 @@ Thus for each functional $\mu \in \F^*$ there exists $d \in \F$ such that $\mu =
 
 Hence we can conclude the existence of functional gradients, as long as the functional derivative $\partial_f \mu |_{f_0}$ is an element of $\F^*$. In other words, $\partial_f \mu |_{f_0}$ is linear and continuous. To guarantee this, for the rest of the thesis we make the restriction, that the marginal distribution $\D_x$ on the input space is given by the empirical distribution on a finite subset of $\R^{n_0}$. This means there exist $m \in \N$ and $x_1, \dots, x_m \in \R^{n_0}$, such that the distribution of inputs is given by
 \[ \D_x = \frac{1}{m} \sum_{i=1}^{m} \delta_{x_i}, \]
-where $\delta_{x_i}$ denotes the Dirac measure in $x_i$. Under this assumption, $\langle \cdot, \cdot \rangle_{\D_x}$ depends only on the values of $f$ at a finite dataset. This implies the following result from \cite{NTK}.
+where $\delta_{x_i}$ denotes the Dirac measure in $x_i$. Under this assumption, $\langle \cdot, \cdot \rangle_{\D_x}$ depends only on the values of $f$ at a finite data set. This implies the following result from \cite{NTK}.
 
 \begin{lemma} \label{lem:funcDerivative}
 Let $\mu: \F \to \R$ be differentiable in $f_0 \in \F$, then we have $\partial_f\mu |_{f_0} \in \F^*$. In other words, the functional derivative $\partial_f\mu |_{f_0}$ is linear and continuous.
@@ -695,7 +693,7 @@ Thus the functional derivative $\partial_f \mu |_{f_0}$ can be viewed as an elem
 
 Theorem \ref{thm:riesz} is a weakening of the Riesz representation theorem, stating that any Hilbert space $\H$ is isometric and isomorphic to its dual space $\H^*$ via  $J:\H \to \H^* : x \mapsto \langle x , \cdot \rangle_\H$. However, since $\langle \cdot , \cdot \rangle_{\D_x}$ is only positive semidefinite and not positive definite we lose the property of $J$ being isometric and therefore injective. This is a severe problem for our approach of minimizing a functional via gradient descent, because the functional gradient is not uniquely determined. Namely any descent direction from the corresponding equivalence class according to $\sim$ could be chosen for the iterative updates, but we have no criterium to select one of them. \\
 
-In terms of machine learning scenarios, this problem can be explained as follows. We assume that there exists an unknown probability distribution $\D_x$ and approximate it by the empirical distribution corresponding to our dataset. Then, we could minimize the functional cost $C$ via the same iterative approach in gradient descent by choosing any element from the corresponding equivalence class of functional gradients. This would perfectly minimize $C$ on the training dataset. However, we have no criterium to optimize our target function on unseen data points, which is the main objective of our machine learning task. Thus we have to find a solution, to generalize the functional derivative to values outside the dataset.  \\
+In terms of machine learning scenarios, this problem can be explained as follows. We assume that there exists an unknown probability distribution $\D_x$ and approximate it by the empirical distribution corresponding to our data set. Then, we could minimize the functional cost $C$ via the same iterative approach in gradient descent by choosing any element from the corresponding equivalence class of functional gradients. This would perfectly minimize $C$ on the training data set. However, we have no criterium to optimize our target function on unseen data points, which is the main objective of our machine learning task. Thus we have to find a solution, to generalize the functional derivative to values outside the data set.  \\
 
 Kernel gradient descent is a method, that addresses this problem by minimizing the cost $C$ in a special subspace of $\F$, namely a reproducing kernel Hilbert space, in which a unique descent direction can be constructed. This idea will be explained in detail in section \ref{sec:KGD}, but first we need some background knowledge on kernels and reproducing kernel Hilbert spaces. 
 
@@ -837,7 +835,7 @@ mapping a dual element $\mu \in \F^*$ to the function
 \[ f_{\mu} : \R^{n_0} \to \R^{n_l} : x \mapsto  \begin{bmatrix} \mu \big [K_1(x,\cdot) \big ] \\ \vdots \\ \mu \big [ K_{n_l}(x,\cdot) \big ] \end{bmatrix}. \]
 \end{definition}
 
-The mapping $\Phi_K$ will be used to restrict our minimization problem to a vector-valued reproducing kernel Hilbert space. To explain this in detail we have to mention the following characterization of $\Phi_K$, which is based on the representation theorem \ref{thm:riesz} and the restriction, that the marginal distribution $\D_x$ is given by the empirical distribution on a finite dataset.
+The mapping $\Phi_K$ will be used to restrict our minimization problem to a vector-valued reproducing kernel Hilbert space. To explain this in detail we have to mention the following characterization of $\Phi_K$, which is based on the representation theorem \ref{thm:riesz} and the restriction, that the marginal distribution $\D_x$ is given by the empirical distribution on a finite data set.
 
 \begin{lemma} \label{lem:phi}
 Let $\mu = \langle d, \cdot \rangle_{\D_x} \in \F^*$ and $K$ be a kernel, then
@@ -854,7 +852,7 @@ for $j = 1, \dots, n_l$. Thus we derive
 \[ \Phi_K \big ( \mu \big )(x) = \begin{bmatrix} \big \langle d, K_1(x,\cdot) \big \rangle_{\D_x} \\ \vdots \\ \big \langle d, K_{n_l}(x,\cdot) \big \rangle_{\D_x} \end{bmatrix} = \E_{x' \sim \D_x} \begin{bmatrix} d(x')\tr K_{1}(x,x') \\ \vdots \\ d(x')\tr K_{n_l}(x,x') \end{bmatrix} = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x,x') \Big ]\tr . \]
 With $K(x,x')\tr  = K(x,x')$ for every $x,x' \in \R^{n_0}$ by definition, we conclude
 \[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ d(x')\tr  K(x,x') \Big ]\tr  = \E_{x' \sim \D_x} \Big [ K(x,x')\tr d(x') \Big ] = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ]. \]
-The last step consists of using the assumption, that $\D_x$ is the empirical distribution on a finite dataset $x_1, \dots, x_m \in \R^{n_0}$. This enables us to derive
+The last step consists of using the assumption, that $\D_x$ is the empirical distribution on a finite data set $x_1, \dots, x_m \in \R^{n_0}$. This enables us to derive
 \[ \Phi_K \big ( \mu \big )(x) = \E_{x' \sim \D_x} \Big [ K(x,x')d(x') \Big ] = \frac{1}{m}\sum_{i=1}^{m} K(x,x_i)d(x_i), \]
 which proves the statement of the lemma.
 \end{proof}
@@ -868,28 +866,28 @@ Let $K$ be a kernel and the functional $\mu : \F \to \R$ be differentiable at $f
 \[ \nabla_K\mu|_{f_0}: \R^{n_0} \to \R^{n_l} : x \mapsto \Phi_K \Big ( \partial_f\mu|_{f_0} \Big )(x). \]
 \end{definition}
 
-The kernel gradient is well-defined based on the restriction, that $\D_x$ is given by the empirical distribution on a finite dataset. In lemma \ref{lem:funcDerivative} we have shown, that  $\partial_f \mu |_{f_0} \in \F^*$ for any $f_0 \in \F$. In the case where the kernel $K$ is positive semidefinite, we can think of the kernel gradient as a descent direction in the vector-valued reproducing kernel Hilbert space associated with $K$. \\
+The kernel gradient is well-defined based on the restriction, that $\D_x$ is given by the empirical distribution on a finite data set. In lemma \ref{lem:funcDerivative} we have shown, that  $\partial_f \mu |_{f_0} \in \F^*$ for any $f_0 \in \F$. In the case where the kernel $K$ is positive semidefinite, we can think of the kernel gradient as a descent direction in the vector-valued reproducing kernel Hilbert space associated with $K$. \\
 
 In terms of minimizing a differentiable cost $C: \F \to \R$, the notation translates as follows. By theorem \ref{thm:riesz} there exists $d|_{f_0} \in \F$, such that the functional derivative of $C$ is given by
 \[ \partial_{f} C |_{f_0} = \big \langle d|_{f_0}, \cdot \big \rangle_{\D_x}. \]
 The element $d|_{f_0} \in \F$ can be thought of as a functional gradient. Using lemma \ref{lem:phi}, the kernel gradient of $C$ at $f_0$ with respect to any kernel $K$ can be written as
 \[ \nabla_KC|_{f_0}(x) = \Phi_K \Big ( \big \langle d|_{f_0} , \cdot \big \rangle_{\D_x} \Big )(x) = \frac{1}{m} \sum_{i=1}^{m} K(x,x_i)d|_{f_0}(x_i). \]
 
-In contrast to a functional gradient $d|_{f_0} \in \F$, the kernel gradient is in general not the direction of steepest descent. Instead it computes a linear combination of the values of a functional gradient $d|_{f_0}$ at the dataset, using the kernel $K$. This construction is independent of the functional gradient chosen, since they are equal on the data. Thanks to the kernel $K$, the kernel gradient generalizes to values outside the dataset, which prevents the problem of choosing a suitable descent direction from the set of functional gradients. \\
+In contrast to a functional gradient $d|_{f_0} \in \F$, the kernel gradient is in general not the direction of steepest descent. Instead it computes a linear combination of the values of a functional gradient $d|_{f_0}$ at the data set, using the kernel $K$. This construction is independent of the functional gradient chosen, since they are equal on the data. Thanks to the kernel $K$, the kernel gradient generalizes to values outside the data set, which prevents the problem of choosing a suitable descent direction from the set of functional gradients. \\
 
 Based on the uniqueness of the kernel gradient, we can finally generalize the gradient descent algorithm to kernel gradient descent, which is formalized as follows.
 
 \begin{algorithm}
 \caption{Kernel Gradient Descent \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires kernel $K$, differentiable cost $C: \F \to \R$, random $f_0 \in \F$ and $\epsilon \geq 0$. \\
-\textcolor{white}{$\Big |$}2: Initialize $k \leftarrow 0$. \\
-\textcolor{white}{$\Big |$}3: \textbf{while} $\big \| \nabla_K C |_{f_k} \big \|_{\D_x} > \epsilon$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}4: \quad Choose a step size $\eta_k > 0$. \\
-\textcolor{white}{$\Big |$}5: \quad Set $f_{k+1} \leftarrow f_k - \eta_k \cdot \nabla_ K C |_{f_k}$ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}6: \textbf{end while}
+\textcolor{white}{$\Big |$}\textbf{Input:} Kernel $K$, differentiable cost $C: \F \to \R$, $f_0 \in \F$, $\epsilon \geq 0$ \\
+\textcolor{white}{$\Big |$}1: Initialize $k \leftarrow 0$; \\
+\textcolor{white}{$\Big |$}2: \textbf{while} $\big \| \nabla_K C |_{f_k} \big \|_{\D_x} > \epsilon$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}3: \quad Choose a step size $\eta_k > 0$; \\
+\textcolor{white}{$\Big |$}4: \quad Set $f_{k+1} \leftarrow f_k - \eta_k \cdot \nabla_ K C |_{f_k}$ and $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}5: \textbf{end while}
 \end {algorithm}
 
-Again, this is based on the assumption, that  $\D_x$ is given by the empirical distribution on a finite dataset. Otherwise we could not guarantee, that the sequence of kernel gradients produced by the algorithm is well-defined. \\
+Again, this is based on the assumption, that  $\D_x$ is given by the empirical distribution on a finite data set. Otherwise we could not guarantee, that the sequence of kernel gradients produced by the algorithm is well-defined. \\
 
 In the convergence analysis of gradient descent, with the choice of an appropriate step size, the empirical error $E$ was strictly decreasing along the parameter sequence $(w_k)_{k=0}^\infty$ in $\R^n$. This guaranteed the convergence to a critical point, as long as the objective function was bounded from below. We will analyze kernel gradient descent in a similar manner. However, in contrast to the analysis of gradient descent, we will investigate the change in $C$ during kernel gradient descent along a continuous curve in the function space $\F$. 
 
@@ -1136,7 +1134,7 @@ taking the expectation with respect to a centered Gaussian process $f$ of covari
 A proof via induction over the number of layers is given in \cite{NTK}. Note that $\Theta_{\infty}$ depends only on the choice of $\sigma$, the number of layers and the variance of parameters at initialization. As a consequence, the limiting kernel $\Theta_{\infty}$ is deterministic, despite the random initialization of $w$. \\
 
 The theorem states, that for any initialization $w_0 \in \R^n$ and any  $x,x' \in \R^{n_0}$ it holds, that
-\[ \forall \epsilon > 0 : \lim_{n_{l-1} \to \infty} \cdots \lim_{n_1 \to \infty} \mathbb{P} \Big ( \big | (\Theta_{w_0})_{i,j}(x,x') - \Theta_{\infty}(x,x') \big | > \epsilon \Big ) = 0, \quad i,j=1, \dots, n_l. \]
+\[ \forall \epsilon > 0 : \lim_{n_{l-1} \to \infty} \cdots \lim_{n_1 \to \infty} \mathbb{P} \Big ( \big | (\Theta_{w_0})_{i,i}(x,x') - \Theta_{\infty}(x,x') \big | > \epsilon \Big ) = 0, \quad i=1, \dots, n_l. \]
 
 The second key result in \cite{NTK} is that the neural tangent kernel stays asymptotically constant during training. To formalize this, we have to notate a slightly more general definition of training. More precisely, in the infinite width limit the parameter space is infinite-dimensional, such that it is in practical nonsense to speak of parameter training. Thus, instead of denoting objects in dependence of the parameters $w(t)$, we use a notation in dependence of time $t$. In contrast to lemma \ref{lem:evolution}, where a descent direction was denoted as $d|_{f_{w(t)}} \in \F$, such that 
 \[ \partial_tw_i(t) = - \big \langle d|_{f_{w(t)}}, \partial_{w_i} f_{w(t)} \big \rangle_{\D_x}, \]
@@ -1161,7 +1159,7 @@ Thus, in the infinite width limit, the neural tangent kernel stays asymptoticall
 This concludes the necessary theory on the neural tangent kernel. Next we will use its properties to motivate our approach of training deep neural networks in tiny subspaces.
 
 \pagebreak
-\section{Training in Low-Dimensional Subspaces}
+\section{Training in Low-Dimensional Subspaces} \label{sec:subspaces}
 
 This section analyzes the training dynamics of deep neural networks, especially the occurring parameter training sequences.
 If not otherwise specified, the following work is based on \cite{Paper}, in which the hypothesis, that deep neural network can be trained in low-dimensional subspaces, is raised. We start by giving an illustration of this hypothesis, followed by theoretical considerations on the existence of low-dimensional optimization trajectories. Finally, this leads to an algorithm for subspace extraction, which offers the possibility to train deep neural networks in subspaces, such small, that second order-methods become applicable.
@@ -1493,14 +1491,14 @@ In summary, we denote the following algorithm for dimensionality reduction from 
 
 \begin{algorithm}
 \caption{Dynamic Linear Dimensionality Reduction (DLDR) \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires dimensionality of the subspace $d$ and number of samples $t \geq d$. \\
-\textcolor{white}{$\Big |$}2: Sample parameter trajectory $\{ w_1, \dots, w_t\}$ along the optimization trajectory. \\
-\textcolor{white}{$\Big |$}3: Compute the mean $\overline{w} \coloneq \sum_{i=1}^{t} w_i$. \\
-\textcolor{white}{$\Big |$}4: Centralize the samples as $W = [w_1-\overline{w}, \dots, w_t - \overline{w}]$. \\
-\textcolor{white}{$\Big |$}5: Perform spectral decomposition such that $W\tr W = V \Sigma^2 V^{-1}$.  \\
-\textcolor{white}{$\Big |$}6: Obtain the $d$ largest eigenvalues $\big [\sigma_1^2, \dots, \sigma_d^2 \big ]$ with eigenvectors $ \big [v_1, \dots, v_d \big ]$. \\
-\textcolor{white}{$\Big |$}7: Determine the singular vectors $u_i = \frac{1}{\sigma_i}Wv_i$ for $i=1, \dots, d$. \\
-\textcolor{white}{$\Big |$}8: Return the orthonormal basis $ \big [u_1, \dots, u_d \big ]$ of the subspace.
+\textcolor{white}{$\Big |$}\textbf{Input:} Dimensionality of the subspace $d$, number of samples $t \geq d$ \\
+\textcolor{white}{$\Big |$}1: Sample parameter trajectory $(w_k)_{k=1}^{t}$ along the optimization trajectory; \\
+\textcolor{white}{$\Big |$}2: Compute the mean $\overline{w} \coloneq \sum_{k=1}^{t} w_k$; \\
+\textcolor{white}{$\Big |$}3: Centralize the samples as $W = [w_1-\overline{w}, \dots, w_t - \overline{w}]$; \\
+\textcolor{white}{$\Big |$}4: Perform spectral decomposition such that $W\tr W = V \Sigma^2 V^{-1}$;  \\
+\textcolor{white}{$\Big |$}5: Obtain the $d$ largest eigenvalues $\big [\sigma_1^2, \dots, \sigma_d^2 \big ]$ with eigenvectors $ \big [v_1, \dots, v_d \big ]$; \\
+\textcolor{white}{$\Big |$}6: Determine the singular vectors $u_i = \frac{1}{\sigma_i}Wv_i$ for $i=1, \dots, d$; \\
+\textcolor{white}{$\Big |$}7: Return the orthonormal basis $ \big [u_1, \dots, u_d \big ]$ of the subspace;
 \end{algorithm}
 
 The complexity of the algorithm is determined by lines 5 and 7. In line 5 we calculate the matrix product $W \tr W$ which is of complexity $\O(t^2n)$ and the complexity of the spectral decomposition is $\O(t^3)$, since $W\tr W \in \R^{t \times t}$. Line 7 contains $d$ products $Wv_i$ which is of complexity $\O(dtn)$. Using $d\leq t$ the total complexity of DLDR is $\O(t^3 + 2t^2n)$. Since $t \ll n$ the time consumption is negligible in comparison to the complexity of training.
@@ -1521,14 +1519,13 @@ Based on the stochastic gradient descent algorithm, we can introduce its project
 
 \begin{algorithm}
 \caption{Projected Stochastic Gradient Descent (P-SGD) \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$}1: Requires orthonormal basis $Q \in \R^{n \times d}$ of the $d$-dimensional subspace. \\
-\textcolor{white}{$\Big |$}2: Requires differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
-\textcolor{white}{$\Big |$}3: Requires a batch size $b \in \N$ and a number of epochs $N \in \N$. \\
-\textcolor{white}{$\Big |$}4: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
-\textcolor{white}{$\Big |$}5: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
-\textcolor{white}{$\Big |$}6: \quad Choose a step size $\eta_k > 0$. \\
-\textcolor{white}{$\Big |$}7: \quad Set $w_{k+1} \leftarrow  w_k - \eta_k \cdot QQ\tr \nabla E(w_k,\I_k)$. \\
-\textcolor{white}{$\Big |$}8: \textbf{end for}
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, $w_0 \in \R^n$, \\
+\textcolor{white}{$\Big |$\textbf{Input:}} orthonormal basis $Q \in \R^{n \times d}$ of the $d$-dimensional subspace \\
+\textcolor{white}{$\Big |$}1: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}2: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$; \\
+\textcolor{white}{$\Big |$}3: \quad Choose a step size $\eta_k > 0$; \\
+\textcolor{white}{$\Big |$}4: \quad Set $w_{k+1} \leftarrow  w_k - \eta_k \cdot QQ\tr \nabla E(w_k,\I_k)$; \\
+\textcolor{white}{$\Big |$}5: \textbf{end for}
 \end{algorithm}
 
 The convergence of projected stochastic gradient descent will be investigated in section \ref{sec:Experiments}. \\
@@ -1545,18 +1542,17 @@ The problem with that approach however, is that we are still confronted with the
 
 \begin{algorithm}
 \caption{Projected Broyden-Fletcher-Goldfarb-Shanno (P-BFGS) \textcolor{white}{$\Big |$}} \ \\
-\textcolor{white}{$\Big |$1}1: Requires orthonormal basis $Q \in \R^{n \times d}$ of the $d$-dimensional subspace. \\
-\textcolor{white}{$\Big |$1}2: Requires twice differentiable empirical error function $E: \R^n \to \R$ and random $w_0 \in \R^n$. \\
-\textcolor{white}{$\Big |$1}3: Requires a batch size $b \in \N$ and a number of epochs $N \in \N$. \\
-\textcolor{white}{$\Big |$1}4: Initialize $B_0 \leftarrow I_n$. \\
-\textcolor{white}{$\Big |$1}5: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
-\textcolor{white}{$\Big |$1}6: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$. \\
-\textcolor{white}{$\Big |$1}7: \quad Compute a step size $\eta_k > 0$ using backtracking line search. \\
-\textcolor{white}{$\Big |$1}8: \quad Set $x_{k+1} \leftarrow x_k - \eta_k \cdot Q B_k Q^T \nabla E(w_k,\I_k)$. \\
-\textcolor{white}{$\Big |$1}9: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$. \\
-\textcolor{white}{$\Big |$}10: \quad Let $\rho_k = (y_k\tr s_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k\tr $. \\
-\textcolor{white}{$\Big |$}11: \quad Set $B_{k+1} \leftarrow V_k\tr B_{k}V_k + \rho_k s_k s_k\tr $ and $k \leftarrow k+1$. \\
-\textcolor{white}{$\Big |$}12: \textbf{end for}
+\textcolor{white}{$\Big |$}\textbf{Input:} Twice differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, \\
+\textcolor{white}{$\Big |$\textbf{Input:}} $w_0 \in \R^n$, orthonormal basis $Q \in \R^{n \times d}$ of the $d$-dimensional subspace \\
+\textcolor{white}{$\Big |$}1: Initialize $B_0 \leftarrow I_n$; \\
+\textcolor{white}{$\Big |$}2: \textbf{for} $k=0, \dots, \frac{Nm}{b}$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}3: \quad Draw a random subset $\I_k \subset \{1, \dots, m \}$ of size $| \I_k | = b$; \\
+\textcolor{white}{$\Big |$}4: \quad Compute a step size $\eta_k > 0$ using backtracking line search; \\
+\textcolor{white}{$\Big |$}5: \quad Set $x_{k+1} \leftarrow x_k - \eta_k \cdot Q B_k Q^T \nabla E(w_k,\I_k)$; \\
+\textcolor{white}{$\Big |$}6: \quad Let $s_k = x_{k+1} - x_{k}$ and $y_k = \nabla f(x_{k+1}) - \nabla f(x_{k})$; \\
+\textcolor{white}{$\Big |$}7: \quad Let $\rho_k = (y_k\tr s_k)^{-1}$ and $V_k = I_n - \rho_k y_k s_k\tr $; \\
+\textcolor{white}{$\Big |$}8: \quad Set $B_{k+1} \leftarrow V_k\tr B_{k}V_k + \rho_k s_k s_k\tr $; \\
+\textcolor{white}{$\Big |$}9: \textbf{end for}
 \end{algorithm}
 
 Note that the backtracking linesearch in here has to be performed with respect to the gradient in the lower-dimensional subspace. Denoting this lower-dimensional descent direction as
@@ -1565,13 +1561,207 @@ the adopted version of backtracking linesearch iteratively searches for some $\e
 \[ E \big (w_k - \eta_k \cdot Q B_k d_k, \I_k \big) \leq E \big (w_k, \I_k \big ) - c \cdot \eta_k \cdot d_k \tr B_k d_k. \]
 In this equation we used the minor definition from section \ref{sec:Training}, namely 
 \[ E(w_k,\I_k) \coloneq \frac{1}{b} \sum_{i \in \I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \big \| w_k \big \|_2^2. \]
-According to \cite{Paper}, the step size choice via this adopted version of backtracking linesearch ensures $y_k \tr s_k > 0$, which guarantees the positive definiteness of the inverse Hessian approximation $B_{k+1}$. As a consequence, the proposed P-BFGS algorithm is well-defined. Similar to the choice in \cite{Paper}, we always use $c = 0.4$ and $\beta = 0.55$ to perform the  backtracking linesearch.
+According to \cite{Paper}, the step size choice via this adopted version of backtracking linesearch ensures $y_k \tr s_k > 0$, which guarantees the positive definiteness of the inverse Hessian approximation $B_{k+1}$. As a consequence, the proposed P-BFGS algorithm is well-defined. Similar to the choice in \cite{Paper}, we always use $c = 0.4$ and $\beta = 0.55$ to perform the backtracking linesearch.
 
 \pagebreak
 \section{Numerical Experiments} \label{sec:Experiments}
 
-\subsection{Space size comparison}
+This section investigates the low-dimensional trajectory hypothesis from a practical perspective. We conduct extensive numerical experiments to study the performance of DLDR-based training algorithms, namely P-SGD and P-BFGS, on various architectures and data sets. In this context, we also analyze the computational complexity of the subspace extraction via DLDR. The experiments include a comparison of different sampling strategies and subspace dimensions. Finally, we propose a technique to effectively find an appropriate space size and use this to introduce a new training algorithm based on P-BFGS. All of the experiments are run on a NVIDIA A100 GPU using PyTorch. \\
 
+As a warm-up, we start with a motivational experiment, indicating that the low-dimensional trajectory hypothesis could indeed hold true. We proceed as in section 3.3 of \cite{Paper} and study the training of ResNet8 \cite{ResNet} on the CIFAR-10 data set. More precisely, we compare the performance of training in a low-dimensional subspace to the performance of training in the full parameter space of dimension 75,290. The data set is normalized by channel-wise mean and variance. Furthermore we apply horizontal flipping with probability of 0.5 as well as cropping and 4-pixel padding. At first we conduct the full parameter training via SGD with learning rate of 0.1, batch size of 128 and momentum of 0.9. During the first 30 epochs of that training, we save the network's parameter vector after each epoch, that is we generate a trajectory $(w_k)_{k=1}^{30}$ in $\R^{75,290}$. In a follow-up experiment, these samples are used to extract a low-dimensional subspace of dimension 15. Note that the choice of this specific dimension is arbitrary and was imitated from section 3.3 of \cite{Paper}. To investigate the low-dimensional trajectory hypothesis from a practical perspective, we then train the same network from scratch, using P-SGD in the 15-dimensional subspace. For reasons of comparability, we start from the same initialization and use the same hyperparameters as for regular SGD.
+
+\begin{figure}[!h]
+\centering
+\subfigure[] {\label{fig:exp0-acc}\includegraphics[width=0.4\textwidth]{images/exp0-acc.png}}
+\subfigure[] {\label{fig:exp0-pca}\includegraphics[width=0.4\textwidth]{images/exp0-pca.png}}
+\caption{\centering Experiments for ResNet8 on CIFAR-10. (a) Training performance of SGD and P-SGD in 15D subspace. (b) PCA variance ratio of the samples $W = [w_1, \dots, w_{30}]$. }
+\label{fig:exp1}
+\end{figure}
+
+Figure \ref{fig:exp0-acc} compares the performance of SGD and P-SGD. With 3 runs, SGD obtains averagely 85.??\% test accuracy and P-SGD obtains averagely 85.??\%. Note that within the first 30 epochs of training, the performance of P-SGD is significantly better than the performance of SGD.  This indicates, that P-SGD is able to optimize the parameters by itself, so the good performance isn't a result of the information provided by the sampling stage. Empirically, this simple experiment strongly supports the low-dimensional trajectory hypothesis.
+
+Figure \ref{fig:exp0-pca} illustrates the PCA variance ratio of the sampled parameters $W = [w_1, \dots, w_{30}]$. This concept can be explained as follows. Given a singular value decomposition
+\[ W = U \Sigma V\tr, \]
+where $\Sigma = \text{diag}(\sigma_1, \dots, \sigma_{30})$, the PCA variance ratio of the $k$-th component is defined as
+\[ \frac{\text{variance of component } k}{\text{total variance}} = \frac{\sigma_k}{\sum_{i=1}^{30}\sigma_i}. \]
+The fact that the first five components contribute over 90\% to the total variance, indicate that, indeed the optimization trajectory could be embedded in a very low-dimensional affine set. This coincides with the good performance of training in a subspace of dimension 15.
+
+\subsection{Verification on Various Architectures}
+
+Next we verify the previous findings for more complex neural network architectures. Similar to section 5.1 and 5.2 of \cite{Paper}, we train 10 neural network architectures on the CIFAR-100 data set. These include widely known architectures like VGG11, DenseNet121 or GoogLeNet. Just like before we normalize the data set by channel-wise mean and variance and perform the same data augmentations as for CIFAR-10. At first we conduct the full parameter training via SGD with batch size of 128, momentum of 0.9 and weight decay of $10^{-4}$. All of the models are trained for 200 epochs each, using a learning rate of 0.1 for the first 150 epochs.  For the final 50 epochs a reduced learning rate of 0.01 is used. During this training we adopt the same sampling strategy as for the motivational experiment, which is to sample ones after each epoch. However, to allow for a larger subspace dimension we sample the parameters for the first 100 epochs. This setup is imitated from section 5.1 and 5.2 of \cite{Paper}. \\
+
+Table \ref{tab:psgd-1} reports the test accuracy of SGD after training for 50, 100 and 200 epochs. The results are exactly the findings of table 2 in \cite{Paper}. Note that the authors report the actual accuracy after the corresponding number of epochs. For example this can be seen for the SqueezeNet, where the accuracy after 100 epochs is lower than after 50 epochs. In order to ensure a fair comparison to the performance of training in low-dimensional subspaces, instead we consider the maximal test accuracy after 50, 100 and 200 epochs, reported in table \ref{tab:psgd-2}. Comparing the number of parameters in these two tables, we notice slight differences. This is most likely explained by negligence in \cite{Paper} and irrelevant for the further analysis. \\
+
+After training the models in full parameter space, we conduct further experiments on the existence of low-dimensional optimization trajectories. The detailed approach is to train 40 epochs of P-SGD in a 40-dimensional subspace. Again, the specific choice of dimension 40 is arbitrary and was imitated from \cite{Paper}. Note that this dimension is used for all of the 10 models. The hyperparameter setting is as follows. Similar to regular SGD training we adopt the same batch size of 128 and momentum of 0.9. For P-SGD however, no weight decay is used and the initial learning rate is set to 1, which is reduced to 0.1 after the first 30 epochs. For reasons of comparability, SGD and P-SGD start with the same initialization. The maximal test accuracy, when using the first 50 or the first 100 samples for subspace extraction is reported in table \ref{tab:psgd-2}. Note that these are two different subspaces, so two independent optimizations, that should not be confused with the sequential results reported for regular SGD training. 
+
+\begin{table}
+\begin{tabu} to \textwidth { l | r | X[c] X[c] X[c] | X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\textcolor{white}{$\Big |$} & & \multicolumn{3}{c|}{SGD} & \multicolumn{2}{c}{P-SGD} \\
+\textcolor{white}{$\Big |$}model & \#params & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
+\textcolor{white}{$\Big |$}& & 50 & 100 & 200 & 50 & 100 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 59.52 & 58.56 & 70.29 & 69.89 & 70.60 \\
+\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.3M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
+\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.3M & 57.15 & 58.67 & 67.94 & 66.86 & 68.00 \\
+\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 62.53 & 63.68 & 72.94 & 71.68 & 72.64 \\
+\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.2M & 62.32 & 66.32 & 76.88 & 75.66 & 77.27 \\
+\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.0M & 65.39 & 64.57 & 76.76 & 74.25 & 76.34 \\
+\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.4M & 64.74 & 64.68 & 74.95 & 74.33 & 75.09 \\
+\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.0M & 64.57 & 65.81 & 75.47 & 75.68 & 75.56 \\
+\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.3M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
+\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.5M & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\centering \parbox{12cm}{\caption{\centering Test accuracy on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces. Source: Table 2 in \cite{Paper}.}\label{tab:psgd-1}}
+\end{table}
+
+\begin{table}
+\begin{tabu} to \textwidth { l | r | X[c] X[c] X[c] | X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\textcolor{white}{$\Big |$}& & \multicolumn{3}{c|}{SGD} & \multicolumn{2}{c}{P-SGD} \\
+\textcolor{white}{$\Big |$}model & \#params & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
+\textcolor{white}{$\Big |$}& & 50 & 100 & 200 & 50 & 100 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 60.91 & 62.44 & 71.38 & & \\
+\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M & 64.55 & 64.74 & 72.34 & & \\
+\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M & 57.99 & 59.95 & 68.01 & & \\
+\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 61.69 & 63.74 & 72.80 & & \\
+\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M & 64.86 & 66.32 & 76.26 & & \\
+\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M & 66.15 & 67.39 & 77.62 & & \\
+\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M & 66.30 & 67.22 & 75.20 & & \\
+\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M & 66.79 & 67.14 & 75.63 & & \\
+\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M & 65.75 & 67.58 & 76.53 & & \\
+\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M & 59.51 & 61.72 & 68.58 & & \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\centering \parbox{12cm}{\caption{\centering Maximal test accuracy on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}\label{tab:psgd-2}}
+\end{table}
+
+Clearly the experiments indicate a comparable performance of training in a 40-dimensional subspace to training in the full parameter space. These findings are empirically verified for 10 different architectures of various complexity, which strongly supports the existence of low-dimensional optimization trajectories. Comparing the performance of P-SGD for subspaces extracted based on 50 and 100 sampling epochs yields another finding. Generally, the performance of P-SGD seems to be better if the subspace extraction method has access to a longer piece of the regular optimization trajectory. A fact that is not directly visible in the table is the fast convergence of P-SGD. Note that we have used an initial learning rate of 1 which is usually too large for regular SGD training. In the low-dimensional subspace however, there are just a few optimizable variables, such that a larger learning rate seems to be applicable. Exemplary, the fast convergence is visualized for the smallest model (SqueezeNet), the largest model (VGG11) and two medium sized models (DenseNet121 and GoogLeNet) in figure \ref{fig:exp1}. Clearly, P-SGD quickly surpasses the performance of SGD and needs just 10 to 20 epochs to almost reach its peak. These observations also apply to the remaining models.
+
+\begin{figure}[!h]
+\centering
+\subfigure[Squeezenet] {\includegraphics[width=0.44\textwidth]{images/exp1-squeezenet.png}}
+\subfigure[GoogLeNet] {\includegraphics[width=0.44\textwidth]{images/exp1-squeezenet.png}}
+\subfigure[DenseNet121] {\includegraphics[width=0.44\textwidth]{images/exp1-vgg.png}}
+\subfigure[VGG11] {\includegraphics[width=0.44\textwidth]{images/exp1-densenet.png}}
+\caption{\centering Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}
+\label{fig:exp1}
+\end{figure}
+
+Next we investigate the computational complexity of DLDR, which includes two major tasks. The first one is to sample parameters along the optimization trajectory using regular SGD. The second one is to perform PCA on these samples. As explained in section \ref{sec:subspaces}, the PCA time consumption should be negligible in comparison to the sampling stage. However, to get a deeper understanding of the computationally complexity, we apply PCA for the optimization trajectories of the 10 previous trained models. The detailed setting is still a fixed subspace dimension of 40, extracted based on various numbers of samples. The computation is conducted on the gpu using torch.pca\_lowrank. Results are reported in table \ref{tab:dldr}.
+
+\begin{table}
+\begin{tabu} to \textwidth { l | r | c | X[c] X[c] X[c] X[c] }
+\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\multirow{2}{*}{\textcolor{white}{$\Big |$}models}& \multirow{2}{*}{\#params} & training time & \multicolumn{4}{c}{\textcolor{white}{$\Big |$} PCA time for \#samples \textcolor{white}{$\Big |$}} \\
+& & \textcolor{white}{$\Big |$} per epoch \textcolor{white}{$\Big |$} &50 & 100 & 150 & 200 \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
+\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M &  &  &  & \\
+\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M &  &  &  & \\
+\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M &  &  &  & \\
+\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M &  &  &  & \\
+\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M &  &  &  & \\
+\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M &  &  &  & \\
+\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M &  &  &  & \\
+\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M &  &  &  & \\
+\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M &  &  &  & \\
+\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M &  &  &  &  \\
+\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\centering \parbox{12cm}{\caption{\centering DLDR time consumption in seconds (s) to extract 40-dimensional subspaces for training on CIFAR-100.}\label{tab:dldr}}
+\end{table}
+
+Clearly, the computationally complexity is smaller than the complexity of training for one epoch, which is equivalent to generating one sample. This coincides with the theoretical analysis, that DLDR's complexity is negligible in comparison to the sampling stage. \\
+
+Having verified the possible existence of low-dimensional optimization trajectories, we now focus on using these findings to design powerful optimization methods. As of now, training in low-dimensional subspaces was always preceded by a heavy sampling stage based on regular SGD training. As illustrated in figure \ref{fig:exp1}, the actual training in the low-dimensional subspace seems to happen pretty fast. Thus, to design a cost efficient but powerful low-dimensional optimization method, it is key to minimize the computational effort spend on subspace extraction. The key challenge here consists of finding a suitable dimension, generating meaningful samples and performing the PCA. As we have already observed the negligibility of PCA, the upcoming experiments focus on addressing the following two questions.
+
+\begin{center}
+Which strategy should be used for sampling? \\
+Which subspace dimension should be used for training? \\
+\end{center}
+
+\subsection{Subspace exploration}
+
+Two address the two main questions, we compare the performance of training in subspaces of various dimensions using several sampling strategies. We step back to the setting in the motivational experiment, which is training a ResNet8 on CIFAR-10. Hyperparameters are also adopted. For reasons of comparability, in all of these experiments we sample based on the same optimization trajectory of 30 epochs length. However, to allow for larger subspaces and to investigate several sampling strategies, we vary the frequency of samplings per epoch from 1 to 50. This enables us to generate up to 1500 samples during the first 30 epochs of regular training with SGD. Note that with a batch size of 128, one epoch consist of 391 batches, such that a frequency of 50 samples per epoch roughly translates to sampling after 8 batches each. Sampling even more frequently makes no sense, since the distance between samples would become too small. Similar to the motivational experiment, we use these samples to extract the lower-dimensional subspaces. The detailed approach is to test all sampling strategies for training in spaces of various dimensions, ranging from 5 up to 1000. The maximal test accuracy after 40 epochs of training with P-SGD is reported in table \ref{tab:dim}.
+
+\begin{table}[h]
+\begin{tabu} to \textwidth { l r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] | r }
+\hline \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+& & \multicolumn{8}{c|}{dimension of subspace} & \textcolor{white}{$\Big |$} \\
+& & 5 & 10 & 15 & 25 & 50 & 100 & 500 & 1000 & best \textcolor{white}{$\Big |$} \\
+\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+\multirow{7}{*}{\rotatebox[origin=c]{90}{\#samples}}
+&     30 & 79.99 & 85.08 & 85.09 & 85.08 & - & - & - & - & 85.09 \textcolor{white}{$\Big |$} \\
+&     60 & 81.72 & 84.45 & 84.77 & 84.63 & 84.86 & - & - & - & 84.86 \textcolor{white}{$\Big |$} \\ 
+&     90 & 79.85 & 83.94 & 84.56 & 84.63 & 84.75 & - & - & - & 84.75 \textcolor{white}{$\Big |$} \\
+&   150 & 80.30 & 81.79 & 84.13 & 85.02 & 85.30 & 85.26 & - & - & 85.30 \textcolor{white}{$\Big |$} \\ 
+&   300 & 74.27 & 81.04 & 82.49 & 84.03 & 84.80 & 85.24 & - & - & 85.24 \textcolor{white}{$\Big |$} \\
+&   900 & 69.97 & 79.15 & 79.31 & 82.81 & 83.83 & 84.42 & 85.03 & - & 85.03 \textcolor{white}{$\Big |$} \\
+& 1500 & 76.20 & 80.31 & 81.53 & 82.90 & 84.40 & 84.68 & 85.33 & 85.44 & 85.44 \textcolor{white}{$\Big |$} \\
+\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+&  best & 81.72 & 85.08 & 85.09 & 85.08 & 85.30 & 85.26 & 85.33 & 85.44 & 85.44 \textcolor{white}{$\Big |$} \\
+\multicolumn{11}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\caption{Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}
+\label{tab:dim}
+\end{table}
+ 
+The experiment empirically provides three major findings. The first one is based on the last row in table \ref{tab:dim}. Clearly, for ResNet8, there seems to be no big difference in performance when training in a subspace of arbitrary dimension between 10 and 1000. However, this is based on an appropriate sampling strategy, that varies from space to space. Furthermore, the 5-dimensional subspace is too small to cover the optimization trajectory. This coincides with the PCA variance ratios illustrated in figure \ref{fig:exp0-pca}. The second finding is based on the last column of table \ref{tab:dim}. Also, for ResNet8, there seems to be no big difference in performance when using different sampling strategies. However, this is based on an appropriate space size, that varies from strategy to strategy. Note that these two findings strongly relate to each other. The third and final finding is a combination of the previous two findings. Especially for the spaces of dimension 5 to 25 it seems to be the case, that given a fixed dimension of the subspace, the performance is better, when only a small number of samples is used for the subspace extraction. Formulated the other way around, given a fixed number of samples, the performance seems to be better when training in a space of larger dimension. Note that the third finding does not contradict the results in table \ref{tab:psgd-2}, where the performance was better when using more samples. The key difference is that we increase the number of samples during a fixed optimization trajectory of 30 epochs length, where as in table \ref{tab:psgd-2} the optimization trajectory was extended from 50 to 100 epochs, explaining the improved results.
+
+Assuming that the findings in table \ref{tab:dim} translate to other architectures and data sets as well, we can formulate the following two approaches for our purpose of designing a cost efficient but powerful low-dimensional optimization method. Firstly, one should aim to find the smallest subspace dimension providing comparable performance to the full parameter training. Secondly, one should aim to generate only a few but high quality samples in the most cost efficient way. For the latter approach, optimizing cost efficiency translates to training as little epochs of regular SGD as possible. \\
+
+With respect to these two approaches, we conduct a follow-up experiment on ResNet8. Its main focus is to investigate the necessary length of the optimization trajectory used for the subspace extraction. Note that table \ref{tab:psgd-2} already indicates a significant improvement when doubling the length from 50 epochs to 100 epochs. However, in the following experiment we are mainly interested in the early stages of samplings. The detailed procedure is to train ResNet8 via P-SGD for 40 epochs in subspaces of dimension 10, 15 and 25. For the subspace extraction we always use a fixed number of 30 samples. However, these samples are generated with several frequencies, translating to different number of epochs needed in the sampling stage. The results are reported in table \ref{tab:epochs}.
+
+\begin{table} [h]
+\centering
+\begin{tabu} to 0.8\textwidth { c c c | X[c] X[c] X[c] }
+\hline \hline \multicolumn{6}{c}{} \\ [-2.5ex]
+\multicolumn{3}{c|}{ \textcolor{white}{$\Big |$} sampling strategy \textcolor{white}{$\Big |$}} & \multicolumn{3}{c}{dimension of subspace} \\
+\textcolor{white}{$\Big |$} frequency \textcolor{white}{$\Big |$} & \#epochs & \#samples & 10 & 15 & 25  \\
+\multicolumn{6}{c}{} \\ [-2.5ex] \hline \multicolumn{6}{c}{} \\ [-2.5ex]
+\textcolor{white}{$\Big |$}   1/epoch \textcolor{white}{$\Big |$} &  30  & 30 & 84.92 & 84.95 & 84.92 \\
+\textcolor{white}{$\Big |$}   2/epoch \textcolor{white}{$\Big |$} &  15  & 30 & 83.05 & 83.10 & 83.21 \\ 
+\textcolor{white}{$\Big |$}   3/epoch \textcolor{white}{$\Big |$} &  10  & 30 & 81.05 & 81.05 & 81.11 \\
+\textcolor{white}{$\Big |$}   5/epoch \textcolor{white}{$\Big |$} &    5  & 30 & 76.38 & 76.69 & 77.06 \\
+\textcolor{white}{$\Big |$} 10/epoch \textcolor{white}{$\Big |$} &    3  & 30 & 69.82 & 70.26 & 70.45 \\
+\multicolumn{6}{c}{} \\ [-2.5ex] \hline \hline
+\end{tabu}
+\centering \parbox{10cm}{\caption{\centering Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}}
+\label{tab:epochs}
+\end{table}
+
+Clearly, the performance decreases when using a smaller piece of the regular optimization trajectory for the subspace extraction. This is bad news for our purpose of cost efficient algorithm design, since the spacial information on the low-dimensional trajectory seems to evolve during the training with regular SGD and is not completely  included in the early epochs of training. Again, this is just an observation for ResNet8 on CIFAR-10. However, since this is a pretty simple task in terms of deep learning scenarios, it is very likely that these inconvenient properties translate to more sophisticated architectures and are even reinforced.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\linewidth]{images/exp1.png}
+\caption{Illustration of a neuron as graph.}
+\label{fig:a}
+\end{figure}
+
+ 
+
+ 
+%\begin{tabu} to \textwidth { r r | X[c] X[c] X[c] | X[c] X[c] X[c] | X[c] X[c] X[c] }
+%\hline \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+%& \textcolor{white}{$\Big |$} & \multicolumn{3}{c|}{10 epochs} & \multicolumn{3}{c|}{20 epochs} & \multicolumn{3}{c}{40 epochs} \\
+%\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+%& \textcolor{white}{$\Big |$} & \multicolumn{3}{c|}{dimension of subspace} & \multicolumn{3}{c|}{dimension of subspace} & \multicolumn{3}{c}{dimension of subspace} \\
+%& \textcolor{white}{$\Big |$} & 10 & 15 & 25 & 10 & 15 & 25 & 10 & 15 & 25  \\
+%\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+%\multirow{5}{*}{\rotatebox[origin=c]{90}{\#sampling epochs}}
+%& \textcolor{white}{$\Big |$} 30 &  &  &  &  &  &  &  &  &  \\
+%& \textcolor{white}{$\Big |$} 15 &  &  &  &  &  &  &  &  &  \\ 
+%& \textcolor{white}{$\Big |$} 10 &  &  &  &  &  &  &  &  &  \\
+%& \textcolor{white}{$\Big |$}   5 &  &  &  &  &  &  &  &  &   \\
+%& \textcolor{white}{$\Big |$}   3 &  &  &  &  &  &  &  &  &   \\
+%\multicolumn{11}{c}{} \\ [-2.5ex] \hline \hline
+%\end{tabu}
+
+\pagebreak
 \textbf{Experiment 1:} ResNet8 on CIFAR10 \\
 \ \\
 - Mention the preliminary work \\
@@ -1609,79 +1799,49 @@ $\Rightarrow$ Second order methods are applicable and efficient \\
 \ \\
 
 \pagebreak
-\renewcommand{\arraystretch}{1.1}
-\begin{center}
-\begin{tabu} to \textwidth { r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] }
-\hline \hline \multicolumn{10}{c}{} \\ [-2.5ex]
-& \multicolumn{10}{c}{\#samples} \\
-dim & 30 & 60 & 90 & 120 & 150 & 300 & 600 & 900 & 1200 & 1500  \\
-\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
-    5 &  &  &  &  &  &  &  &  &  &  \\
-  10 &  &  &  &  &  &  &  &  &  &  \\
-  15 &  &  &  &  &  &  &  &  &  &  \\
-  25 &  &  &  &  &  &  &  &  &  &  \\
-  50 & - &  &  &  &  &  &  &  &  &  \\
-  75 & - & - &  &  &  &  &  &  &  &  \\
- 100 & - & - & - &  &  &  &  &  &  &  \\
- 250 & - & - & - & - & - &  &  &  &  &  \\
- 500 & - & - & - & - & - & - &  &  &  &  \\
- 750 & - & - & - & - & - & - & - &  &  &  \\
-1000 & - & - & - & - & - & - & - & - &  &  \\
-\multicolumn{11}{c}{} \\ [-2.5ex] \hline \hline
-\end{tabu}
-\end{center}
-\renewcommand{\arraystretch}{1}
+
+%\begin{tabu} to \textwidth { r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] | r }
+%\hline \hline \multicolumn{12}{c}{} \\ [-2.5ex]
+%& \multicolumn{10}{c|}{\#samples} & \textcolor{white}{$\Big |$} \\
+%dim & 30 & 60 & 90 & 120 & 150 & 300 & 600 & 900 & 1200 & 1500 & best \textcolor{white}{$\Big |$} \\
+%\multicolumn{12}{c}{} \\ [-2.5ex] \hline \multicolumn{12}{c}{} \\ [-2.5ex]
+%    5 & 79.99 & 81.72 & 79.85 & 79.86 & 80.30 & 74.27 & 72.63 & 69.97 & 72.93 & 76.20 & 81.72 \textcolor{white}{$\Big |$} \\
+%  10 & 85.08 & 84.45 & 83.94 & 83.14 & 81.79 & 81.04 & 78.28 & 79.15 & 78.65 & 80.31 & 85.08 \textcolor{white}{$\Big |$} \\
+%  15 & 85.09 & 84.77 & 84.56 & 83.61 & 84.13 & 82.49 & 79.89 & 79.31 & 81.30 & 81.53 & 85.09 \textcolor{white}{$\Big |$} \\
+%  25 & 85.08 & 84.63 & 84.63 & 84.90 & 85.02 & 84.03 & 82.30 & 82.81 & 82.13 & 82.90 & 85.08 \textcolor{white}{$\Big |$} \\
+%  50 & - & 84.86 & 84.75 & 84.96 & 85.30 & 84.80 & 84.01 & 83.83 & 84.03 & 84.40 & 85.30 \textcolor{white}{$\Big |$} \\
+% 100 & - & - & - & 85.08 & 85.26 & 85.24 & 84.80 & 84.42 & 84.24 & 84.68 & 85.26 \textcolor{white}{$\Big |$} \\
+% 500 & - & - & - & - & - & - & 85.11 & 85.03 & 85.27 & 85.33 & 85.33 \textcolor{white}{$\Big |$} \\
+%1000 & - & - & - & - & - & - & - & - & 85.22 & 85.44 & 85.44 \textcolor{white}{$\Big |$} \\
+%\hline
+%best & 85.09 & 84.86 & 84.75 & 85.08 & 85.30 & 85.24 & 85.11 & 85.03 & 85.27 & 85.44 & 85.44 \textcolor{white}{$\Big |$} \\
+%\multicolumn{12}{c}{} \\ [-2.5ex] \hline \hline
+%\end{tabu}
+
+%\begin{tabu} to \textwidth { l r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] | r }
+%\hline \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+%& & \multicolumn{8}{c|}{\#dimension of subspace} & \textcolor{white}{$\Big |$} \\
+%& & 5 & 10 & 15 & 25 & 50 & 100 & 500 & 1000 & best \textcolor{white}{$\Big |$} \\
+%\multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
+%\multirow{10}{*}{\rotatebox[origin=c]{90}{\#samples}}
+%&     30 & 79.99 & 85.08 & 85.09 & 85.08 & - & - & - & - & 85.09 \textcolor{white}{$\Big |$} \\
+%&     60 & 81.72 & 84.45 & 84.77 & 84.63 & 84.86 & - & - & - & 84.86 \textcolor{white}{$\Big |$} \\ 
+%&     90 & 79.85 & 83.94 & 84.56 & 84.63 & 84.75 & - & - & - & 84.75 \textcolor{white}{$\Big |$} \\
+%&   120 & 79.86 & 83.14 & 83.61 & 84.90 & 84.96 & 85.08 & - & - & 85.08 \textcolor{white}{$\Big |$} \\ 
+%&   150 & 80.30 & 81.79 & 84.13 & 85.02 & 85.30 & 85.26 & - & - & 85.30 \textcolor{white}{$\Big |$} \\ 
+%&   300 & 74.27 & 81.04 & 82.49 & 84.03 & 84.80 & 85.24 & - & - & 85.24 \textcolor{white}{$\Big |$} \\
+%&   600 & 72.63 & 78.28 & 79.89 & 82.30 & 84.01 & 84.80 & 85.11 & - & 85.11 \textcolor{white}{$\Big |$} \\ 
+%&   900 & 69.97 & 79.15 & 79.31 & 82.81 & 83.83 & 84.42 & 85.03 & - & 85.03 \textcolor{white}{$\Big |$} \\
+%& 1200 & 72.93 & 78.65 & 81.30 & 82.13 & 84.03 & 84.24 & 85.27 & 85.22 & 85.27 \textcolor{white}{$\Big |$} \\ 
+%& 1500 & 76.20 & 80.31 & 81.53 & 82.90 & 84.40 & 84.68 & 85.33 & 85.44 & 85.44 \textcolor{white}{$\Big |$} \\
+%\hline
+%&  best & 81.72 & 85.08 & 85.09 & 85.08 & 85.30 & 85.26 & 85.33 & 85.44 & 85.44 \textcolor{white}{$\Big |$} \\
+%\multicolumn{11}{c}{} \\ [-2.5ex] \hline \hline
+%\end{tabu}
 
 \pagebreak
 
-DLDR paper results:
-\renewcommand{\arraystretch}{1.1}
-\begin{center}
-\begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
-\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} & \multicolumn{2}{c}{P-SGD} \\
-& & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
-& & 50 & 100 & 200 & 50 & 100 \\
-\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-VGG11\_bn & 28.5M & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
-\rowcolor{black}
-EfficientNet-B0 & 4.14M & 62.53 & 63.68 & 72.94 & 71.68 & 72.64 \\
-MobileNet & 3.3M & 57.15 & 58.67 & 67.94 & 66.86 & 68.00 \\
-DenseNet121 & 7.0M & 65.39 & 64.57 & 76.76 & 74.25 & 76.34 \\
-Inceptionv3 & 22.3M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
-Xception & 21.0M & 64.57 & 65.81 & 75.47 & 75.68 & 75.56 \\
-GoogLeNet & 6.2M & 62.32 & 66.32 & 76.88 & 75.66 & 77.27 \\
-ShuffleNetv2 & 1.3M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
-SqueezeNet & 0.78M & 59.52 & 58.56 & 70.29 & 69.89 & 70.60 \\
-SEResNet18 & 11.4M & 64.74 & 64.68 & 74.95 & 74.33 & 75.09 \\
-\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
-\end{tabu}
-\end{center}
-\renewcommand{\arraystretch}{1}
 
-My results:
-\renewcommand{\arraystretch}{1.1}
-\begin{center}
-\begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
-\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{SGD} & \multicolumn{2}{c}{P-SGD} \\
-& & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
-& & 50 & 100 & 200 & 50 & 100 \\
-\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-VGG11\_bn & 28.52M & 59.51 & 61.72 & 68.58 & & \\
-EfficientNet-B0 & 4.14M & 61.69 & 63.74 & 72.80 & & \\
-MobileNet & 3.32M & 57.99 & 59.95 & 68.01 & & \\
-DenseNet121 & 7.05M & 66.15 & 67.39 & 77.62 & & \\
-Inceptionv3 & 22.32M & 65.75 & 67.58 & 76.53 & & \\
-Xception & 21.01M & 66.79 & 67.14 & 75.63 & & \\
-GoogLeNet & 6.40M & 64.86 & 66.32 & 76.26 & & \\
-ShuffleNetv2 & 1.36M & 64.55 & 64.74 & 72.34 & & \\
-SqueezeNet & 0.78M & 60.91 & 62.44 & 71.38 & & \\
-SEResNet18 & 11.31M & 66.30 & 67.22 & 75.20 & & \\
-\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
-\end{tabu}
-\end{center}
-\renewcommand{\arraystretch}{1}
 
 Comparison to BFGS:
 \renewcommand{\arraystretch}{1.1}
@@ -1707,29 +1867,126 @@ SEResNet18 & 11.31M & 75.20 & 74.80 & 75.13 & & \\
 \end{center}
 \renewcommand{\arraystretch}{1}
 
-Time consumption:
-\renewcommand{\arraystretch}{1.1}
-\begin{center}
-\begin{tabu} to \textwidth { c | r | X[c] X[c] X[c] | X[c] X[c] }
-\hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\multirow{3}{*}{model} & \multirow{3}{*}{\#params} & \multicolumn{3}{c|}{Training time (s/epoch)} & \multicolumn{2}{c}{DLDR time (s)} \\
-& & \multicolumn{3}{c|}{optimizer} & \multicolumn{2}{c}{\#samples} \\
-& & SGD & P-SGD & P-BFGS & 50 & 100 \\
-\multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-VGG11\_bn & 28.52M &  &  &  &  & \\
-EfficientNet-B0 & 4.14M &  &  &  &  & \\
-MobileNet & 3.32M &  &  &  &  & \\
-DenseNet121 & 7.05M &  &  &  &  & \\
-Inceptionv3 & 22.32M &  &  &  &  & \\
-Xception & 21.01M &  &  &  &  & \\
-GoogLeNet & 6.40M &  &  &  &  & \\
-ShuffleNetv2 & 1.36M &  &  &  &  & \\
-SqueezeNet & 0.78M &  &  &  &  & \\
-SEResNet18 & 11.31M &  &  &  &  & \\
-\multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
-\end{tabu}
-\end{center}
-\renewcommand{\arraystretch}{1}
+\begin{algorithm}
+\caption{Name: TBD \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, $w_0 \in \R^n$, \\
+\textcolor{white}{$\Big |$\textbf{Input:}} sampling frequency $\xi \in \N$, learning rate $\eta > 0$ \\
+\textcolor{white}{$\Big |0$}1: Initialize $k \leftarrow 0$, $Q \leftarrow [ \ ]$, $W \leftarrow [ \ ]$, $d \leftarrow 0$; \\
+\textcolor{white}{$\Big |0$}2: \textbf{while} $k<N$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}3: \quad \textbf{for} $i=0, \dots, 7$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}4: \quad \quad Train one epoch of SGD using learning rate $\eta$ and sample $w_1, \dots, w_\xi \in \R^n$; \\
+\textcolor{white}{$\Big |0$}5: \quad \quad Set $W \leftarrow W + [w_1, \dots, w_\xi]$; \\
+\textcolor{white}{$\Big |0$}6: \quad \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |0$}7: \quad \textbf{end for} \\
+\textcolor{white}{$\Big |0$}8: \quad Set $d \leftarrow d+5$; \\
+\textcolor{white}{$\Big |0$}9: \quad Compute the singular values $\sigma_1, \dots, \sigma_d$ of $W$; \\
+\textcolor{white}{$\Big |$}10: \quad Compute the overall variability $\text{var}(W) = \sum_{i=1}^{k+1} (W\tr W)_{i,i}$; \\
+\textcolor{white}{$\Big |$}11: \quad \textbf{if} $\sum_{i=1}^{d} \sigma_i \geq 0.99 \cdot \text{var}(W)$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}12: \quad Set $Q \leftarrow$ $d$-dimensional basis of $W$; \\
+\textcolor{white}{$\Big |$}12: \quad \quad \textbf{break}; \\
+\textcolor{white}{$\Big |$}13: \quad \textbf{end if} \\
+\textcolor{white}{$\Big |$}14: \textbf{end while} \\
+\textcolor{white}{$\Big |$}16: \textbf{while} $k<N$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}17: \quad Train one epoch of P-SGD using learning rate $10\cdot\eta$ and basis $Q$; \\
+\textcolor{white}{$\Big |$}24: \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}25: \textbf{end while} \\
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Name: TBD \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, $w_0 \in \R^n$, \\
+\textcolor{white}{$\Big |$\textbf{Input:}} sampling frequency $\xi \in \N$, learning rate $\eta > 0$ \\
+\textcolor{white}{$\Big |0$}1: Initialize $k \leftarrow 0$, $Q \leftarrow [ \ ]$, $W \leftarrow [ \ ]$, $d \leftarrow 0$; \\
+\textcolor{white}{$\Big |0$}2: \textbf{while} $k<N$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}3: \quad \textbf{for} $i=0, \dots, 7$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}4: \quad \quad Train one epoch of SGD using learning rate $\eta$ and sample $w_1, \dots, w_\xi \in \R^n$; \\
+\textcolor{white}{$\Big |0$}5: \quad \quad Set $W \leftarrow W + [w_1, \dots, w_\xi]$; \\
+\textcolor{white}{$\Big |0$}6: \quad \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |0$}7: \quad \textbf{end for} \\
+\textcolor{white}{$\Big |0$}8: \quad Set $d \leftarrow d+5$; \\
+\textcolor{white}{$\Big |0$}9: \quad Compute the singular values $\sigma_1, \dots, \sigma_d$ of $W$; \\
+\textcolor{white}{$\Big |$}10: \quad Compute the overall variability $\text{var}(W) = \sum_{i=1}^{k+1} (W\tr W)_{i,i}$; \\
+\textcolor{white}{$\Big |$}11: \quad \textbf{if} $\sum_{i=1}^{d} \sigma_i \geq 0.99 \cdot \text{var}(W)$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}12: \quad Set $Q \leftarrow$ $d$-dimensional basis of $W$; \\
+\textcolor{white}{$\Big |$}12: \quad \quad \textbf{break}; \\
+\textcolor{white}{$\Big |$}13: \quad \textbf{end if} \\
+\textcolor{white}{$\Big |$}14: \textbf{end while} \\
+\textcolor{white}{$\Big |$}15: Initialize $\text{best\_acc} \leftarrow 0$, $j \leftarrow 0$; \\
+\textcolor{white}{$\Big |$}16: \textbf{while} $k<N$ \textbf{and} $j<3$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}17: \quad Train one epoch of P-SGD using learning rate $10\cdot\eta$ and basis $Q$; \\
+\textcolor{white}{$\Big |$}18: \quad Validate the model and compute the accuracy; \\
+\textcolor{white}{$\Big |$}19: \quad \textbf{if} accuracy $>$ best\_acc \textbf{do}: \\
+\textcolor{white}{$\Big |$}20: \quad \quad Set best\_acc $\leftarrow$ accuracy; \\
+\textcolor{white}{$\Big |$}21: \quad \textbf{else}: \\
+\textcolor{white}{$\Big |$}22: \quad \quad Set $j \leftarrow j +1$; \\
+\textcolor{white}{$\Big |$}23: \quad \textbf{end if} \\
+\textcolor{white}{$\Big |$}24: \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}25: \textbf{end while} \\
+\end{algorithm}
+
+
+
+\begin{algorithm}
+\caption{Name: TBD \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, $w_0 \in \R^n$, \\
+\textcolor{white}{$\Big |$\textbf{Input:}} dimension $d \in \N$ of the subspace, learning rate $\eta > 0$ \\
+\textcolor{white}{$\Big |0$}1: Initialize $k \leftarrow 0$, $\text{best\_acc} \leftarrow 0$, $W \leftarrow [w_0]$; \\
+\textcolor{white}{$\Big |0$}2: \textbf{for} $j=0, \dots, 1.2d \cdot \frac{1}{3}$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}3: \quad Train one epoch of SGD using learning rate $\eta$ and sample $w_1, w_2, w_3 \in \R^n$; \\
+\textcolor{white}{$\Big |0$}4: \quad Set $W \leftarrow W + [w_1, w_2, w_3]$; \\
+\textcolor{white}{$\Big |0$}5: \quad Validate the model and compute the accuracy; \\
+\textcolor{white}{$\Big |0$}6: \quad \textbf{if} accuracy $>$ best\_acc \textbf{do}: \\
+\textcolor{white}{$\Big |0$}7: \quad \quad Set best\_acc $\leftarrow$ accuracy; \\
+\textcolor{white}{$\Big |0$}8: \quad \textbf{end if} \\
+\textcolor{white}{$\Big |0$}9: \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}10: \textbf{end for} \\
+\textcolor{white}{$\Big |$}11: Extract basis $Q$ of the $d$-dimensional subspace using the samples $W$; \\
+\textcolor{white}{$\Big |$}12: Initialize $j \leftarrow 0$; \\
+\textcolor{white}{$\Big |$}13: \textbf{while} $j<3$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}14: \quad Train one epoch of P-SGD using learning rate $10\cdot\eta$ and basis $Q$; \\
+\textcolor{white}{$\Big |$}15: \quad Validate the model and compute the accuracy; \\
+\textcolor{white}{$\Big |$}16: \quad \textbf{if} accuracy $>$ best\_acc \textbf{do}: \\
+\textcolor{white}{$\Big |$}17: \quad \quad Set best\_acc $\leftarrow$ accuracy; \\
+\textcolor{white}{$\Big |$}18: \quad \textbf{else}: \\
+\textcolor{white}{$\Big |$}19: \quad \quad Set $j \leftarrow j +1$; \\
+\textcolor{white}{$\Big |$}20: \quad \textbf{end if} \\
+\textcolor{white}{$\Big |$}21: \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}22: \textbf{end while} \\
+\textcolor{white}{$\Big |$}23: Train $N-k$ epochs of SGD with learning rate $\frac{1}{10}\cdot \eta$; \\
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Name: TBD \textcolor{white}{$\Big |$}} \ \\
+\textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $E: \R^n \to \R$, batch size $b \in \N$, number of epochs $N \in \N$, $w_0 \in \R^n$, \\
+\textcolor{white}{$\Big |$\textbf{Input:}} dimension $d \in \N$ of the subspace, number of subspace refinements $\rho \in \N$, \\ 
+\textcolor{white}{$\Big |$\textbf{Input:}} sampling frequency $\xi \in \N$, learning rate $\eta > 0$ \\
+\textcolor{white}{$\Big |0$}1: Initialize $k \leftarrow 0$, $\text{best\_acc} \leftarrow 0$, $W \leftarrow [ w_0 ]$; \\
+\textcolor{white}{$\Big |1$}2: \textbf{for} $i=0, \dots, \rho$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}3: \quad \textbf{for} $j=0, \dots, 1.2d \cdot \frac{1}{\xi(\rho+1)}$ \textbf{do}: \\
+\textcolor{white}{$\Big |0$}4: \quad \quad Train one epoch of SGD using learning rate $\eta$ and sample $w_1, \dots, w_\xi \in \R^n$; \\
+\textcolor{white}{$\Big |0$}5: \quad \quad Set $W \leftarrow W + [w_1, \dots, w_\xi]$; \\
+\textcolor{white}{$\Big |0$}6: \quad \quad Validate the model and compute the accuracy; \\
+\textcolor{white}{$\Big |0$}7: \quad \quad \textbf{if} accuracy $>$ best\_acc \textbf{do}: \\
+\textcolor{white}{$\Big |0$}8: \quad \quad \quad Set best\_acc $\leftarrow$ accuracy; \\
+\textcolor{white}{$\Big |0$}9: \quad \quad \textbf{end if} \\
+\textcolor{white}{$\Big |$}10: \quad \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}11: \quad \textbf{end for} \\
+\textcolor{white}{$\Big |$}12: \quad Extract basis $Q$ of the $d \cdot \frac{i+1}{\rho+1}$-dimensional subspace using the samples $W$; \\
+\textcolor{white}{$\Big |$}13: \quad Initialize $j \leftarrow 0$; \\
+\textcolor{white}{$\Big |$}14: \quad \textbf{while} $j<3$ \textbf{do}: \\
+\textcolor{white}{$\Big |$}15: \quad \quad Train one epoch of P-SGD using learning rate $10\cdot\eta$ and basis $Q$; \\
+\textcolor{white}{$\Big |$}16: \quad \quad Validate the model and compute the accuracy; \\
+\textcolor{white}{$\Big |$}17: \quad \quad \textbf{if} accuracy $>$ best\_acc \textbf{do}: \\
+\textcolor{white}{$\Big |$}18: \quad \quad \quad Set best\_acc $\leftarrow$ accuracy; \\
+\textcolor{white}{$\Big |$}19: \quad \quad \textbf{else}: \\
+\textcolor{white}{$\Big |$}20: \quad \quad \quad Set $j \leftarrow j +1$; \\
+\textcolor{white}{$\Big |$}21: \quad \quad \textbf{end if} \\
+\textcolor{white}{$\Big |$}22: \quad \quad Set $k \leftarrow k+1$; \\
+\textcolor{white}{$\Big |$}23: \quad \textbf{end while} \\
+\textcolor{white}{$\Big |$}24: \textbf{end for} \\
+\textcolor{white}{$\Big |$}25: Train $N-k$ epochs of SGD with learning rate $\frac{1}{10}\cdot \eta$; \\
+\end{algorithm}
+
 
 \pagebreak
 \section{Conclusion}
@@ -1741,11 +1998,15 @@ Let $f \in \F$ be differentiable at $x \in \R^{n_0}$ and $\mu : \F \to \R$ be di
 \[ \partial_x \mu[f(x)] = \partial_f \mu[\partial_xf(x)] \]
 \end{lemma}
 
-To Do: Check $l$, $\ell$, $\L$. \\
-
-To Do: Double Check NTK Theorems \\
+To Do: Figure 4 \\
 
 To Do: Check why Z is orthogonal in pca \\
+
+To Do: Check chain rule with Leonardo \\
+
+To Do: Experiments \\
+
+To Do: Introduction, Conclusion \\
 
 In conclusion...
 
@@ -1783,6 +2044,28 @@ In conclusion...
 \bibitem{Decay2} Amnon Geifman, Abhay Yadav, Yoni Kasten, Meirav Galun, David Jacobs, Ronen Basri. \textit{On the Similarity between the Laplace and Neural Tangent Kernels}. Advances in Neural Information Processing Systems, volume 33,  pages 1451–1461, 2020.
 
 \bibitem{PCA} Mehryar Mohri, Afshin Rostamizadeh, Ameet Talwalkar. \textit{Foundations of Machine Learning}. Second edition, 2018.
+
+\bibitem{ResNet} Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun. \textit{Deep Residual Learning for Image Recognition}. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pages 770-778, 2016.
+
+\bibitem{VGG}
+
+\bibitem{EfficientNet}
+
+\bibitem{MobileNet}
+
+\bibitem{DenseNet}
+
+\bibitem{Inception}
+
+\bibitem{Xception}
+
+\bibitem{GoogLeNet}
+
+\bibitem{ShuffleNet}
+
+\bibitem{SqueezeNet}
+
+\bibitem{SEResNet}
 
 \end{thebibliography}
 

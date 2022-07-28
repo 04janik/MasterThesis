@@ -34,7 +34,7 @@ parser.add_argument('-rpath', default='', type=str, help='result path')         
 
 # parse arguments for bsgd
 parser.add_argument('-xi', default=3, type=int, help='sampling frequency per epoch')        # sampling frequency
-parser.add_argument('-rho', default=0, type=int, help='number of space refinements')        # space refinements
+parser.add_argument('-rho', default=1, type=int, help='number of space refinements')        # space refinements
 
 # store arguments
 args = parser.parse_args()
