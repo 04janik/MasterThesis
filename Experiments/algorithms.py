@@ -174,14 +174,14 @@ def train_SGD(args, model, train_loader, test_loader):
 
     # construct name
     model_name = model.__class__.__name__
-    run_name = f'{model_name}-SGD-lr{args.lr}'
+    run_name = f'{model_name}-SGD-lr{args.lr}-'
 
     # create directory for checkpoints
-    run_path = os.path.join(args.rpath, run_name + '-f' + str(args.freq))
+    run_path = os.path.join(args.rpath, run_name + args.strat + '-f' + str(args.freq))
     os.makedirs(run_path)
 
     # define sample manager and sample initialization
-    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, path=run_path)
+    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, path=run_path, strategy=args.strat)
     sample_manager.sample()
 
     # configure training
@@ -308,7 +308,7 @@ def train_BSGD(args, model, train_loader, test_loader):
     evaluater = Evaluater(model, test_loader, args.data)
 
     # define sample manager
-    sample_manager = Sample_Manager(model, len(train_loader), freq=args.xi, W=torch.unsqueeze(get_model_param_vec(model), 1))
+    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(get_model_param_vec(model), 1), strategy=args.strat)
     
     # variables
     V_old = None

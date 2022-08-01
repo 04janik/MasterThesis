@@ -3,13 +3,14 @@ import torch
 
 class Sample_Manager:
 
-    def __init__(self, model, batch_count, freq, path=None, W=None, strategy='uniform'):
+    def __init__(self, model, batch_count, freq, path=None, W=None, strategy='uni'):
 
         self.model = model
         self.idx = 0
         self.batch = 0
         self.batch_count = batch_count
         self.freq = freq
+        self.strategy = strategy
         self.milestones = [int(batch_count*(i+1)/freq) for i in range(freq)]
 
         self.W = W
@@ -30,7 +31,7 @@ class Sample_Manager:
             case 'max': self.strategy = self.strategy_max_loss()
             case 'min': self.strategy = self.strategy_min_loss()
             case 'pro': self.strategy = self.strategy_max_progress()
-            case 'uniform': self.strategy = self.strategy_uniform()
+            case 'uni': self.strategy = self.strategy_uniform()
             case _: raise Exception('invalid sampling strategy')
 
     def get_samples(self):

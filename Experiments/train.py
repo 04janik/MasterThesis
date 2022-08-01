@@ -24,14 +24,12 @@ parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')       
 # parse arguments for sgd
 parser.add_argument('-freq', default=1, type=int, help='sampling frequency per epoch')      # sampling frequency
 parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
+parser.add_argument('-strat', default='uni', type=str, help='sampling strategy')            # sampling strategy
 
 # parse arguments for psgd
 parser.add_argument('-dim', default=0, type=int, help='subspace dimension')                 # subspace dimension
 parser.add_argument('-samples', default=0, type=int, help='number of sampling epochs')      # sampling epochs
 parser.add_argument('-spath', default='', type=str, help='sampling path')                   # sampling path
-
-# parse arguments for bsgd
-parser.add_argument('-xi', default=1, type=int, help='sampling frequency per epoch')        # sampling frequency
 
 # store arguments
 args = parser.parse_args()
@@ -55,6 +53,8 @@ if args.optimizer == 'sgd':
         raise Exception('invalid sampling frequency')
     elif not os.path.exists(args.rpath):
         raise Exception('invalid result path')
+    elif args.strat is not in ['avg', 'max', 'min', 'pro', 'uni']:
+        raise Exception('invalid sampling strategy')
 
 elif args.optimizer == 'psgd':
     if args.dim <= 0 or args.dim > args.samples:
@@ -65,8 +65,10 @@ elif args.optimizer == 'psgd':
         raise Exception('invalid sampling path')
 
 elif args.optimizer == 'bsgd':
-    if args.xi <= 0:
+    if args.freq <= 0:
         raise Exception('invalid sampling frequency')
+    elif args.strat is not in ['avg', 'max', 'min', 'pro', 'uni']:
+        raise Exception('invalid sampling strategy')
 
 else:
     raise Exception('invalid optimizer')
