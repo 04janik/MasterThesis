@@ -1,5 +1,6 @@
 import os
 import torch
+import utils
 
 class Sample_Manager:
 
@@ -22,11 +23,11 @@ class Sample_Manager:
         self.max_loss = 0
         self.max_progress = 0
 
-        self.param_vec = self.get_model_param_vec()
+        self.param_vec = utils.get_model_param_vec(self.model)
         self.model_state = self.model.state_dict()
         self.mark_sample = self.mark_sample_mem if path is None else self.mark_sample_disk
 
-        if strategy == 'avg': self.strategy = self.strategy_avg_loss
+        if strategy == 'avg': self.strategy = self.strategy_avg_param
         elif strategy == 'max': self.strategy = self.strategy_max_loss
         elif strategy == 'min': self.strategy = self.strategy_min_loss
         elif strategy == 'pro': self.strategy = self.strategy_max_progress
@@ -39,26 +40,39 @@ class Sample_Manager:
     def get_last_samples(self, epochs):
         return self.W[:,self.idx-self.freq*epochs+1:]
 
-    def get_model_param_vec(self):
-        vec = []
-        for name, param in self.model.named_parameters():
-            vec.append(param.detach().reshape(-1))
-        return torch.cat(vec, 0)
-
     def mark_sample_disk(self):
         self.model_state = self.model.state_dict()
 
     def mark_sample_mem(self):
-        self.param_vec = self.get_model_param_vec()
+        self.param_vec = utils.get_model_param_vec(self.model)
 
-    def step(self, evaluater):
+    def step(self, criterion, inputs, labels, prev_loss):
 
-        self.strategy(evaluater)
+        self.strategy(criterion, inputs, labels, prev_loss)
         self.batch = (self.batch % self.batch_count) + 1
 
         if self.batch in self.milestones:
+
             self.idx = self.idx + 1
-            self.sample()
+
+            if strategy == 'avg' and self.sample == self.sample_param_mem:
+                i = self.milestones.index(self.batch)
+                n = self.batch - self.milestones[i-1] if i > 0 else self.batch
+                self.param_vec = self.param_vec/n
+                self.sample()
+
+            elif strategy == 'avg' and self.sample == self.sample_param_disk:
+                i = self.milestones.index(self.batch)
+                n = self.batch - self.milestones[i-1] if i > 0 else self.batch
+                self.param_vec = self.param_vec/n
+                state = self.model.state_dict()
+                utils.update_param(self.model, self.param_vec)
+                self.model_state = self.model.state_dict()
+                self.sample()
+                self.model.load_state_dict(state)
+            else:
+                self.sample()
+
             self.reset_values()
 
     def sample_param_disk(self):
@@ -68,20 +82,22 @@ class Sample_Manager:
         sample = torch.unsqueeze(self.param_vec, 1)
         self.W = torch.cat((self.W, sample), -1)
 
-    def strategy_avg_loss(self, criterion, inputs, labels, prev_loss):
-        self.mark_sample()
+    def strategy_avg_param(self, criterion, inputs, labels, prev_loss):
+        self.param_vec = self.param_vec + utils.get_model_param_vec(self.model)
 
-    def strategy_max_loss(self, evaluater):
+    def strategy_max_loss(self, criterion, inputs, labels, prev_loss):
 
-        loss = evaluater.get_test_loss()
+        outputs = self.model.forward(inputs)
+        loss = criterion(outputs, labels)
 
         if loss > self.max_loss:
-            self.max_loss = prev_loss
+            self.max_loss = loss
             self.mark_sample()
 
-    def strategy_min_loss(self, evaluater):
+    def strategy_min_loss(self, criterion, inputs, labels, prev_loss):
 
-        loss = evaluater.get_test_loss()
+        outputs = self.model.forward(inputs)
+        loss = criterion(outputs, labels)
 
         if loss < self.min_loss:
             self.min_loss = loss
@@ -105,7 +121,7 @@ class Sample_Manager:
         self.min_loss = float('inf')
         self.max_loss = 0
         self.max_progress = 0
-        self.param_vec = self.get_model_param_vec()
+        self.param_vec = utils.get_model_param_vec(self.model)
         self.model_state = self.model.state_dict()
 
     

@@ -1,8 +1,44 @@
 import torch
 import torchvision
 import torchvision.transforms as transforms
-
 import numpy as np
+
+
+def get_model_param_vec(model):
+    vec = []
+    for name, param in model.named_parameters():
+        vec.append(param.detach().reshape(-1))
+    return torch.cat(vec, 0)
+
+
+def get_model_grad_vec(model):
+    vec = []
+    for name, param in model.named_parameters():
+        vec.append(param.grad.detach().reshape(-1))
+    return torch.cat(vec, 0)
+
+
+def update_grad(model, grad_vec):
+    idx = 0
+    for name, param in model.named_parameters():
+        shape = param.grad.shape
+        size = 1
+        for i in range(len(list(shape))):
+            size *= shape[i]
+        param.grad.data = grad_vec[idx:idx+size].reshape(shape)
+        idx += size
+
+
+def update_param(model, param_vec):
+    idx = 0
+    for name, param in model.named_parameters():
+        shape = param.data.shape
+        size = 1
+        for i in range(len(list(shape))):
+            size *= shape[i]
+        param.data = param_vec[idx:idx+size].reshape(shape)
+        idx += size
+
 
 def get_datasets(args):
 

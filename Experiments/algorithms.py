@@ -1,54 +1,14 @@
 import os
 import torch 
-
-# matrix calculations
 import numpy as np
 
-# utility functions
+import utils
 from evaluater import Evaluater
-from utils import get_datasets, get_model
 from sample_manager import Sample_Manager
 
-# monitoring tools
 from fastprogress import master_bar, progress_bar
 import wandb
 import time
-
-
-def get_model_param_vec(model):
-    vec = []
-    for name, param in model.named_parameters():
-        vec.append(param.detach().reshape(-1))
-    return torch.cat(vec, 0)
-
-
-def get_model_grad_vec(model):
-    vec = []
-    for name, param in model.named_parameters():
-        vec.append(param.grad.detach().reshape(-1))
-    return torch.cat(vec, 0)
-
-
-def update_grad(model, grad_vec):
-    idx = 0
-    for name, param in model.named_parameters():
-        shape = param.grad.shape
-        size = 1
-        for i in range(len(list(shape))):
-            size *= shape[i]
-        param.grad.data = grad_vec[idx:idx+size].reshape(shape)
-        idx += size
-
-
-def update_param(model, param_vec):
-    idx = 0
-    for name, param in model.named_parameters():
-        shape = param.data.shape
-        size = 1
-        for i in range(len(list(shape))):
-            size *= shape[i]
-        param.data = param_vec[idx:idx+size].reshape(shape)
-        idx += size
 
 
 def pca(W):
@@ -115,12 +75,12 @@ def get_subspace(args, model):
 
     # load the initialization
     model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(0))))
-    W = torch.unsqueeze(get_model_param_vec(model), 1)
+    W = torch.unsqueeze(utils.get_model_param_vec(model), 1)
 
     # load sampled parameters
     for i in range(args.samples):
         model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(i+1))))
-        sample = torch.unsqueeze(get_model_param_vec(model), 1)
+        sample = torch.unsqueeze(utils.get_model_param_vec(model), 1)
         W = torch.cat((W, sample), -1)
 
     W = W.cuda()
@@ -163,7 +123,7 @@ def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, 
 
         # sample parameters
         if sample_manager is not None:
-            sample_manager.step(evaluater)
+            sample_manager.step(criterion, inputs, labels, loss)
 
     run.log({'epoch time consumption': time.time() - start})
 
@@ -206,7 +166,7 @@ def train_SGD(args, model, train_loader, test_loader):
         for epoch in mbar:
 
             # train for one epoch
-            train_SGD_epoch(model, criterion, optimizer, train_loader, run, mbar, sample_manager)
+            train_SGD_epoch(model, criterion, optimizer, train_loader, run, mbar, sample_manager, evaluater)
 
             # evaluate the model
             evaluater.eval_model(run)
@@ -234,10 +194,10 @@ def train_PSGD_epoch(Q, model, criterion, optimizer, train_loader, run, master_b
         loss.backward()
 
         # parameter update in subspace
-        grad = get_model_grad_vec(model).float()
+        grad = utils.get_model_grad_vec(model).float()
         grad = torch.mm(Q.transpose(0,1), grad.reshape(-1,1))
         grad = torch.mm(Q, grad)
-        update_grad(model, grad)
+        utils.update_grad(model, grad)
         optimizer.step()
 
         # log the loss
@@ -261,10 +221,10 @@ def train_PSGD(args, model, train_loader, test_loader):
     model.load_state_dict(torch.load(os.path.join(args.spath, 'checkpoint_' + str(0))))
 
     # project initialization to subspace
-    param = get_model_param_vec(model).float()
+    param = utils.get_model_param_vec(model).float()
     param = torch.mm(Q.transpose(0,1), param.reshape(-1,1))
     param = torch.mm(Q, param)
-    update_param(model, param)
+    utils.update_param(model, param)
 
     # configure training
     criterion = torch.nn.CrossEntropyLoss().cuda()
@@ -308,7 +268,7 @@ def train_BSGD(args, model, train_loader, test_loader):
     evaluater = Evaluater(model, criterion, test_loader, args.data)
 
     # define sample manager
-    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(get_model_param_vec(model), 1), strategy=args.strat)
+    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(utils.get_model_param_vec(model), 1), strategy=args.strat)
     
     # variables
     V_old = None
@@ -371,10 +331,10 @@ def train_BSGD(args, model, train_loader, test_loader):
             V_old = V
 
         # project parameters to subspace
-        param = get_model_param_vec(model).float()
+        param = utils.get_model_param_vec(model).float()
         param = torch.mm(Q.transpose(0,1), param.reshape(-1,1))
         param = torch.mm(Q, param)
-        update_param(model, param)
+        utils.update_param(model, param)
 
         # define optimizer for PSGD
         optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
