@@ -53,7 +53,7 @@ if args.optimizer == 'sgd':
         raise Exception('invalid sampling frequency')
     elif not os.path.exists(args.rpath):
         raise Exception('invalid result path')
-    elif args.strat is not in ['avg', 'max', 'min', 'pro', 'uni']:
+    elif args.strat not in ['avg', 'max', 'min', 'pro', 'uni']:
         raise Exception('invalid sampling strategy')
 
 elif args.optimizer == 'psgd':
@@ -67,7 +67,7 @@ elif args.optimizer == 'psgd':
 elif args.optimizer == 'bsgd':
     if args.freq <= 0:
         raise Exception('invalid sampling frequency')
-    elif args.strat is not in ['avg', 'max', 'min', 'pro', 'uni']:
+    elif args.strat not in ['avg', 'max', 'min', 'pro', 'uni']:
         raise Exception('invalid sampling strategy')
 
 else:

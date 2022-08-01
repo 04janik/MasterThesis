@@ -140,7 +140,7 @@ def get_subspace(args, model):
     return Q, pca_time
 
 
-def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, sample_manager=None):
+def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, sample_manager=None, evaluater=None):
 
     start = time.time()
 
@@ -163,7 +163,7 @@ def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, 
 
         # sample parameters
         if sample_manager is not None:
-            sample_manager.step(criterion, inputs, labels, loss)
+            sample_manager.step(evaluater)
 
     run.log({'epoch time consumption': time.time() - start})
 
@@ -174,10 +174,10 @@ def train_SGD(args, model, train_loader, test_loader):
 
     # construct name
     model_name = model.__class__.__name__
-    run_name = f'{model_name}-SGD-lr{args.lr}-'
+    run_name = f'{model_name}-SGD-lr{args.lr}'
 
     # create directory for checkpoints
-    run_path = os.path.join(args.rpath, run_name + args.strat + '-f' + str(args.freq))
+    run_path = os.path.join(args.rpath, run_name + '-' + args.strat + '-f' + str(args.freq))
     os.makedirs(run_path)
 
     # define sample manager and sample initialization
@@ -187,7 +187,7 @@ def train_SGD(args, model, train_loader, test_loader):
     # configure training
     criterion = torch.nn.CrossEntropyLoss().cuda()
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
-    evaluater = Evaluater(model, test_loader, args.data)
+    evaluater = Evaluater(model, criterion, test_loader, args.data)
 
     # schedule learning rate
     if args.data == 'CIFAR10':
@@ -270,7 +270,7 @@ def train_PSGD(args, model, train_loader, test_loader):
     criterion = torch.nn.CrossEntropyLoss().cuda()
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
     lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[30], gamma=0.1)
-    evaluater = Evaluater(model, test_loader, args.data)
+    evaluater = Evaluater(model, criterion, test_loader, args.data)
 
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:
@@ -305,7 +305,7 @@ def train_BSGD(args, model, train_loader, test_loader):
     # configure training
     criterion = torch.nn.CrossEntropyLoss().cuda()
     optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
-    evaluater = Evaluater(model, test_loader, args.data)
+    evaluater = Evaluater(model, criterion, test_loader, args.data)
 
     # define sample manager
     sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(get_model_param_vec(model), 1), strategy=args.strat)

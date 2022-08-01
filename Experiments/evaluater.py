@@ -2,9 +2,10 @@ import numpy as np
 
 class Evaluater:
 
-    def __init__(self, model, test_loader, data_set):
+    def __init__(self, model, criterion, test_loader, data_set):
 
         self.model = model
+        self.criterion = criterion
         self.test_loader = test_loader
 
         self.acc = 0
@@ -39,3 +40,18 @@ class Evaluater:
             self.model.train()
 
         run.log({'accuracy': self.acc, 'max accuracy': self.acc_max, 'epoch': self.epoch})
+
+    def get_test_loss(self, criterion):
+
+        loss = 0
+
+        for inputs, labels in iter(self.test_loader):
+
+            inputs, labels = inputs.cuda(), labels.cuda()
+
+            outputs = model.forward(inputs)
+            loss = loss + self.criterion(outputs, labels)
+
+        return loss
+
+

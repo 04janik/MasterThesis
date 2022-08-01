@@ -22,17 +22,16 @@ class Sample_Manager:
         self.max_loss = 0
         self.max_progress = 0
 
-        self.param_vec = None
-        self.model_state = None
+        self.param_vec = self.get_model_param_vec()
+        self.model_state = self.model.state_dict()
         self.mark_sample = self.mark_sample_mem if path is None else self.mark_sample_disk
 
-        match strategy:
-            case 'avg': self.strategy = self.strategy_avg_loss()
-            case 'max': self.strategy = self.strategy_max_loss()
-            case 'min': self.strategy = self.strategy_min_loss()
-            case 'pro': self.strategy = self.strategy_max_progress()
-            case 'uni': self.strategy = self.strategy_uniform()
-            case _: raise Exception('invalid sampling strategy')
+        if strategy == 'avg': self.strategy = self.strategy_avg_loss
+        elif strategy == 'max': self.strategy = self.strategy_max_loss
+        elif strategy == 'min': self.strategy = self.strategy_min_loss
+        elif strategy == 'pro': self.strategy = self.strategy_max_progress
+        elif strategy == 'uni': self.strategy = self.strategy_uniform
+        else: raise Exception('invalid sampling strategy')
 
     def get_samples(self):
         return self.W
@@ -52,9 +51,9 @@ class Sample_Manager:
     def mark_sample_mem(self):
         self.param_vec = self.get_model_param_vec()
 
-    def step(self, criterion, inputs, labels, prev_loss):
+    def step(self, evaluater):
 
-        self.strategy(criterion, inputs, labels, prev_loss)
+        self.strategy(evaluater)
         self.batch = (self.batch % self.batch_count) + 1
 
         if self.batch in self.milestones:
@@ -63,7 +62,7 @@ class Sample_Manager:
             self.reset_values()
 
     def sample_param_disk(self):
-        torch.save(self.model_state, os.path.join(self.path + '/checkpoint_' + str(self.idx)))
+            torch.save(self.model_state, os.path.join(self.path + '/checkpoint_' + str(self.idx)))
 
     def sample_param_mem(self):
         sample = torch.unsqueeze(self.param_vec, 1)
@@ -72,15 +71,17 @@ class Sample_Manager:
     def strategy_avg_loss(self, criterion, inputs, labels, prev_loss):
         self.mark_sample()
 
-    def strategy_max_loss(self, criterion, inputs, labels, prev_loss):
-        if prev_loss > self.max_loss:
+    def strategy_max_loss(self, evaluater):
+
+        loss = evaluater.get_test_loss()
+
+        if loss > self.max_loss:
             self.max_loss = prev_loss
             self.mark_sample()
 
-    def strategy_min_loss(self, criterion, inputs, labels, prev_loss):
+    def strategy_min_loss(self, evaluater):
 
-        outputs = self.model.forward(inputs)
-        loss = criterion(outputs, labels)
+        loss = evaluater.get_test_loss()
 
         if loss < self.min_loss:
             self.min_loss = loss
@@ -96,15 +97,15 @@ class Sample_Manager:
             self.max_progress = progress
             self.mark_sample()
 
-    def strategy_uniform(self, criterion, inputs, labels, prev_loss):
+    def strategy_uniform(self, evaluater):
         self.mark_sample()
 
-    def reset_values():
+    def reset_values(self):
         self.avg_loss = float('inf')
         self.min_loss = float('inf')
         self.max_loss = 0
         self.max_progress = 0
-        self.param_vec = None
-        self.model_state = None
+        self.param_vec = self.get_model_param_vec()
+        self.model_state = self.model.state_dict()
 
     
