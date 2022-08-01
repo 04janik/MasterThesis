@@ -96,7 +96,4 @@ elif args.optimizer == 'psgd':
 elif args.optimizer == 'bsgd':
     algorithms.train_BSGD(args, model, train_loader, test_loader)
 
-# print test results
-accuracy, confusion = algorithms.eval_model(args, model, test_loader)
-print(f'Global accuracy: {accuracy:.2%}')
-print(confusion)
+print('Succesfully trained the model. Check results on wandb.ai.')

@@ -17,17 +17,17 @@ class Evaluater:
 
         self.epoch = self.epoch + 1
 
-        train_mode = model.training
+        train_mode = self.model.training
 
         if train_mode:
-            model.eval()
+            self.model.eval()
 
         self.confusion = np.zeros((self.targets,self.targets), dtype=np.int32)
 
-        for inputs, labels in iter(test_loader):
+        for inputs, labels in iter(self.test_loader):
 
             inputs = inputs.cuda()
-            outputs = model(inputs)
+            outputs = self.model(inputs)
 
             for label, output in zip(labels, outputs.cpu().detach().numpy()):
                 self.confusion[label, np.argmax(output)] += 1
@@ -36,6 +36,6 @@ class Evaluater:
         self.acc_max = self.acc if self.acc > self.acc_max else self.acc_max
 
         if train_mode:
-            model.train()
+            self.model.train()
 
         run.log({'accuracy': self.acc, 'max accuracy': self.acc_max, 'epoch': self.epoch})

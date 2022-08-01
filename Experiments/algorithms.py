@@ -83,7 +83,7 @@ def pc_angles(V1, V2):
         thetas = []
 
         for j in range(V2.shape[1]):
-            theta = torch.acos(torch.abs(torch.dot(V1[:,i],V2[:,j]))/(torch.linalg.norm(V1[:,i])*torch.linalg.norm(V2[:,j])))
+            theta = torch.acos(torch.abs(torch.dot(V1[:,i],V2[:,j])))
             thetas.append(theta.item())
 
         angles.append(np.min(thetas))
@@ -103,10 +103,10 @@ def get_best_dim(S):
 
     while pca_var_d < 0.95*pca_var:
         d = d+1
-        pca_var_d = pca_var_d + S[d_max-d-1]
+        pca_var_d = pca_var_d + S[d_max-d]
 
-    print('#samples: ', d_max)
-    print('dimension: ', d)
+    print('#samples:', d_max)
+    print('dimension:', d)
 
     return d
 
@@ -134,8 +134,8 @@ def get_subspace(args, model):
     Q = torch.div(Q,S[idx:])
     Q = Q.cuda()
 
-    print('W: ', W.shape)
-    print('Q: ', Q.shape)
+    print('W:', W.shape)
+    print('Q:', Q.shape)
 
     return Q, pca_time
 
@@ -163,7 +163,7 @@ def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, 
 
         # sample parameters
         if sample_manager is not None:
-            sample_manager.step()
+            sample_manager.step(criterion, inputs, labels, loss)
 
     run.log({'epoch time consumption': time.time() - start})
 
@@ -181,7 +181,7 @@ def train_SGD(args, model, train_loader, test_loader):
     os.makedirs(run_path)
 
     # define sample manager and sample initialization
-    sample_manager = Sample_Manager(model, len(train_loader), args.freq, run_path):
+    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, path=run_path)
     sample_manager.sample()
 
     # configure training
@@ -308,7 +308,7 @@ def train_BSGD(args, model, train_loader, test_loader):
     evaluater = Evaluater(model, test_loader, args.data)
 
     # define sample manager
-    sample_manager = Sample_Manager(model, len(train_loader), args.xi, torch.unsqueeze(get_model_param_vec(model), 1)):
+    sample_manager = Sample_Manager(model, len(train_loader), freq=args.xi, W=torch.unsqueeze(get_model_param_vec(model), 1))
     
     # variables
     V_old = None
@@ -336,7 +336,7 @@ def train_BSGD(args, model, train_loader, test_loader):
                 k = k+1
 
             # get samples from last 5 epochs
-            W = sample_manager.get_last_samples(5).cuda()
+            W = sample_manager.get_last_samples(epochs=5).cuda()
 
             # perform PCA
             S, V, pca_time = pca(W)
@@ -364,8 +364,8 @@ def train_BSGD(args, model, train_loader, test_loader):
                     Q = torch.div(Q,S[idx:])
                     Q = Q.cuda()
 
-                    print('W: ', W.shape)
-                    print('Q: ', Q.shape)
+                    print('W:', W.shape)
+                    print('Q:', Q.shape)
                     break
 
             V_old = V
@@ -396,7 +396,7 @@ def train_BSGD(args, model, train_loader, test_loader):
             k = k+1
 
             if evaluater.acc > acc_psgd:
-                acc_psgd = evalauater.acc
+                acc_psgd = evaluater.acc
             else:
                 stuck = stuck + 1
 
