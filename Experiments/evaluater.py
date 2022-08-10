@@ -41,17 +41,5 @@ class Evaluater:
 
         run.log({'accuracy': self.acc, 'max accuracy': self.acc_max, 'epoch': self.epoch})
 
-    def get_test_loss(self):
-
-        loss = 0
-
-        for inputs, labels in iter(self.test_loader):
-
-            inputs, labels = inputs.cuda(), labels.cuda()
-
-            outputs = self.model.forward(inputs)
-            loss = loss + self.criterion(outputs, labels)
-
-        return loss
 
 

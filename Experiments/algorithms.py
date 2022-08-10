@@ -1,6 +1,7 @@
 import os
-import torch 
+import torch
 import numpy as np
+import math
 
 import utils
 from evaluater import Evaluater
@@ -43,17 +44,17 @@ def pc_angles(V1, V2):
         thetas = []
 
         for j in range(V2.shape[1]):
-            theta = torch.acos(torch.abs(torch.dot(V1[:,i],V2[:,j])))
+            theta = torch.acos(torch.dot(V1[:,i],V2[:,j]))
+            if abs(theta > math.pi/2):
+                theta = theta + math.pi/2 if theta < 0 else theta - math.pi/2
             thetas.append(theta.item())
 
         angles.append(np.min(thetas))
 
-    print('angles:', angles)
-
     return angles
 
 
-def get_best_dim(S):
+def get_best_dim(S, precision=0.95):
 
     d = 0
     d_max = S.shape[0]
@@ -61,7 +62,7 @@ def get_best_dim(S):
     pca_var_d = 0
     pca_var = torch.sum(S)
 
-    while pca_var_d < 0.95*pca_var:
+    while pca_var_d < precision*pca_var:
         d = d+1
         pca_var_d = pca_var_d + S[d_max-d]
 
@@ -269,8 +270,9 @@ def train_BSGD(args, model, train_loader, test_loader):
 
     # define sample manager
     sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(utils.get_model_param_vec(model), 1), strategy=args.strat)
-    
+
     # variables
+    S_old = None
     V_old = None
     Q = None
     k = 0
@@ -301,13 +303,19 @@ def train_BSGD(args, model, train_loader, test_loader):
             # perform PCA
             S, V, pca_time = pca(W)
 
+            run.log({'sigma_1': S[4]})
+            run.log({'sigma_2': S[3]})
+            run.log({'sigma_3': S[2]})
+            run.log({'sigma_4': S[1]})
+            run.log({'sigma_5': S[0]})
+
             if V_old is not None:
 
                 # compute angles between current
                 # and previous principal components
                 angles = pc_angles(V_old, V)
 
-                if np.max(angles) < 0.035:
+                if np.max(angles) < math.pi/180 and torch.max(torch.div(S,S_old)) < 1.02:
 
                     # select all samples
                     W = sample_manager.get_samples().cuda()
@@ -316,7 +324,7 @@ def train_BSGD(args, model, train_loader, test_loader):
                     S, V, pca_time = pca(W)
 
                     # get dimension
-                    d = get_best_dim(S)
+                    d = get_best_dim(S, 0.95)
                     idx = k - d + 1
 
                     # determine basis
@@ -328,6 +336,7 @@ def train_BSGD(args, model, train_loader, test_loader):
                     print('Q:', Q.shape)
                     break
 
+            S_old = S
             V_old = V
 
         # project parameters to subspace
@@ -336,9 +345,28 @@ def train_BSGD(args, model, train_loader, test_loader):
         param = torch.mm(Q, param)
         utils.update_param(model, param)
 
-        # define optimizer for PSGD
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
+        for lr in [args.lr, 0.1*args.lr]:
 
+            print('Training 10 epochs of PSGD with learning rate:', lr)
+
+            # define optimizer for PSGD
+            optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=args.mom)
+
+            # progress bar
+            mbar = master_bar(range(10))
+
+            for epoch in mbar:
+
+                # train for one epoch
+                train_PSGD_epoch(Q, model, criterion, optimizer, train_loader, run, mbar)
+
+                # evaluate the model
+                evaluater.eval_model(run)
+
+                k = k+1
+
+
+        '''
         # progress bar
         mbar = master_bar(range(args.epochs - k))
 
@@ -365,7 +393,7 @@ def train_BSGD(args, model, train_loader, test_loader):
                 break
 
         # define optimizer for SGD
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.1*args.lr, momentum=args.mom)
 
         # progress bar
         mbar = master_bar(range(args.epochs - k))
@@ -377,6 +405,7 @@ def train_BSGD(args, model, train_loader, test_loader):
 
             # evaluate the model
             evaluater.eval_model(run)
+            '''
 
 
 '''

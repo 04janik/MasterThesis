@@ -4,28 +4,27 @@ import utils
 
 class Sample_Manager:
 
-    def __init__(self, model, batch_count, freq, path=None, W=None, strategy='uni'):
+    def __init__(self, model, batch_count, freq, path=None, W=None, strategy='avg'):
 
         self.model = model
         self.idx = 0
         self.batch = 0
         self.batch_count = batch_count
         self.freq = freq
-        self.strategy = strategy
         self.milestones = [int(batch_count*(i+1)/freq) for i in range(freq)]
 
         self.W = W
         self.path = path
-        self.sample = self.sample_param_mem if path is None else self.sample_param_disk
+        self.disk = path is not None
+        self.sample = self.sample_param_disk if self.disk else self.sample_param_mem
         
-        self.avg_loss = float('inf')
         self.min_loss = float('inf')
         self.max_loss = 0
         self.max_progress = 0
 
         self.param_vec = utils.get_model_param_vec(self.model)
         self.model_state = self.model.state_dict()
-        self.mark_sample = self.mark_sample_mem if path is None else self.mark_sample_disk
+        self.mark_sample = self.mark_sample_disk if self.disk else self.mark_sample_mem
 
         if strategy == 'avg': self.strategy = self.strategy_avg_param
         elif strategy == 'max': self.strategy = self.strategy_max_loss
@@ -55,21 +54,21 @@ class Sample_Manager:
 
             self.idx = self.idx + 1
 
-            if strategy == 'avg' and self.sample == self.sample_param_mem:
+            if self.strategy == self.strategy_avg_param:
+                
                 i = self.milestones.index(self.batch)
                 n = self.batch - self.milestones[i-1] if i > 0 else self.batch
                 self.param_vec = self.param_vec/n
-                self.sample()
 
-            elif strategy == 'avg' and self.sample == self.sample_param_disk:
-                i = self.milestones.index(self.batch)
-                n = self.batch - self.milestones[i-1] if i > 0 else self.batch
-                self.param_vec = self.param_vec/n
-                state = self.model.state_dict()
-                utils.update_param(self.model, self.param_vec)
-                self.model_state = self.model.state_dict()
-                self.sample()
-                self.model.load_state_dict(state)
+                if self.disk:
+                    state = self.model.state_dict()
+                    utils.update_param(self.model, self.param_vec)
+                    self.model_state = self.model.state_dict()
+                    self.sample()
+                    self.model.load_state_dict(state)
+                else:
+                    self.sample()
+
             else:
                 self.sample()
 
@@ -113,11 +112,10 @@ class Sample_Manager:
             self.max_progress = progress
             self.mark_sample()
 
-    def strategy_uniform(self, evaluater):
+    def strategy_uniform(self, criterion, inputs, labels, prev_loss):
         self.mark_sample()
 
     def reset_values(self):
-        self.avg_loss = float('inf')
         self.min_loss = float('inf')
         self.max_loss = 0
         self.max_progress = 0
