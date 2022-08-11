@@ -24,7 +24,7 @@ parser.add_argument('-wd', default=1e-4, type=float, help='weight decay')       
 # parse arguments for sgd
 parser.add_argument('-freq', default=1, type=int, help='sampling frequency per epoch')      # sampling frequency
 parser.add_argument('-rpath', default='', type=str, help='result path')                     # result path
-parser.add_argument('-strat', default='uni', type=str, help='sampling strategy')            # sampling strategy
+parser.add_argument('-strat', default='avg', type=str, help='sampling strategy')            # sampling strategy
 
 # parse arguments for psgd
 parser.add_argument('-dim', default=0, type=int, help='subspace dimension')                 # subspace dimension

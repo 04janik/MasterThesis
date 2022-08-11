@@ -75,7 +75,7 @@ class Sample_Manager:
             self.reset_values()
 
     def sample_param_disk(self):
-            torch.save(self.model_state, os.path.join(self.path + '/checkpoint_' + str(self.idx)))
+        torch.save(self.model_state, os.path.join(self.path + '/checkpoint_' + str(self.idx)))
 
     def sample_param_mem(self):
         sample = torch.unsqueeze(self.param_vec, 1)

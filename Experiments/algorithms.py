@@ -14,8 +14,6 @@ import time
 
 def pca(W):
 
-    start = time.time()
-
     # centralize the samples
     means = torch.mean(W, dim=0)
     W = W - means.expand_as(W)
@@ -25,11 +23,7 @@ def pca(W):
     S, V = torch.linalg.eigh(WTW)
     S = torch.sqrt(S)
 
-    end = time.time()
-    pca_time = end - start
-    print("PCA time consumed:", pca_time)
-
-    return S, V, pca_time
+    return S, V
 
 
 def pc_angles(V1, V2):
@@ -86,14 +80,20 @@ def get_subspace(args, model):
 
     W = W.cuda()
 
+    start = time.time()
+
     # perform PCA
-    S, V, pca_time = pca(W)
+    S, V = pca(W)
 
     # determine basis of subspace
     idx = args.samples - args.dim + 1
     Q = torch.mm(W,V[:,idx:])
     Q = torch.div(Q,S[idx:])
     Q = Q.cuda()
+
+    end = time.time()
+    pca_time = end - start
+    print('PCA time consumed:', pca_time)
 
     print('W:', W.shape)
     print('Q:', Q.shape)
@@ -237,7 +237,7 @@ def train_PSGD(args, model, train_loader, test_loader):
     with wandb.init(project=model_name, name=run_name) as run:
 
         run.watch(model)
-        run.log({'PCA time consumption': pca_time})
+        #run.log({'PCA time consumption': pca_time})
 
         # progress bar
         mbar = master_bar(range(args.epochs))
@@ -301,7 +301,7 @@ def train_BSGD(args, model, train_loader, test_loader):
             W = sample_manager.get_last_samples(epochs=5).cuda()
 
             # perform PCA
-            S, V, pca_time = pca(W)
+            S, V = pca(W)
 
             run.log({'sigma_1': S[4]})
             run.log({'sigma_2': S[3]})
@@ -321,7 +321,7 @@ def train_BSGD(args, model, train_loader, test_loader):
                     W = sample_manager.get_samples().cuda()
 
                     # perform PCA
-                    S, V, pca_time = pca(W)
+                    S, V = pca(W)
 
                     # get dimension
                     d = get_best_dim(S, 0.95)
