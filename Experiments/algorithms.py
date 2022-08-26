@@ -303,7 +303,7 @@ def train_BSGD(args, model, train_loader, test_loader):
 
             # get dimension
             d = get_best_dim(S, 0.95)
-            idx = k - d + 1
+            idx = torch.numel(S) - d
 
             # determine basis
             Q = torch.mm(W,V[:,idx:])
@@ -320,7 +320,7 @@ def train_BSGD(args, model, train_loader, test_loader):
             utils.update_param(model, param)
 
             # define optimizer for PSGD
-            optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=args.mom)
+            optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
 
             # progress bar
             mbar = master_bar(range(1))

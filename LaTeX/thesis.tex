@@ -1573,19 +1573,19 @@ As a warm-up, we start with a motivational experiment, indicating that the low-d
 
 \begin{figure}[!h]
 \centering
-\subfigure[] {\label{fig:exp0-acc}\includegraphics[width=0.4\textwidth]{images/exp0-acc.png}}
-\subfigure[] {\label{fig:exp0-pca}\includegraphics[width=0.4\textwidth]{images/exp0-pca.png}}
-\caption{\centering Experiments for ResNet8 on CIFAR-10. (a) Training performance of SGD and P-SGD in 15D subspace. (b) PCA variance ratio of the samples $W = [w_0, \dots, w_{30}]$. }
+\subfigure[] {\label{fig:exp0-acc}\includegraphics[width=0.49\textwidth]{images/exp0-acc.png}}
+\subfigure[] {\label{fig:exp0-pca}\includegraphics[width=0.49\textwidth]{images/exp0-pca.png}}
+\caption{\centering Experiments for ResNet8 on CIFAR-10. (a) Training performance of SGD and P-SGD in 15D subspace. (b) PCA variance ratio of the samples $W = [w_1, \dots, w_{30}]$. }
 \label{fig:exp1}
 \end{figure}
 
-Figure \ref{fig:exp0-acc} compares the performance of SGD and P-SGD. With 3 runs, SGD obtains averagely 85.??\% test accuracy and P-SGD obtains averagely 85.??\%. Note that within the first 30 epochs of training, the performance of P-SGD is significantly better than the performance of SGD.  This indicates, that P-SGD is able to optimize the parameters by itself, so the good performance isn't a result of the information provided by the sampling stage. Empirically, this simple experiment strongly supports the low-dimensional trajectory hypothesis.
+Figure \ref{fig:exp0-acc} compares the performance of SGD and P-SGD. With 3 runs, SGD obtains averagely 85.41\% test accuracy and P-SGD obtains averagely 85.00\%. Note that within the first 30 epochs of training, the performance of P-SGD is significantly better than the performance of SGD.  This indicates, that P-SGD is able to optimize the parameters by itself, so the good performance isn't a result of the information provided by the sampling stage. Empirically, this simple experiment strongly supports the low-dimensional trajectory hypothesis.
 
-Figure \ref{fig:exp0-pca} illustrates the PCA variance ratio of the sampled parameters $W = [w_0, \dots, w_{30}]$. This concept can be explained as follows. Given a singular value decomposition
+Figure \ref{fig:exp0-pca} illustrates the PCA variance ratio of the sampled parameters $W = [w_1, \dots, w_{30}]$. This concept can be explained as follows. Given a singular value decomposition
 \[ W = U \Sigma V\tr, \]
-where $\Sigma = \text{diag}(\sigma_1, \dots, \sigma_{31})$, the PCA variance ratio of the $k$-th component is defined as
-\[ \frac{\text{variance of component } k}{\text{total variance}} = \frac{\sigma_k}{\sum_{i=1}^{31}\sigma_i}. \]
-The fact that the first five components contribute over 90\% to the total variance, indicate that, indeed the optimization trajectory could be embedded in a very low-dimensional affine set. This coincides with the good performance of training in a subspace of dimension 15.
+where $\Sigma = \text{diag}(\sigma_1, \dots, \sigma_{30})$, the PCA variance ratio of the $k$-th component is defined as
+\[ \frac{\text{variance of component } k}{\text{total variance}} = \frac{\sigma_k}{\sum_{i=1}^{30}\sigma_i}. \]
+The fact that the first five components contribute nearly 80\% to the total variance, indicate that, indeed the optimization trajectory could be embedded in a very low-dimensional affine set. This coincides with the good performance of training in a subspace of dimension 15.
 
 \subsection{Verification on Various Architectures} \label{sec:verify}
 
@@ -1624,16 +1624,16 @@ After training the models in full parameter space, we conduct further experiment
 \textcolor{white}{$\Big |$}model & \#params & \multicolumn{3}{c|}{\#training epochs} & \multicolumn{2}{c}{\#sampling epochs} \\
 \textcolor{white}{$\Big |$}& & 50 & 100 & 200 & 50 & 100 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M &  &  &  & & \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M &  &  &  & & \\
-\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M &  &  &  & & \\
-\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M &  &  &  & & \\
-\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M &  &  &  & & \\
-\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M &  &  &  & & \\
-\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M &  &  &  & & \\
-\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M &  &  &  & & \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M &  &  &  & & \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M &  &  &  & & \\
+\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 60.96 & 62.49 & 71.14 & 69.45 & 71.70 \\
+\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M & 63.84 & 64.53 & 72.57 & 72.13 & 73.54 \\
+\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M & 58.69 & 59.84 & 67.94 & 67.01 & 68.76 \\
+\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 62.53 & 63.44 & 73.21 & 71.52 & 73.47 \\
+\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M & 66.20 & 67.78 & 77.09 & 75.67 & 77.22 \\
+\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M & 66.02 & 67.12 & 77.01 & 74.62 & 74.71 \\
+\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M & 65.64 & 66.97 & 74.82 & 74.94 & 75.59 \\
+\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M & 66.51 & 67.45 & 75.81 & 75.35 & 75.55 \\
+\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M & 64.69 & 65.80 & 75.57 & 73.78 & 75.89 \\
+\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M & 60.88 & 61.14 & 68.94 & 69.94 & 71.14 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering Maximal test accuracy on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}\label{tab:psgd-2}}
@@ -1643,17 +1643,17 @@ Clearly, the experiments indicate a comparable performance of training in a 40-d
 
 \begin{figure}[!h]
 \centering
-\subfigure[Squeezenet] {\includegraphics[width=0.49\textwidth]{images/exp1-squeezenet.png}}
-\subfigure[GoogLeNet] {\includegraphics[width=0.49\textwidth]{images/exp1-squeezenet.png}}
-\subfigure[DenseNet121] {\includegraphics[width=0.49\textwidth]{images/exp1-vgg.png}}
-\subfigure[VGG11] {\includegraphics[width=0.49\textwidth]{images/exp1-densenet.png}}
+\subfigure[SqueezeNet] {\includegraphics[width=0.49\textwidth]{images/exp1-squeezenet.png}} \vspace{15pt}
+\subfigure[GoogLeNet] {\includegraphics[width=0.49\textwidth]{images/exp1-googlenet.png}} 
+\subfigure[DenseNet121] {\includegraphics[width=0.49\textwidth]{images/exp1-densenet.png}}
+\subfigure[VGG11] {\includegraphics[width=0.49\textwidth]{images/exp1-vgg.png}}
 \caption{\centering Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}
 \label{fig:exp1}
 \end{figure}
 
 Having verified the possible existence of low-dimensional optimization trajectories, we now focus on using these findings to design powerful optimization methods. As of now, training in low-dimensional subspaces was always preceded by a heavy sampling stage based on regular SGD training. As illustrated in figure \ref{fig:exp1}, the actual training in the low-dimensional subspace seems to happen pretty fast. Thus, to design a cost efficient but powerful low-dimensional optimization method, it is key to minimize the computational effort spent on subspace extraction. Recall that the subspace extraction is achieved by the DLDR algorithm in which the key challenge consists of finding a suitable dimension, generating meaningful samples and extracting an orthonormal basis via principal component analysis. \\
 
-To investigate the complexity of DLDR empirically, we compare the wall-clock time spent on sampling the parameters to the time spent on performing PCA on these samples. Note that generating one sample corresponds to training for one epoch of SGD. For the PCA we analyze the extraction of 40-dimensional subspaces based on $t=50, 100, 150, 200$ samples which includes singular value decomposition of $(t+1) \times (t+1)$ matrices. Both, the parameter sampling and the PCA are performed on the GPU. The results are reported in table \ref{tab:dldr}.
+To empirically investigate the complexity of DLDR, we compare the wall-clock time spent on sampling the parameters to the time spent on performing PCA on these samples. Note that generating one sample corresponds to training for one epoch of SGD. For the PCA we analyze the extraction of 40-dimensional subspaces based on $t=50, 100, 150, 200$ samples which includes singular value decomposition of $(t+1) \times (t+1)$ matrices. Both, the parameter sampling and the PCA are performed on the GPU. The results are reported in table \ref{tab:dldr}.
 
 \begin{table}[!h]
 \begin{tabu} to \textwidth { l | r | c | X[c] X[c] X[c] X[c] }
@@ -1661,23 +1661,23 @@ To investigate the complexity of DLDR empirically, we compare the wall-clock tim
 \multirow{2}{*}{\textcolor{white}{$\Big |$}models}& \multirow{2}{*}{\#params} & training time & \multicolumn{4}{c}{\textcolor{white}{$\Big |$} PCA time for \#samples \textcolor{white}{$\Big |$}} \\
 & & \textcolor{white}{$\Big |$} per epoch \textcolor{white}{$\Big |$} &50 & 100 & 150 & 200 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M &  &  &  & \\
-\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M &  &  &  &  & \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M &  &  &  &  & \\
+\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 16.830 & 0.016 & 0.020 & 0.023 & 0.043 \\
+\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M & 20.707 & 0.012 & 0.020 & 0.018 & 0.022 \\
+\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M & 16.237 & 0.020 & 0.023 & 0.030 & 0.104 \\
+\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 23.132 & 0.018 & 0.028 & 0.051 & 0.190 \\
+\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M & 28.068 & 0.025 & 0.030 & 0.048 & 0.051 \\
+\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M & 43.932 & 0.027 & 0.033 & 0.245 & 0.226 \\
+\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M & 18.377 & 0.027 & 0.250 & 0.219 & 0.081 \\
+\textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M & 31.819 & 0.412 & 0.759 & 0.473 & 0.634 \\
+\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M & 68.253 & 0.050 & 0.584 & 0.513 & 0.677 \\
+\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M & 14.528 & 0.049 & 0.076 & 0.647 & 0.654 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering DLDR time consumption in seconds (s) to extract 40-dimensional subspaces for training on CIFAR-100.}
 \label{tab:dldr}}
 \end{table}
 
-The complexity of generating $t$ samples far exceeds the complexity of performing PCA on these samples, which coincides with the theoretical analysis from section \ref{sec:DLDR}. Even in the worst case, which is extracting the subspace for VGG11 based on 50 samples only, the sampling stage consumes more than 50x the time needed for PCA. Therefore, for our purpose of designing a cost efficient but powerful low-dimensional optimization method, we should focus on minimizing the number of SGD epochs trained during the sampling stage. As of now, the subspace dimension was chosen by random guessing and the samples were generated by a very naive technique, namely sampling once after each epoch. With regard to that, the upcoming experiments focus on addressing the following two main questions.
+The complexity of generating $t$ samples far exceeds the complexity of performing PCA on these samples, which coincides with the theoretical analysis from section \ref{sec:DLDR}. Therefore, for our purpose of designing a cost efficient but powerful low-dimensional optimization method, we should focus on minimizing the number of SGD epochs trained during the sampling stage. As of now, the subspace dimension was chosen by random guessing and the samples were generated by a very naive technique, namely sampling once after each epoch. With regard to that, the upcoming experiments focus on addressing the following two main questions.
 
 \begin{center}
 Which strategy should be used for sampling? \\
@@ -1695,73 +1695,79 @@ Sampling once after each epoch of SGD as in \cite{Paper} is a very basic stratge
 \textcolor{white}{$\Big |$} model & \multicolumn{2}{c|}{\#sampling epochs} & \multicolumn{5}{c}{\#sampling epochs} \\
 \textcolor{white}{$\Big |$}& 50 & 100 & 50 & 75 & 100 & 125 & 150 \\
 \multicolumn{8}{c}{} \\ [-2.5ex] \hline \multicolumn{8}{c}{} \\ [-2.5ex]
-\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}Xception \cite{Xception} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} &  &  &  &  &  &  &  \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} &  &  &  &  &  &  &  \\
+\textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 69.45 & 71.70 & 70.19 & 71.55 & 71.99 & 72.36 & 72.52 \\
+\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 72.13 & 73.54 & 72.27 & 72.98 & 73.42 & 73.33 & 73.35 \\
+\textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 67.01 & 68.76 & 67.81 & 68.60 & 68.63 & 68.89 & 68.92 \\
+\textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 71.52 & 73.47 & 72.15 & 72.90 & 73.66 & 74.05 & 74.15 \\
+\textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 75.67 & 77.22 & 75.85 & 76.65 & 77.16 & 77.19 & 77.13 \\
+\textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 74.62 & 74.71 & 74.54 & 74.55 & 74.48 & 74.52 & 74.49  \\
+\textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 74.94 & 75.59 & 74.99 & 75.58 & 75.59 & 75.70 & 75.79 \\
+\textcolor{white}{$\Big |$}Xception \cite{Xception} & 75.35 & 75.55 & 75.66 & 75.54 & 75.59 & 75.64 & 75.58 \\
+\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 73.78 & 75.89 & 74.72 & 75.88 & 75.98 & 75.91 & 75.86 \\
+\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 69.94 & 71.14 & 69.98 & 70.91 & 71.22 & 71.21 & 71.24 \\
 \multicolumn{8}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering Maximal test accuracy on CIFAR-100 using 40 epochs of P-SGD training in 40-dimensional subspaces.}\label{tab:avg}}
 \end{table}
 
-Clearly, the performance for 50 and 100 epochs is slightly better when using the average sampling strategy rather than the discrete one. Another finding is, that ...
+Generally, the performance of training in subspaces extracted based on 50 samples seems to be better when using the average sampling technique rather than the discrete one. For 100 samples however there seems to be no big difference at all. Presumably the averaging effect indirectly occurs for the discrete sampling strategy too, due to the larger number of samples. For the following experiments, we will always use the average sampling technique. \\
 
-\pagebreak
-Two address the two main questions, we compare the performance of training in subspaces of various dimensions using several sampling strategies. We step back to the setting in the motivational experiment, which is training a ResNet8 on CIFAR-10. Hyperparameters are also adopted. For reasons of comparability, in all of these experiments we sample based on the same optimization trajectory of 30 epochs length. However, to allow for larger subspaces and to investigate several sampling strategies, we vary the frequency of samplings per epoch from 1 to 50. This enables us to generate up to 1500 samples during the first 30 epochs of regular training with SGD. Note that with a batch size of 128, one epoch consist of 391 batches, such that a frequency of 50 samples per epoch roughly translates to sampling after 8 batches each. Sampling even more frequently makes no sense, since the distance between samples would become too small. Similar to the motivational experiment, we use these samples to extract the lower-dimensional subspaces. The detailed approach is to test all sampling strategies for training in spaces of various dimensions, ranging from 5 up to 1000. The maximal test accuracy after 40 epochs of training with P-SGD is reported in table \ref{tab:dim}.
+Another finding is, that the number of samples needed to extract the subspace differs from model to model. For example the performance of SqueezeNet is significantly better, the more samples are used for the subspace extraction where as 50 or even fewer samples seem to be sufficient for the DenseNet121. Further experiments on the length of the optimization trajectory needed for the subspace extraction will be conducted later on. But first let us investigate further sampling strategies and analyze different choices of subspace dimensions.
+
+Two address the two main questions, we compare the performance of training in subspaces of various dimensions using several sampling strategies. We step back to the setting in the motivational experiment, which is training a ResNet8 on CIFAR-10. Hyperparameters are also adopted. For reasons of comparability, in all of these experiments we sample based on the same optimization trajectory of 30 epochs length. However, to allow for larger subspaces and to investigate several sampling strategies, we vary the frequency of samples per epoch from 1 to 50. This enables us to generate up to 1500 samples during the first 30 epochs of regular training with SGD. Note that with a batch size of 128, one epoch consist of 391 batches, such that a frequency of 50 samples per epoch roughly translates to sampling after 8 batches each. Sampling even more frequently makes no sense, since the distance between samples would become too small. Similar to the motivational experiment, we use these samples to extract the lower-dimensional subspaces. The detailed approach is to test all sampling strategies for training in spaces of various dimensions, ranging from 2 up to 1000. The maximal test accuracy after 40 epochs of training with P-SGD is reported in table \ref{tab:dim}.
 
 \begin{table}[h]
 \begin{tabu} to \textwidth { l r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] | r }
 \hline \hline \multicolumn{11}{c}{} \\ [-2.5ex]
 & & \multicolumn{8}{c|}{dimension of subspace} & \textcolor{white}{$\Big |$} \\
-& & 5 & 10 & 15 & 25 & 50 & 100 & 500 & 1000 & best \textcolor{white}{$\Big |$} \\
+& & 2 & 5 & 15 & 25 & 50 & 100 & 500 & 1000 & best \textcolor{white}{$\Big |$} \\
 \multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
 \multirow{7}{*}{\rotatebox[origin=c]{90}{\#samples}}
-&     30 &  &  &  &  & - & - & - & - &  \textcolor{white}{$\Big |$} \\
-&     60 &  &  &  &  &  & - & - & - &  \textcolor{white}{$\Big |$} \\ 
-&     90 &  &  &  &  &  & - & - & - &  \textcolor{white}{$\Big |$} \\
-&   150 &  &  &  &  &  &  & - & - &  \textcolor{white}{$\Big |$} \\ 
-&   300 &  &  &  &  &  &  & - & - &  \textcolor{white}{$\Big |$} \\
-&   900 &  &  &  &  &  &  &  & - &  \textcolor{white}{$\Big |$} \\
-& 1500 &  &  &  &  &  &  &  &  &  \textcolor{white}{$\Big |$} \\
+&     30 & 50.15 & 85.44 & 85.22 & 85.16 & - & - & - & - & 85.44 \textcolor{white}{$\Big |$} \\
+&     60 & 59.57 & 85.36 & 85.26 & 85.13 & 85.15 & - & - & - & 85.36 \textcolor{white}{$\Big |$} \\ 
+&     90 & 63.71 & 85.42 & 85.27 & 85.15 & 85.10 & - & - & - & 85.42 \textcolor{white}{$\Big |$} \\
+&   150 & 69.48 & 85.43 & 85.27 & 85.13 & 85.08 & 85.14 & - & - & 85.43 \textcolor{white}{$\Big |$} \\ 
+&   300 & 76.16 & 85.47 & 85.27 & 85.15 & 85.14 & 85.14 & - & - & 85.47 \textcolor{white}{$\Big |$} \\
+&   900 & 83.41 & 85.45 & 85.29 & 85.12 & 85.20 & 85.09 & 85.14 & - & 85.45 \textcolor{white}{$\Big |$} \\
+& 1500 & 85.43 & 85.44 & 85.33 & 85.14 & 85.20 & 85.15 & 85.28 & 85.42 & 85.44 \textcolor{white}{$\Big |$} \\
 \multicolumn{11}{c}{} \\ [-2.5ex] \hline \multicolumn{11}{c}{} \\ [-2.5ex]
-&  best &  &  &  &  &  &  &  &  &  \textcolor{white}{$\Big |$} \\
+&  best & 85.43 & 85.47 & 85.33 & 85.16 & 85.20 & 85.15 & 85.28 & 85.42 & 85.47 \textcolor{white}{$\Big |$} \\
 \multicolumn{11}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \caption{Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}
 \label{tab:dim}
 \end{table}
  
-The experiment empirically provides three major findings. The first one is based on the last row in table \ref{tab:dim}. Clearly, for ResNet8, there seems to be no big difference in performance when training in a subspace of arbitrary dimension between 10 and 1000. However, this is based on an appropriate sampling strategy, that varies from space to space. Furthermore, the 5-dimensional subspace is too small to cover the optimization trajectory. This coincides with the PCA variance ratios illustrated in figure \ref{fig:exp0-pca}. The second finding is based on the last column of table \ref{tab:dim}. Also, for ResNet8, there seems to be no big difference in performance when using different sampling strategies. However, this is based on an appropriate space size, that varies from strategy to strategy. Note that these two findings strongly relate to each other. The third and final finding is a combination of the previous two findings. Especially for the spaces of dimension 5 to 25 it seems to be the case, that given a fixed dimension of the subspace, the performance is better, when only a small number of samples is used for the subspace extraction. Formulated the other way around, given a fixed number of samples, the performance seems to be better when training in a space of larger dimension. Note that the third finding does not contradict the results in table \ref{tab:psgd-2}, where the performance was better when using more samples. The key difference is that we increase the number of samples during a fixed optimization trajectory of 30 epochs length, where as in table \ref{tab:psgd-2} the optimization trajectory was extended from 50 to 100 epochs, explaining the improved results.
+The experiment empirically provides three major findings. The first one is based on the last column in table \ref{tab:dim}. Clearly, for ResNet8, there seems to be no big difference in performance when using different frequencies of samples per epoch. The second finding is based on the last row of table \ref{tab:dim}. Also, for ResNet8, there seems to be no big difference in performance when training in a subspace of arbitrary dimension between 5 and 1000. Note that the best results were achieved by training in a subspace of dimension 5 which could be explained by some kind of noise reduction due to only few variables being optimized. The third and final finding is, that for most of the sampling strategies, a two-dimensional subspace does not sufficiently cover the optimization trajectory. However, it is remarkable that for higher sampling frequencies, ResNet8 can still be trained in just a two-dimensional subspace. \\
 
-Assuming that the findings in table \ref{tab:dim} translate to other architectures and data sets as well, we can formulate the following two approaches for our purpose of designing a cost efficient but powerful low-dimensional optimization method. Firstly, one should aim to find the smallest subspace dimension providing comparable performance to the full parameter training. Secondly, one should aim to generate only a few but high quality samples in the most cost efficient way. For the latter approach, optimizing cost efficiency translates to training as little epochs of regular SGD as possible. \\
+Assuming that the findings in table \ref{tab:dim} translate to other architectures and data sets as well, we can formulate the following approach for our purpose of designing a cost efficient but powerful low-dimensional optimization method. The dimension of the subspace should be chosen large enough, such that the frequency of samples per epoch does not matter and small enough, so that the computational effort is kept small. With respect to that choice, samples should be generated only once per epoch to further reduce the computational effort. Furthermore, the averaging sampling strategy should be applied. With respect to the findings in table \ref{tab:dim}, the optimal choice for ResNet8 would be a 5-dimensional subspace extracted based on 30 samples. \\
 
-With respect to these two approaches, we conduct a follow-up experiment on ResNet8. Its main focus is to investigate the necessary length of the optimization trajectory used for the subspace extraction. Note that table \ref{tab:psgd-2} already indicates a significant improvement when doubling the length from 50 epochs to 100 epochs. However, in the following experiment we are mainly interested in the early stages of samplings. The detailed procedure is to train ResNet8 via P-SGD for 40 epochs in subspaces of dimension 10, 15 and 25. For the subspace extraction we always use a fixed number of 30 samples. However, these samples are generated with several frequencies, translating to different number of epochs needed in the sampling stage. The results are reported in table \ref{tab:epochs}.
+Before we turn these discoveries into powerful optimization methods, we still have to investigate how many regular SGD epochs are needed to sufficiently extract the low-dimensional subspace. With respect to that we conduct a follow-up experiment on ResNet8. Its main focus is to investigate the spacial information included in the early stages of regular SGD training. Note that table \ref{tab:avg} already indicates that for certain models, the spacial information seems to still evolve after a lot of epochs. However, in the following experiment we are mainly interested in how much spacial information is contained in the early stages of training. The detailed procedure is to train ResNet8 via P-SGD for 40 epochs in subspaces of dimension 5, 15 and 25. For the subspace extraction we always use a fixed number of 30 samples. However, these samples are generated with several frequencies, translating to different number of epochs needed in the sampling stage. The results are reported in table \ref{tab:epochs}.
+
+%The experiment empirically provides three major findings. The first one is based on the last row in table \ref{tab:dim}. Clearly, for ResNet8, there seems to be no big difference in performance when training in a subspace of arbitrary dimension between 10 and 1000. However, this is based on an appropriate sampling strategy, that varies from space to space. Furthermore, the 5-dimensional subspace is too small to cover the optimization trajectory. This coincides with the PCA variance ratios illustrated in figure \ref{fig:exp0-pca}. The second finding is based on the last column of table \ref{tab:dim}. Also, for ResNet8, there seems to be no big difference in performance when using different sampling strategies. However, this is based on an appropriate space size, that varies from strategy to strategy. Note that these two findings strongly relate to each other. The third and final finding is a combination of the previous two findings. Especially for the spaces of dimension 5 to 25 it seems to be the case, that given a fixed dimension of the subspace, the performance is better, when only a small number of samples is used for the subspace extraction. Formulated the other way around, given a fixed number of samples, the performance seems to be better when training in a space of larger dimension. Note that the third finding does not contradict the results in table \ref{tab:psgd-2}, where the performance was better when using more samples. The key difference is that we increase the number of samples during a fixed optimization trajectory of 30 epochs length, where as in table \ref{tab:psgd-2} the optimization trajectory was extended from 50 to 100 epochs, explaining the improved results.
+
+%Assuming that the findings in table \ref{tab:dim} translate to other architectures and data sets as well, we can formulate the following two approaches for our purpose of designing a cost efficient but powerful low-dimensional optimization method. Firstly, one should aim to find the smallest subspace dimension providing comparable performance to the full parameter training. Secondly, one should aim to generate only a few but high quality samples in the most cost efficient way. For the latter approach, optimizing cost efficiency translates to training as little epochs of regular SGD as possible. \\
+
+%With respect to these two approaches, we conduct a follow-up experiment on ResNet8. Its main focus is to investigate the necessary length of the optimization trajectory used for the subspace extraction. Note that table \ref{tab:psgd-2} already indicates a significant improvement when doubling the length from 50 epochs to 100 epochs. However, in the following experiment we are mainly interested in the early stages of samplings. The detailed procedure is to train ResNet8 via P-SGD for 40 epochs in subspaces of dimension 10, 15 and 25. For the subspace extraction we always use a fixed number of 30 samples. However, these samples are generated with several frequencies, translating to different number of epochs needed in the sampling stage. The results are reported in table \ref{tab:epochs}.
 
 \begin{table} [h]
 \centering
 \begin{tabu} to 0.8\textwidth { c c c | X[c] X[c] X[c] }
 \hline \hline \multicolumn{6}{c}{} \\ [-2.5ex]
 \multicolumn{3}{c|}{ \textcolor{white}{$\Big |$} sampling strategy \textcolor{white}{$\Big |$}} & \multicolumn{3}{c}{dimension of subspace} \\
-\textcolor{white}{$\Big |$} frequency \textcolor{white}{$\Big |$} & \#epochs & \#samples & 10 & 15 & 25  \\
+\textcolor{white}{$\Big |$} frequency \textcolor{white}{$\Big |$} & \#epochs & \#samples & 5 & 15 & 25  \\
 \multicolumn{6}{c}{} \\ [-2.5ex] \hline \multicolumn{6}{c}{} \\ [-2.5ex]
-\textcolor{white}{$\Big |$}   1/epoch \textcolor{white}{$\Big |$} &  30  & 30 &  &  &  \\
-\textcolor{white}{$\Big |$}   2/epoch \textcolor{white}{$\Big |$} &  15  & 30 &  &  &  \\ 
-\textcolor{white}{$\Big |$}   3/epoch \textcolor{white}{$\Big |$} &  10  & 30 &  &  &  \\
-\textcolor{white}{$\Big |$}   5/epoch \textcolor{white}{$\Big |$} &    5  & 30 &  &  &  \\
-\textcolor{white}{$\Big |$} 10/epoch \textcolor{white}{$\Big |$} &    3  & 30 &  &  &  \\
+\textcolor{white}{$\Big |$}   1/epoch \textcolor{white}{$\Big |$} &  30  & 30 & 85.44 & 85.22 & 85.16 \\
+\textcolor{white}{$\Big |$}   2/epoch \textcolor{white}{$\Big |$} &  15  & 30 & 83.25 & 83.29 & 83.30 \\ 
+\textcolor{white}{$\Big |$}   3/epoch \textcolor{white}{$\Big |$} &  10  & 30 & 81.54 & 81.44 & 81.45 \\
+\textcolor{white}{$\Big |$}   5/epoch \textcolor{white}{$\Big |$} &    6  & 30 & 78.06 & 78.26 & 78.20 \\
+\textcolor{white}{$\Big |$} 10/epoch \textcolor{white}{$\Big |$} &    3  & 30 & 72.16 & 72.45 & 72.38 \\
 \multicolumn{6}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
-\centering \parbox{10cm}{\caption{\centering Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}}
-\label{tab:epochs}
+\centering \parbox{10cm}{\caption{\centering Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}\label{tab:epochs}}
 \end{table}
 
-Clearly, the performance decreases when using a smaller piece of the regular optimization trajectory for the subspace extraction. This is bad news for our purpose of cost efficient algorithm design, since the spacial information on the low-dimensional trajectory seems to evolve during the training with regular SGD and is not completely  included in the early epochs of training. Again, this is just an observation for ResNet8 on CIFAR-10. However, since this is a pretty simple task in terms of deep learning scenarios, it is very likely that these inconvenient properties translate to more sophisticated architectures and are even reinforced.
+Clearly, the performance decreases when using a smaller piece of the regular optimization trajectory for the subspace extraction. This is what we would expect with regard to the previous experiments. It is remarkable however, that training in a subspace, extracted based on the first 6 epochs of SGD training already yields more than 90\% of the performance of regular SGD training. This circumstance could be used to speed up the training.  \\ 
  
 %\begin{tabu} to \textwidth { r r | X[c] X[c] X[c] | X[c] X[c] X[c] | X[c] X[c] X[c] }
 %\hline \hline \multicolumn{11}{c}{} \\ [-2.5ex]
@@ -1780,7 +1786,11 @@ Clearly, the performance decreases when using a smaller piece of the regular opt
 %\end{tabu}
 
 \pagebreak
-\subsection{Algorithm Design}
+\subsection{Algorithm Design} \label{sec:design}
+
+Next, the prior findings will be used to finally design cost efficient but powerful low-dimensional optimization algorithms. The basic idea is still to use SGD to generate samples, extract a subspace based on these samples and finally train via P-SGD in the extracted low-dimensional subspace. As the computational effort spent on PCA computation is negligible by table \ref{tab:dldr}, one can focus on minimizing the computational effort spent on the sampling stage. For this, two different approaches will be tested. One of them is with regard to table \ref{tab:avg} and aims to determine the minimal length of the optimization trajectory needed, to provide good performance of P-SGD. The other approach is to speed-up the evolution of the optimization trajectory, so to generate the same information in a shorter period of time. \\
+
+Let us start with the second approach. In table \ref{tab:epochs}, we have seen that, at least for ResNet8, a lot of spacial information seems to be contained in the early epochs of SGD training. Since convergence happens a lot faster in low-dimensional subspaces, one could train a few epochs of SGD to extract an approximation of the optimal subspace and train a little in this approximated subspace to speed things up. Of course, training in the subspace won't provide further information on the optimization trajectory, so one should fall back to regular SGD training after a while to generate more samples. These could then be used to extract an improved approximation of the optimal subspace. An iterative application of this idea could reach a final performance comparable to regular SGD, while saving some time due to the fast convergence in subspaces. Of course, this is completely hypothetical so far and needs some practical investigation. Therefore, we train VGG11 for 20 epochs with SGD using the average sampling technique. Based on these 20 samples, we extract a 15-dimensional subspace to train 10 epochs of P-SGD in that subspace. Finally we train 10 further epochs of regular SGD. The learning rate is set to 0.1 both for SGD and P-SGD. The remaining experiment setup is adopted from section \ref{sec:verify}.
 
 \begin{figure}[!h]
 \centering
@@ -2054,12 +2064,12 @@ In conclusion...
 
 \begin{figure}[!h]
 \centering
-\subfigure[ShuffleNetv2] {\includegraphics[width=0.328\textwidth]{images/exp1-squeezenet.png}}
-\subfigure[MobileNet] {\includegraphics[width=0.328\textwidth]{images/exp1-squeezenet.png}}
-\subfigure[EfficientNet] {\includegraphics[width=0.328\textwidth]{images/exp1-vgg.png}}
-\subfigure[SEResNet18] {\includegraphics[width=0.328\textwidth]{images/exp1-densenet.png}}
-\subfigure[Xception] {\includegraphics[width=0.328\textwidth]{images/exp1-vgg.png}}
-\subfigure[Inceptionv3] {\includegraphics[width=0.328\textwidth]{images/exp1-densenet.png}}
+\subfigure[ShuffleNetv2] {\includegraphics[width=0.328\textwidth]{images/exp1-shufflenet.png}}
+\subfigure[MobileNet] {\includegraphics[width=0.328\textwidth]{images/exp1-mobilenet.png}}
+\subfigure[EfficientNet] {\includegraphics[width=0.328\textwidth]{images/exp1-efficientnet.png}}
+\subfigure[SEResNet18] {\includegraphics[width=0.328\textwidth]{images/exp1-seresnet.png}}
+\subfigure[Xception] {\includegraphics[width=0.328\textwidth]{images/exp1-xception.png}}
+\subfigure[Inceptionv3] {\includegraphics[width=0.328\textwidth]{images/exp1-inception.png}}
 \caption{\centering Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}
 \label{fig:exp1-app}
 \end{figure}
