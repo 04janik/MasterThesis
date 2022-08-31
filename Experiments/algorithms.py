@@ -273,7 +273,6 @@ def train_BSGD(args, model, train_loader, test_loader):
 
     # variables
     k = 0
-    min_loss = float('inf')
 
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:
@@ -283,7 +282,7 @@ def train_BSGD(args, model, train_loader, test_loader):
         while k < args.epochs:
 
             # progress bar
-            mbar = master_bar(range(5))
+            mbar = master_bar(range(10))
 
             for epoch in mbar:
 
@@ -337,165 +336,3 @@ def train_BSGD(args, model, train_loader, test_loader):
                 evaluater.eval_model(run)
 
                 k = k+1
-
-            loss = evaluater.get_loss()
-            print('current loss after P-SGD:', loss)
-
-            if loss < min_loss:
-                min_loss = loss
-                continue
-            else:
-                # select all samples
-                W = sample_manager.get_samples().cuda()
-
-                # perform PCA
-                S, V = pca(W)
-
-                # get dimension
-                d = get_best_dim(S, 0.95)
-                idx = torch.numel(S) - d
-
-                # determine basis
-                Q = torch.mm(W,V[:,idx:])
-                Q = torch.div(Q,S[idx:])
-                Q = Q.cuda()
-
-                print('W:', W.shape)
-                print('Q:', Q.shape)
-
-                # project parameters to subspace
-                param = utils.get_model_param_vec(model).float()
-                param = torch.mm(Q.transpose(0,1), param.reshape(-1,1))
-                param = torch.mm(Q, param)
-                utils.update_param(model, param)
-
-                # define optimizer for PSGD
-                optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom)
-
-                # progress bar
-                mbar = master_bar(range(10))
-
-                for epoch in mbar:
-
-                    # train for one epoch
-                    train_PSGD_epoch(Q, model, criterion, optimizer, train_loader, run, mbar)
-
-                    # evaluate the model
-                    evaluater.eval_model(run)
-
-                    k = k+1
-
-                break
-
-
-'''
-def train_BSGD(args, model, train_loader, test_loader):
-
-    model.train()
-
-    # construct name
-    model_name = model.__class__.__name__
-    run_name = f'{model_name}-BSGD-lr{args.lr}'
-
-    # configure training
-    criterion = torch.nn.CrossEntropyLoss().cuda()
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.mom, weight_decay=args.wd)
-    evaluater = Evaluater(model, criterion, test_loader, args.data)
-
-    # define sample manager
-    sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(utils.get_model_param_vec(model), 1), strategy=args.strat)
-
-    # variables
-    S_old = None
-    V_old = None
-    Q = None
-    k = 0
-
-    # configure monitoring tool
-    with wandb.init(project=model_name, name=run_name) as run:
-
-        run.watch(model)
-
-        while k < args.epochs:
-
-            # progress bar
-            mbar = master_bar(range(5))
-
-            for epoch in mbar:
-
-                # train for one epoch
-                train_SGD_epoch(model, criterion, optimizer, train_loader, run, mbar, sample_manager)
-
-                # evaluate the model
-                evaluater.eval_model(run)
-
-                k = k+1
-
-            # get samples from last 5 epochs
-            W = sample_manager.get_last_samples(epochs=5).cuda()
-
-            # perform PCA
-            S, V = pca(W)
-
-            run.log({'sigma_1': S[4]})
-            run.log({'sigma_2': S[3]})
-            run.log({'sigma_3': S[2]})
-            run.log({'sigma_4': S[1]})
-            run.log({'sigma_5': S[0]})
-
-            if V_old is not None:
-
-                # compute angles between current
-                # and previous principal components
-                angles = pc_angles(V_old, V)
-
-                if np.max(angles) < math.pi/180 and torch.max(torch.div(S,S_old)) < 1.02:
-
-                    # select all samples
-                    W = sample_manager.get_samples().cuda()
-
-                    # perform PCA
-                    S, V = pca(W)
-
-                    # get dimension
-                    d = get_best_dim(S, 0.95)
-                    idx = k - d + 1
-
-                    # determine basis
-                    Q = torch.mm(W,V[:,idx:])
-                    Q = torch.div(Q,S[idx:])
-                    Q = Q.cuda()
-
-                    print('W:', W.shape)
-                    print('Q:', Q.shape)
-                    break
-
-            S_old = S
-            V_old = V
-
-        # project parameters to subspace
-        param = utils.get_model_param_vec(model).float()
-        param = torch.mm(Q.transpose(0,1), param.reshape(-1,1))
-        param = torch.mm(Q, param)
-        utils.update_param(model, param)
-
-        for lr in [args.lr, 0.1*args.lr]:
-
-            print('Training 10 epochs of PSGD with learning rate:', lr)
-
-            # define optimizer for PSGD
-            optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=args.mom)
-
-            # progress bar
-            mbar = master_bar(range(10))
-
-            for epoch in mbar:
-
-                # train for one epoch
-                train_PSGD_epoch(Q, model, criterion, optimizer, train_loader, run, mbar)
-
-                # evaluate the model
-                evaluater.eval_model(run)
-
-                k = k+1
-'''

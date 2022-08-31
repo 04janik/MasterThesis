@@ -12,7 +12,6 @@ class Evaluater:
         self.acc_max = 0
         self.confusion = []
         self.epoch = 0
-        self.loss = 0
         self.targets = 10 if data_set == 'CIFAR10' else 100
 
     def eval_model(self, run):
@@ -24,14 +23,12 @@ class Evaluater:
         if train_mode:
             self.model.eval()
 
-        self.loss = 0
         self.confusion = np.zeros((self.targets,self.targets), dtype=np.int32)
 
         for inputs, labels in iter(self.test_loader):
 
             inputs = inputs.cuda()
             outputs = self.model(inputs)
-            self.loss = self.loss + self.criterion(outputs, labels)
 
             for label, output in zip(labels, outputs.cpu().detach().numpy()):
                 self.confusion[label, np.argmax(output)] += 1
@@ -43,6 +40,3 @@ class Evaluater:
             self.model.train()
 
         run.log({'accuracy': self.acc, 'max accuracy': self.acc_max, 'epoch': self.epoch})
-
-    def get_loss(self):
-        return self.loss

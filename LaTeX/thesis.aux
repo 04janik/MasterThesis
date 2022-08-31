@@ -3,6 +3,10 @@
 \@nameuse{bbl@beforestart}
 \providecommand*\new@tpo@label[2]{}
 \babel@aux{english}{}
+\citation{Paper}
+\citation{Paper}
+\citation{NTK}
+\citation{Paper}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {2}Neural Networks}{3}{}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Notation}{3}{}\protected@file@percent }
@@ -29,7 +33,7 @@
 \citation{SGD}
 \citation{Armijo}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Stochastic Gradient Descent (SGD) \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{12}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Backtracking Linesearch \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{12}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces Backtracking Line Search \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{12}{}\protected@file@percent }
 \citation{NTK}
 \@writefile{toc}{\contentsline {section}{\numberline {3}Training in the Function Space}{13}{}\protected@file@percent }
 \newlabel{sec:functionspace}{{3}{13}}
@@ -84,9 +88,9 @@
 \citation{SVD}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Singular Value Decomposition}{38}{}\protected@file@percent }
 \newlabel{thm:svd}{{4.1}{38}}
-\newlabel{cor:svd}{{4.3}{38}}
 \citation{SVD}
 \citation{SVD}
+\newlabel{cor:svd}{{4.3}{39}}
 \newlabel{def:rank}{{4.4}{39}}
 \newlabel{thm:eym}{{4.5}{39}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Low-Dimensional Trajectory Hypothesis}{40}{}\protected@file@percent }
@@ -184,33 +188,53 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Sampling Strategies}{55}{}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces \centering  Maximal test accuracy on CIFAR-100 using 40 epochs of P-SGD training in 40-dimensional subspaces.}}{55}{}\protected@file@percent }
 \newlabel{tab:avg}{{4}{55}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}}{56}{}\protected@file@percent }
-\newlabel{tab:dim}{{5}{56}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces \centering  Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD in subspaces extracted with average samples.}}{56}{}\protected@file@percent }
+\newlabel{tab:dim_avg}{{5}{56}}
 \@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces \centering  Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD for 40 epochs.}}{57}{}\protected@file@percent }
 \newlabel{tab:epochs}{{6}{57}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces \centering  Maximal test accuracy of ResNet8 trained on CIFAR-10 using P-SGD in 15D subspace for 40 epochs.}}{58}{}\protected@file@percent }
+\newlabel{tab:trajectories}{{7}{58}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Algorithm Design}{58}{}\protected@file@percent }
 \newlabel{sec:design}{{5.3}{58}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces \centering  To Do: Caption.}}{58}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {}}}{58}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {}}}{58}{}\protected@file@percent }
-\newlabel{fig:exp5}{{7}{58}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Application of Second-Order Information}{58}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {10}{\ignorespaces Name: TBD \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{61}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {11}{\ignorespaces Name: TBD \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{62}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {12}{\ignorespaces Name: TBD \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{63}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {13}{\ignorespaces Name: TBD \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{64}{}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {14}{\ignorespaces Name: TBD \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces \centering  Training performance of SqueezeNet using 1 epoch of P-SGD after each 10 epochs of SGD. }}{59}{}\protected@file@percent }
+\newlabel{fig:refinement}{{7}{59}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces \centering  Training performance of SqueezeNet using 3 batches of P-SGD (a) after each 10 epochs of SGD and (b) after each epoch of SGD. }}{60}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {}}}{60}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {}}}{60}{}\protected@file@percent }
+\newlabel{fig:refinement2}{{8}{60}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces \centering  PCA variance evolution of 5 epoch long pieces of the optimization trajectory.}}{61}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {$\sigma _1$}}}{61}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {$\sigma _2$}}}{61}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {$\sigma _3$}}}{61}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {$\sigma _4$}}}{61}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(e)}{\ignorespaces {$\sigma _5$}}}{61}{}\protected@file@percent }
+\newlabel{fig:sigmas}{{9}{61}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {10}{\ignorespaces  \leavevmode {\color  {white}$\leavevmode@ifvmode {\setbox \z@ \hbox {\mathsurround \z@ $\nulldelimiterspace \z@ \left |\vcenter to1.5\big@size {}\right .$}\box \z@ }$}}}{63}{}\protected@file@percent }
 \citation{Functionals}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{66}{}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces \centering  Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {ShuffleNetv2}}}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {MobileNet}}}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {EfficientNet}}}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {SEResNet18}}}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(e)}{\ignorespaces {Xception}}}{66}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {subfigure}{\numberline{(f)}{\ignorespaces {Inceptionv3}}}{66}{}\protected@file@percent }
-\newlabel{fig:exp1-app}{{8}{66}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{64}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces \centering  Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {ShuffleNetv2}}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {MobileNet}}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {EfficientNet}}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {SEResNet18}}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(e)}{\ignorespaces {Xception}}}{65}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(f)}{\ignorespaces {Inceptionv3}}}{65}{}\protected@file@percent }
+\newlabel{fig:exp1-app}{{10}{65}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces \centering  PCA variance evolution of 5 epoch long pieces of the optimization trajectory.}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {$\sigma _1$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {$\sigma _2$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {$\sigma _3$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {$\sigma _4$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(e)}{\ignorespaces {$\sigma _5$}}}{66}{}\protected@file@percent }
+\newlabel{fig:sigmas-app1}{{11}{66}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces \centering  PCA variance evolution of 5 epoch long pieces of the optimization trajectory.}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {$\sigma _1$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {$\sigma _2$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {$\sigma _3$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(d)}{\ignorespaces {$\sigma _4$}}}{66}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {subfigure}{\numberline{(e)}{\ignorespaces {$\sigma _5$}}}{66}{}\protected@file@percent }
+\newlabel{fig:sigmas-app2}{{12}{66}}
 \bibcite{Paper}{1}
 \bibcite{GD}{2}
 \bibcite{ConvexOptimization}{3}
@@ -238,4 +262,4 @@
 \bibcite{Xception}{25}
 \bibcite{Inception}{26}
 \bibcite{VGG}{27}
-\gdef \@abspage@last{71}
+\gdef \@abspage@last{68}

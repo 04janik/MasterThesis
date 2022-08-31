@@ -1,4 +1,4 @@
-\babel@toc {english}{}\relax 
+\babel@toc {english}{}
 \contentsline {section}{\numberline {1}Introduction}{2}{}%
 \contentsline {section}{\numberline {2}Neural Networks}{3}{}%
 \contentsline {subsection}{\numberline {2.1}Notation}{3}{}%
@@ -19,6 +19,5 @@
 \contentsline {subsection}{\numberline {5.1}Verification on Various Architectures}{51}{}%
 \contentsline {subsection}{\numberline {5.2}Sampling Strategies}{55}{}%
 \contentsline {subsection}{\numberline {5.3}Algorithm Design}{58}{}%
-\contentsline {subsection}{\numberline {5.4}Application of Second-Order Information}{58}{}%
-\contentsline {section}{\numberline {6}Conclusion}{66}{}%
-\contentsline {section}{\numberline {A}Appendix}{66}{}%
+\contentsline {section}{\numberline {6}Conclusion}{64}{}%
+\contentsline {section}{\numberline {A}Appendix}{65}{}%
