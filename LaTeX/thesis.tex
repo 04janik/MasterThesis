@@ -1726,16 +1726,16 @@ Therefore, we train a SqueezeNet for 10 epochs with SGD to generate 10 samples. 
 \parbox{12cm}{\centering \caption{\centering Training performance of SqueezeNet using 1 intermediate epoch of P-SGD after each 10 epochs of SGD. \label{fig:refinement}}}
 \end{figure}
 
-Figure \ref{fig:refinement} illustrates the performance of this procedure. As expected, once the P-SGD training starts, both test accuracy and loss experience a jump due to the faster convergence in the subspace. Unfortunately, however, when falling back to regular SGD training, we lose the progress made during the P-SGD phase and the performance decreases to its level prior to the P-SGD phase. One explanation for this could be the following. Casually speaking, when training in an approximation of the true subspace, we are optimizing in the wrong direction, so once we fall back to regular SGD training we have to adapt the training direction and lose the progress made. To ensure that we don't optimize too far in the wrong direction, the same experiment is re-run, but the P-SGD phase is shortened to just one single batch. Also, since the PCA computation costs almost nothing, we conduct another experiment where 10 initial SGD epochs are trained to get rid of the initial randomness. After that, we train one intermediate batch of P-SGD after each epoch of regular SGD.
+Figure \ref{fig:refinement} illustrates the performance of this procedure. As expected, once the P-SGD training starts, both test accuracy and loss experience a jump due to the faster convergence in the subspace. Unfortunately, however, when falling back to regular SGD training, we lose the progress made during the P-SGD phase and the performance decreases to its level prior to the P-SGD phase. One explanation for this could be the following. Casually speaking, when training in an approximation of the true subspace, we are optimizing in the wrong direction, so once we fall back to regular SGD training we have to adapt the training direction and lose the progress made. To ensure that we don't optimize too far in the wrong direction, the same experiment is re-run, but the P-SGD phase is shortened to just three batches. Also, since the PCA computation costs almost nothing, we conduct another experiment where 10 initial SGD epochs are trained to get rid of the initial randomness. After that, we train three intermediate batches of P-SGD after each epoch of regular SGD.
 
 \begin{figure}[!h]
 \centering
-\subfigure[] {\includegraphics[width=0.49\textwidth]{images/exp5-loss.png}}
-\subfigure[] {\includegraphics[width=0.49\textwidth]{images/exp5-loss.png}}
-\parbox{14.5cm}{\centering \caption{\centering Training performance of SqueezeNet using 1 intermediate batch of P-SGD (a) after each 10 epochs of SGD and (b) after each epoch of SGD. \label{fig:refinement2}}}
+\subfigure[] {\includegraphics[width=0.49\textwidth]{images/exp6-acc1.png}}
+\subfigure[] {\includegraphics[width=0.49\textwidth]{images/exp6-acc2.png}}
+\parbox{14.5cm}{\centering \caption{\centering Training performance of SqueezeNet using 3 intermediate batches of P-SGD (a) after each 10 epochs of SGD and (b) after each epoch of SGD. \label{fig:refinement2}}}
 \end{figure}
 
-Figure \ref{fig:refinement2} illustrates that, again, right after the P-SGD training, the test accuracy peaks but decreases immediately once the next SGD phase starts. Overall the maximal performance is better than the performance of regular SGD training due to the break-outs through P-SGD. The performance during the SGD phases however is similar to the performance of regular SGD training. As a consequence, for the purpose of speeding up the optimization trajectories evolution, we can not detect any advantages of this procedure over regular SGD training.
+Figure \ref{fig:refinement2} illustrates that, again, right after the P-SGD training, the test accuracy peaks but decreases immediately once the next SGD phase starts. Though the peaks are smaller, indicating that we do not train too long in the subspace. Nonetheless, the performance during the SGD phases is similar to the performance of regular SGD training. As a consequence, for the purpose of speeding up the optimization trajectories evolution, we can not detect any advantages of this procedure over regular SGD training.
 
 We conclude that speeding up the generation of samples by iterative space refinements is not an option. At least not in the proposed manner. Nonetheless, the experiment indicates that training in low-dimensional subspaces can start at any time during regular SGD training and does not have to be conducted from scratch. Also, training in the projected subspace at any time during regular SGD training leads to a significant improvement in performance. It thus might be a good practice to finish regular SGD training with a few final epochs of P-SGD to maximize the performance. \\
 
@@ -1760,7 +1760,7 @@ With regard to the findings in table \ref{tab:avg}, the subspace and thus the si
 \label{fig:sigmas}
 \end{figure}
 
-Based on these charts it is hard to decide the number of samples that are sufficient for the subspace extraction. Nonetheless, we can formulate some observations. Naturally, in the early epochs, there seems to be a lot of change due to random initialization. After some epochs of training, however, things seem to stabilize and the singular values settle down in a certain region. For the DenseNet121 this stabilization seems to happen around the 50th sample. For the SqueezeNet however, the singular values seem to experience a slight constant growth over time and stabilization occurs only at the end. This coincides with our expectations. Of course, detecting these observations during the training is pretty challenging and does not provide a sophisticated decision criterium yet. Anyhow the experiment indicates that the proposed ideas are worth further investigation and offer the potential to design a criterium to decide once the SGD sampling stage can be terminated. To summarize the previous ideas, we provide a sketched outline of a future low-dimensional training algorithm.
+Based on these charts it is hard to decide the number of samples that are sufficient for the subspace extraction. Nonetheless, we can formulate some observations. Naturally, in the early epochs, there seems to be a lot of change due to random initialization. After some epochs of training, however, things seem to stabilize and the singular values settle down in a certain region. For the DenseNet121 this stabilization seems to happen around the 50th sample. For the SqueezeNet however, the singular values seem to experience a slight constant growth over time and stabilization occurs only at the end. This coincides with our expectations. Of course, detecting these observations during the training is pretty challenging and does not provide a sophisticated decision criterium yet. Anyhow the experiment indicates that the proposed ideas are worth further investigation and offer the potential to design a criterium to decide once the SGD sampling stage can be terminated. To summarize the previous ideas, we provide a sketched outline of a future low-dimensional training algorithm. \\
 
 \begin{algorithm}
 \caption{ Sketch of Future Algorithm \textcolor{white}{$\Big |$}} \ \\
@@ -1815,22 +1815,22 @@ Possibilities for future works include the design of a criterium to decide once 
 
 \begin{figure}[!h]
 \centering
-\subfigure[$\sigma_1$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma1.png}}
-\subfigure[$\sigma_2$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma2.png}}
-\subfigure[$\sigma_3$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma3.png}}
-\subfigure[$\sigma_4$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma4.png}}
-\subfigure[$\sigma_5$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma5.png}}
+\subfigure[$\sigma_1$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma1-app1.png}}
+\subfigure[$\sigma_2$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma2-app1.png}}
+\subfigure[$\sigma_3$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma3-app1.png}}
+\subfigure[$\sigma_4$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma4-app1.png}}
+\subfigure[$\sigma_5$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma5-app1.png}}
 \caption{\centering PCA variance evolution of 5 epoch long pieces of the optimization trajectory.}
 \label{fig:sigmas-app1}
 \end{figure}
 
 \begin{figure}[!h]
 \centering
-\subfigure[$\sigma_1$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma1.png}}
-\subfigure[$\sigma_2$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma2.png}}
-\subfigure[$\sigma_3$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma3.png}}
-\subfigure[$\sigma_4$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma4.png}}
-\subfigure[$\sigma_5$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma5.png}}
+\subfigure[$\sigma_1$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma1-app2.png}}
+\subfigure[$\sigma_2$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma2-app2.png}}
+\subfigure[$\sigma_3$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma3-app2.png}}
+\subfigure[$\sigma_4$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma4-app2.png}}
+\subfigure[$\sigma_5$] {\includegraphics[width=0.328\textwidth]{images/exp7-sigma5-app2.png}}
 \caption{\centering PCA variance evolution of 5 epoch long pieces of the optimization trajectory.}
 \label{fig:sigmas-app2}
 \end{figure}
