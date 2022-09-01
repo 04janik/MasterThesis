@@ -1,4 +1,10 @@
 """
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
+"""
 Implementation of DenseNet121/169/201
 
 Reference:

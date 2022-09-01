@@ -1,6 +1,10 @@
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
 """squeezenet in pytorch
-
-
 
 [1] Song Han, Jeff Pool, John Tran, William J. Dally
 

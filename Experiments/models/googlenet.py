@@ -1,6 +1,10 @@
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
 """google net in pytorch
-
-
 
 [1] Christian Szegedy, Wei Liu, Yangqing Jia, Pierre Sermanet, Scott Reed,
     Dragomir Anguelov, Dumitru Erhan, Vincent Vanhoucke, Andrew Rabinovich.

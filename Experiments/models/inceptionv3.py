@@ -1,5 +1,10 @@
-""" inceptionv3 in pytorch
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
 
+""" inceptionv3 in pytorch
 
 [1] Christian Szegedy, Vincent Vanhoucke, Sergey Ioffe, Jonathon Shlens, Zbigniew Wojna
 

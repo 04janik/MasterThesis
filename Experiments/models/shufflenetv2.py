@@ -1,6 +1,10 @@
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
 """shufflenetv2 in pytorch
-
-
 
 [1] Ningning Ma, Xiangyu Zhang, Hai-Tao Zheng, Jian Sun
 

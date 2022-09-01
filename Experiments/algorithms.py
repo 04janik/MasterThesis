@@ -26,46 +26,6 @@ def pca(W):
     return S, V
 
 
-def pc_angles(V1, V2):
-
-    if V1.shape != V2.shape:
-        raise Exception('Angle computation failed: invalid shapes provided')
-
-    angles = []
-
-    for i in range(V1.shape[1]):
-
-        thetas = []
-
-        for j in range(V2.shape[1]):
-            theta = torch.acos(torch.dot(V1[:,i],V2[:,j]))
-            if abs(theta > math.pi/2):
-                theta = theta + math.pi/2 if theta < 0 else theta - math.pi/2
-            thetas.append(theta.item())
-
-        angles.append(np.min(thetas))
-
-    return angles
-
-
-def get_best_dim(S, precision=0.95):
-
-    d = 0
-    d_max = S.shape[0]
-
-    pca_var_d = 0
-    pca_var = torch.sum(S)
-
-    while pca_var_d < precision*pca_var:
-        d = d+1
-        pca_var_d = pca_var_d + S[d_max-d]
-
-    print('#samples:', d_max)
-    print('dimension:', d)
-
-    return d
-
-
 def get_subspace(args, model):
 
     # load the initialization
@@ -78,6 +38,7 @@ def get_subspace(args, model):
         sample = torch.unsqueeze(utils.get_model_param_vec(model), 1)
         W = torch.cat((W, sample), -1)
 
+    # move samples to cuda
     W = W.cuda()
 
     start = time.time()
@@ -93,15 +54,15 @@ def get_subspace(args, model):
 
     end = time.time()
     pca_time = end - start
-    print('PCA time consumed:', pca_time)
 
+    print('PCA time consumed:', pca_time)
     print('W:', W.shape)
     print('Q:', Q.shape)
 
     return Q, pca_time
 
 
-def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, sample_manager=None, evaluater=None):
+def train_SGD_epoch(model, criterion, optimizer, train_loader, run, master_bar, sample_manager=None):
 
     start = time.time()
 
@@ -137,7 +98,7 @@ def train_SGD(args, model, train_loader, test_loader):
     model_name = model.__class__.__name__
     run_name = f'{model_name}-SGD-lr{args.lr}'
 
-    # create directory for checkpoints
+    # create directory for samples
     run_path = os.path.join(args.rpath, run_name + '-' + args.strat + '-f' + str(args.freq))
     os.makedirs(run_path)
 
@@ -167,7 +128,7 @@ def train_SGD(args, model, train_loader, test_loader):
         for epoch in mbar:
 
             # train for one epoch
-            train_SGD_epoch(model, criterion, optimizer, train_loader, run, mbar, sample_manager, evaluater)
+            train_SGD_epoch(model, criterion, optimizer, train_loader, run, mbar, sample_manager)
 
             # evaluate the model
             evaluater.eval_model(run)
@@ -271,8 +232,7 @@ def train_BSGD(args, model, train_loader, test_loader):
     # define sample manager
     sample_manager = Sample_Manager(model, len(train_loader), freq=args.freq, W=torch.unsqueeze(utils.get_model_param_vec(model), 1), strategy=args.strat)
 
-    # variables
-    k = 0
+    k = 0 # count number of epochs
 
     # configure monitoring tool
     with wandb.init(project=model_name, name=run_name) as run:

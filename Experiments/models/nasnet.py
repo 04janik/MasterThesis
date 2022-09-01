@@ -1,6 +1,10 @@
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
 """nasnet in pytorch
-
-
 
 [1] Barret Zoph, Vijay Vasudevan, Jonathon Shlens, Quoc V. Le
 

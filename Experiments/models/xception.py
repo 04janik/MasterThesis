@@ -1,5 +1,10 @@
-"""xception in pytorch
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
 
+"""xception in pytorch
 
 [1] François Chollet
 

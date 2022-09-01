@@ -1,3 +1,9 @@
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
 import torch.nn as nn
 import math
 

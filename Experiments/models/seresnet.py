@@ -1,6 +1,10 @@
+"""
+####################################################################
+# This implementation is copied from: https://github.com/nblt/DLDR #
+####################################################################
+"""
+
 """senet in pytorch
-
-
 
 [1] Jie Hu, Li Shen, Samuel Albanie, Gang Sun, Enhua Wu
 
