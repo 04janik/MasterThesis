@@ -65,9 +65,9 @@ Deep Neural Networks usually contain a tremendous amount of parameters, leading 
 
 If this hypothesis holds, it would provide a new understanding of neural networks, both from a theoretical and practical perspective. According to \cite{Paper}, this includes generalization capability, implicit regularization, efficient learning algorithms, and much more. \\
 
-The goal of this thesis is to investigate the feasibility of training deep neural networks in low-dimensional subspaces both from a theoretical and practical perspective. For the theoretical investigation, we first study the training of neural networks in function spaces and introduce the Neural Tangent Kernel, which was first raised by Arthur Jacot, Franck Gabriel, and Cl\'{e}ment Hongler in ``Neural Tangent Kernel: Convergence and Generalization in Neural Networks'' \cite{NTK} from the year 2018. Based on the special properties of this kernel, we can theoretically motivate the existence of low-dimensional optimization trajectories in the infinite-width limit. In practical applications, however, the setting of infinite-width limit never applies. Therefore, the practical investigation is of great importance and will be conducted through various numerical experiments, indicating that the low-dimensional trajectory hypothesis could indeed hold. The practical exploration is predominantly based on the work of Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, and Xiaolin Huang in ``Low Dimensional Trajectory Hypothesis is True: DNNs can be Trained in Tiny Subspaces'' \cite{Paper} from the year 2022. The topic is thus characterized by high topicality and relevance. \\
+The goal of this thesis is to investigate the feasibility of training deep neural networks in low-dimensional subspaces both from a theoretical and practical perspective. For the theoretical investigation, we first study the training of neural networks in function spaces and introduce the Neural Tangent Kernel, which was first analysed by Arthur Jacot, Franck Gabriel, and Cl\'{e}ment Hongler in ``Neural Tangent Kernel: Convergence and Generalization in Neural Networks'' \cite{NTK} from the year 2018. Based on the special properties of this kernel, we can theoretically motivate the existence of low-dimensional optimization trajectories in the infinite-width limit. In practical applications, however, the setting of infinite-width limit never applies. Therefore, the practical investigation is of great importance and will be conducted through various numerical experiments, indicating that the low-dimensional trajectory hypothesis could indeed hold. The practical exploration is predominantly based on the work of Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, and Xiaolin Huang in ``Low Dimensional Trajectory Hypothesis is True: DNNs can be Trained in Tiny Subspaces'' \cite{Paper} from the year 2022. The topic is thus characterized by high topicality and relevance. \\
 
-In the following, we start by introducing the necessary notations for neural networks and proceed by presenting several algorithms for the training of neural networks in parameter spaces. To circumvent the problem of non-convexity we then analyze the kernel gradient descent algorithm, which is a theoretical approach to training neural networks in function spaces. Naturally, this leads to the definition of the Neural Tangent Kernel, which is used to theoretically motivate the existence of low-dimensional optimization trajectories. After these theoretical considerations, we move on to study the practical feasibility of training deep neural networks in low-dimensional subspaces. We introduce a method to extract appropriate subspaces and adapt widely known training techniques to these subspaces. Finally, these algorithms are extensively tested in various numerical experiments. The code is released on github\footnote{https://github.com/04janik/Master\_Thesis/Experiments}. Also, detailed results of all numerical experiments are published\footnote{https://wandb.ai/04janik}.
+In the following, we start by introducing the necessary notations for neural networks and proceed by presenting several algorithms for the training of neural networks in parameter spaces. To circumvent the problem of non-convexity we then analyze the kernel gradient descent algorithm, which is a theoretical approach to training neural networks in function spaces. Naturally, this leads to the definition of the Neural Tangent Kernel, which is used to theoretically motivate the existence of low-dimensional optimization trajectories. After these theoretical considerations, we move on to study the practical feasibility of training deep neural networks in low-dimensional subspaces. We introduce a method to extract appropriate subspaces and adapt widely known training techniques to these subspaces. Finally, these algorithms are extensively tested in various numerical experiments. The code is released on github\footnote{https://github.com/04janik/MasterThesis/tree/master/Experiments}. Also, detailed results of all numerical experiments are published\footnote{https://wandb.ai/04janik}.
 
 \section{Neural Networks}
 
@@ -163,7 +163,7 @@ Let $f: \R^n \to \R$ be differentiable. The gradient of $f$ is defined as
 \[ \nabla f : \R^n \to \R^n : x = (x_1, \dots, x_n) \mapsto \bigg [ \frac{\partial}{\partial x_1} f(x), \cdots, \frac{\partial}{\partial x_n} f(x) \bigg ]\tr . \]
 \end{definition}
 
-Due to the complexity of the error function, in general, there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first raised by Cauchy in \cite{GD}.
+Due to the complexity of the error function, in general, there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first introduced by Cauchy in \cite{GD}.
 
 \begin{algorithm}
 \caption{Gradient Descent \textcolor{white}{$\Big |$}} \ \\
@@ -378,7 +378,7 @@ as an approximation of $\nabla E(w_k)$. Although only a small amount of data is 
 
 Here, the number of epochs describes the number of complete passes through the training data set. Thus, on average, each  training sample will contribute $N$ times to the optimization process. In comparison to this, the classical gradient descent method uses the data of one epoch per iteration. A theoretical convergence analysis of stochastic gradient descent can be found in \cite{SGD} but would exceed the scope of this thesis. \\
 
-As of now, we have not discussed the choice of step sizes $\eta_k$ in any of the four optimization methods proposed so far. In machine learning scenarios, it is a common practice to choose a constant step size $\eta > 0$ for all parameter updates. Of course, there are better choices of step sizes rather than this naive approach. However, these often come with additional computational effort. A widely known technique for the choice of sophisticated step sizes is the backtracking line search, which was first raised in \cite{Armijo}. 
+As of now, we have not discussed the choice of step sizes $\eta_k$ in any of the four optimization methods proposed so far. In machine learning scenarios, it is a common practice to choose a constant step size $\eta > 0$ for all parameter updates. Of course, there are better choices of step sizes rather than this naive approach. However, these often come with additional computational effort. A widely known technique for the choice of sophisticated step sizes is the backtracking line search, which was first introduced in \cite{Armijo}. 
 \begin{algorithm} 
 \caption{Backtracking Line Search \textcolor{white}{$\Big |$}} \ \\
 \textcolor{white}{$\Big |$}\textbf{Input:} Differentiable $f: \R^n \to \R$, $x \in \R^n$, $\beta \in (0,1)$, $c \in (0,1)$ \\ 
@@ -1122,17 +1122,17 @@ This concludes the necessary theory on the Neural Tangent Kernel. Next, we will 
 \section{Training in Low-Dimensional Subspaces} \label{sec:subspaces}
 
 This section analyzes the training dynamics of deep neural networks, especially the occurring parameter training sequences.
-If not otherwise specified, the following work is based on \cite{Paper}, in which the hypothesis that deep neural networks can be trained in low-dimensional subspaces is raised. We start by giving an illustration of this hypothesis, followed by theoretical considerations on the existence of low-dimensional optimization trajectories. Finally, this leads to an algorithm for subspace extraction, which offers the possibility to train deep neural networks in subspaces so small, that second-order methods become applicable.
+If not otherwise specified, the following work is based on \cite{Paper}, in which the hypothesis that deep neural networks can be trained in low-dimensional subspaces is risen. We start by giving an illustration of this hypothesis, followed by theoretical considerations on the existence of low-dimensional optimization trajectories. Finally, this leads to an algorithm for subspace extraction, which offers the possibility to train deep neural networks in subspaces so small, that second-order methods become applicable.
 
 \subsection{Motivation}
 
-In the following, we denote a deep neural network's parameter training sequence after $t \in \N$ iterations as $(w_k)_{k=0}^t$ in $\R^n$. Such a sequence naturally arises during training of the neural network via some reasonable iterative optimization method, such as stochastic gradient descent. \\
+In the following, we denote a deep neural network's parameter training sequence after $t \in \N$ iterations as $(w_k)_{k=0}^t$ in $\R^n$. Such a sequence naturally arises during training of the neural network via some reasonable iterative optimization method like stochastic gradient descent. \\
 
 In \cite{Paper}, it is argued that based on the nested construction of deep neural networks and the training of networks via error backpropagation, there has to be a lot of dependence and redundancy within the parameters of a deep neural network. This leads to the low-dimensional trajectory hypothesis, claiming that there exists a low-dimensional affine set that approximately covers the optimization trajectory $(w_k)_{k=0}^t$. An illustration of this hypothesis is given in figure \ref{fig:trajectory}, which was originally published in \cite{Paper} as figure 1.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.5\linewidth]{images/trajectory.png}
+\includegraphics[width=0.6\linewidth]{images/trajectory.png}
 \caption{Low-dimensional optimization trajectory}
 \label{fig:trajectory}
 \end{figure}  
@@ -1291,7 +1291,7 @@ we can let $\eta \to 0$, to derive the equation
 As a consequence, the training dynamics are governed by the differential equation
 \[ \partial_tw_t = -\nabla E (w_t ). \]
 A basic application of the chain rule yields
-\[ \partial_t w_t = -\nabla E (w_t ) = \sum_{i=1}^{m} \nabla_w f(x_i,w_t) \cdot \partial_x \ell \big ( f(x_i,w_t), y_i \big ), \]
+\[ \partial_t w_t = -\nabla E (w_t ) = - \sum_{i=1}^{m} \nabla_w f(x_i,w_t) \cdot \partial_x \ell \big ( f(x_i,w_t), y_i \big ), \]
 where $\partial_x \ell$ denotes the partial derivative of the loss function with respect to the first argument. Note that we are still in the one-dimensional setting, such that $\partial_x \ell$ can equivalently be interpreted as the gradient $\nabla_x \ell$. To explain the main idea of dimensionality reduction, we have to present this gradient flow in terms of vectors and matrices. Therefore, we let
 \[ \nabla_w f(\X, w_t)\tr \coloneq \Big [ \nabla_wf(x_1,w_t), \dots, \nabla_wf(x_m, w_t) \Big ] \in \R^{n \times m} \]
 denote the gradients of $f$ at $w_t$ on the training data set $\X$ and
@@ -1300,9 +1300,9 @@ denote the gradients of $\ell$ with respect to the first argument. This yields t
 \[ \partial_tw_t = - \nabla_w f(\X, w_t)\tr \cdot \nabla_{f(\X,w_t)} E. \]
 
 Based on this differential equation we can use the previously seen properties of the Neural Tangent Kernel to motivate the existence of low-dimensional optimization trajectories and to explain the approach of dimensionality reduction. For this, we denote the parallelized outputs
-\[ \tilde{f}: \R^{n} \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]\tr , \]
+\[ \hat{f}: \R^{n} \to \R^m : w \mapsto \Big [ f(x_1,w), \dots, f(x_m,w) \Big ]\tr , \]
 such that for given $w \in \R^n$, by definition \ref{def:ntk} the Neural Tangent Kernel translates to
-\[ \Theta_{w} = \sum_{i=1}^{n} \partial_{w_i} \tilde{f}(w) \otimes \partial_{w_i} \tilde{f}(w) = \nabla_wf(\X,w) \cdot \nabla_wf(\X,w)\tr. \]
+\[ \Theta_{w} = \sum_{i=1}^{n} \partial_{w_i} \hat{f}(w) \otimes \partial_{w_i} \hat{f}(w) = \nabla_wf(\X,w) \cdot \nabla_wf(\X,w)\tr. \]
 In the setting of theorem \ref{thm:ntk}, we have seen that, in the infinite width limit, the Neural Tangent Kernel converges to a deterministic limiting kernel. Thus, in this limit, we have
 \[ \nabla_wf(\X,w_t) \cdot \nabla_wf(\X,w_t)\tr = \Theta_t = \Theta_0 = \nabla_wf(\X,w_0) \cdot \nabla_wf(\X,w_0)\tr, \] 
 such that, ideally, the dynamics of gradient flow are governed by
@@ -1549,7 +1549,7 @@ Clearly, the experiments indicate a comparable performance of training in a 40-d
 \begin{figure}[!h]
 \centering
 \subfigure[SqueezeNet] {\includegraphics[width=0.49\textwidth]{images/exp1-squeezenet.png}} %\vspace{15pt}
-\subfigure[GoogLeNet] {\includegraphics[width=0.49\textwidth]{images/exp1-googlenet.png}} 
+\subfigure[VGG11] {\includegraphics[width=0.49\textwidth]{images/exp1-vgg.png}} 
 \caption{\centering Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}
 \label{fig:exp1}
 \end{figure}
@@ -1561,7 +1561,7 @@ To empirically investigate the complexity of DLDR, we compare the wall-clock tim
 \begin{table}[!h]
 \begin{tabu} to \textwidth { l | r | c | X[c] X[c] X[c] X[c] }
 \hline \hline \multicolumn{7}{c}{} \\ [-2.5ex]
-\multirow{2}{*}{\textcolor{white}{$\Big |$}models}& \multirow{2}{*}{\#params} & training time & \multicolumn{4}{c}{\textcolor{white}{$\Big |$} PCA time for \#samples \textcolor{white}{$\Big |$}} \\
+\multirow{2}{*}{\textcolor{white}{$\Big |$}model}& \multirow{2}{*}{\#params} & training time & \multicolumn{4}{c}{\textcolor{white}{$\Big |$} PCA time for \#samples \textcolor{white}{$\Big |$}} \\
 & & \textcolor{white}{$\Big |$} per epoch \textcolor{white}{$\Big |$} &50 & 100 & 150 & 200 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
 \textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 16.830 & 0.016 & 0.020 & 0.023 & 0.043 \\

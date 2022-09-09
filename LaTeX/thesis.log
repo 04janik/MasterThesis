@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.16)  1 SEP 2022 20:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.16)  9 SEP 2022 21:30
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1352,14 +1352,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 1129--1130
 File: images/trajectory.png Graphic file (type png)
 <use images/trajectory.png>
 Package pdftex.def Info: images/trajectory.png  used on input line 1135.
-(pdftex.def)             Requested size: 220.50887pt x 190.25227pt.
+(pdftex.def)             Requested size: 264.61333pt x 228.30046pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 1140--1141
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1142--1143
 
  []
 
@@ -1372,6 +1367,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [37 <./images/trajectory.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1142--1143
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1144--1145
 
  []
@@ -1579,10 +1579,10 @@ File: images/exp1-squeezenet.png Graphic file (type png)
 <use images/exp1-squeezenet.png>
 Package pdftex.def Info: images/exp1-squeezenet.png  used on input line 1551.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
-<images/exp1-googlenet.png, id=204, 602.25pt x 341.275pt>
-File: images/exp1-googlenet.png Graphic file (type png)
-<use images/exp1-googlenet.png>
-Package pdftex.def Info: images/exp1-googlenet.png  used on input line 1552.
+<images/exp1-vgg.png, id=204, 602.25pt x 341.275pt>
+File: images/exp1-vgg.png Graphic file (type png)
+<use images/exp1-vgg.png>
+Package pdftex.def Info: images/exp1-vgg.png  used on input line 1552.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 1557--1558
@@ -1605,7 +1605,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
-[53 <./images/exp1-squeezenet.png> <./images/exp1-googlenet.png>]
+[53 <./images/exp1-squeezenet.png> <./images/exp1-vgg.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 1592--1593
 
  []
@@ -1926,26 +1926,27 @@ File: images/exp1-efficientnet.png Graphic file (type png)
 Package pdftex.def Info: images/exp1-efficientnet.png  used on input line 1844.
 
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
+<images/exp1-googlenet.png, id=290, 602.25pt x 341.275pt>
 File: images/exp1-googlenet.png Graphic file (type png)
 <use images/exp1-googlenet.png>
 Package pdftex.def Info: images/exp1-googlenet.png  used on input line 1845.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
-<images/exp1-densenet.png, id=290, 602.25pt x 341.275pt>
+<images/exp1-densenet.png, id=291, 602.25pt x 341.275pt>
 File: images/exp1-densenet.png Graphic file (type png)
 <use images/exp1-densenet.png>
 Package pdftex.def Info: images/exp1-densenet.png  used on input line 1846.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
-<images/exp1-seresnet.png, id=291, 602.25pt x 341.275pt>
+<images/exp1-seresnet.png, id=292, 602.25pt x 341.275pt>
 File: images/exp1-seresnet.png Graphic file (type png)
 <use images/exp1-seresnet.png>
 Package pdftex.def Info: images/exp1-seresnet.png  used on input line 1847.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
-<images/exp1-xception.png, id=292, 602.25pt x 341.275pt>
+<images/exp1-xception.png, id=293, 602.25pt x 341.275pt>
 File: images/exp1-xception.png Graphic file (type png)
 <use images/exp1-xception.png>
 Package pdftex.def Info: images/exp1-xception.png  used on input line 1848.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
-<images/exp1-inception.png, id=293, 602.25pt x 341.275pt>
+<images/exp1-inception.png, id=294, 602.25pt x 341.275pt>
 File: images/exp1-inception.png Graphic file (type png)
 <use images/exp1-inception.png>
 Package pdftex.def Info: images/exp1-inception.png  used on input line 1849.
@@ -1960,8 +1961,9 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [66 <./images/exp1-shufflenet.png> <./images/exp1-mobilenet.png> <./images/exp1
--efficientnet.png> <./images/exp1-densenet.png> <./images/exp1-seresnet.png> <.
-/images/exp1-xception.png> <./images/exp1-inception.png>]
+-efficientnet.png> <./images/exp1-googlenet.png> <./images/exp1-densenet.png> <
+./images/exp1-seresnet.png> <./images/exp1-xception.png> <./images/exp1-incepti
+on.png>]
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 13.59999pt, for example:
@@ -1990,10 +1992,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 8749 strings out of 478268
- 139842 string characters out of 5846347
+ 8756 strings out of 478268
+ 139999 string characters out of 5846347
  495748 words of memory out of 5000000
- 26765 multiletter control sequences out of 15000+600000
+ 26771 multiletter control sequences out of 15000+600000
  485405 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,20n,106p,1758b,494s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2020,10 +2022,10 @@ exmf-dist/fonts/type1/public/mathabx-type1/matha8.pfb></usr/local/texlive/2022/
 texmf-dist/fonts/type1/public/mathabx-type1/mathb10.pfb></usr/local/texlive/202
 2/texmf-dist/fonts/type1/public/mathabx-type1/mathx10.pfb></usr/local/texlive/2
 022/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (68 pages, 4351643 bytes).
+Output written on thesis.pdf (68 pages, 4457626 bytes).
 PDF statistics:
- 409 PDF objects out of 1000 (max. 8388607)
+ 411 PDF objects out of 1000 (max. 8388607)
  222 compressed objects within 3 object streams
  0 named destinations out of 1000 (max. 500000)
- 171 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 176 words of extra memory for PDF output out of 10000 (max. 10000000)
 
