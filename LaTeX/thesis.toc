@@ -5,7 +5,7 @@
 \contentsline {subsection}{\numberline {2.2}Training in the Parameter Space}{5}{}%
 \contentsline {section}{\numberline {3}Training in the Function Space}{13}{}%
 \contentsline {subsection}{\numberline {3.1}Motivation}{13}{}%
-\contentsline {subsection}{\numberline {3.2}Functional Derivative}{14}{}%
+\contentsline {subsection}{\numberline {3.2}Functional Derivatives}{14}{}%
 \contentsline {subsection}{\numberline {3.3}Reproducing Kernel Hilbert Space}{22}{}%
 \contentsline {subsection}{\numberline {3.4}Kernel Gradient Descent}{25}{}%
 \contentsline {subsection}{\numberline {3.5}Neural Tangent Kernel}{31}{}%
@@ -14,7 +14,7 @@
 \contentsline {subsection}{\numberline {4.2}Singular Value Decomposition}{38}{}%
 \contentsline {subsection}{\numberline {4.3}Low-Dimensional Trajectory Hypothesis}{40}{}%
 \contentsline {subsection}{\numberline {4.4}Dynamic Linear Dimensionality Reduction}{44}{}%
-\contentsline {subsection}{\numberline {4.5}DLDR-based Training Algorithms}{47}{}%
+\contentsline {subsection}{\numberline {4.5}Low-Dimensional Training Algorithms}{47}{}%
 \contentsline {section}{\numberline {5}Numerical Experiments}{50}{}%
 \contentsline {subsection}{\numberline {5.1}Verification on Various Architectures}{51}{}%
 \contentsline {subsection}{\numberline {5.2}Sampling Strategies}{54}{}%

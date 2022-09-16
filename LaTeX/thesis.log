@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.16)  9 SEP 2022 21:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.16)  16 SEP 2022 07:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1143,17 +1143,17 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [23]
-Underfull \hbox (badness 10000) in paragraph at lines 745--749
+Underfull \hbox (badness 10000) in paragraph at lines 745--747
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 750--751
+Underfull \hbox (badness 10000) in paragraph at lines 748--749
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 774--775
+Underfull \hbox (badness 10000) in paragraph at lines 772--773
 
  []
 
@@ -1168,7 +1168,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 [24]
 
 Package amsthm Warning: The \qedhere command may not work correctly here on inp
-ut line 779.
+ut line 777.
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1179,7 +1179,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [25]
-Underfull \hbox (badness 10000) in paragraph at lines 837--838
+Underfull \hbox (badness 10000) in paragraph at lines 835--836
 
  []
 
@@ -1192,12 +1192,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [26]
-Underfull \hbox (badness 10000) in paragraph at lines 844--845
+Underfull \hbox (badness 10000) in paragraph at lines 842--843
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 858--859
+Underfull \hbox (badness 10000) in paragraph at lines 856--857
 
  []
 
@@ -1210,7 +1210,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [27]
-Underfull \hbox (badness 10000) in paragraph at lines 878--879
+Underfull \hbox (badness 10000) in paragraph at lines 876--877
 
  []
 
@@ -1232,12 +1232,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [29]
-Underfull \hbox (badness 10000) in paragraph at lines 957--959
+Underfull \hbox (badness 10000) in paragraph at lines 955--957
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 964--965
+Underfull \hbox (badness 10000) in paragraph at lines 962--963
 
  []
 
@@ -1250,12 +1250,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [30]
-Underfull \hbox (badness 10000) in paragraph at lines 973--975
+Underfull \hbox (badness 10000) in paragraph at lines 971--973
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 986--987
+Underfull \hbox (badness 10000) in paragraph at lines 984--985
 
  []
 
@@ -1268,7 +1268,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [31]
-Underfull \hbox (badness 10000) in paragraph at lines 989--991
+Underfull \hbox (badness 10000) in paragraph at lines 987--989
 
  []
 
@@ -1290,17 +1290,17 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [33]
-Underfull \hbox (badness 10000) in paragraph at lines 1055--1057
+Underfull \hbox (badness 10000) in paragraph at lines 1053--1055
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1067--1068
+Underfull \hbox (badness 10000) in paragraph at lines 1065--1066
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1072--1073
+Underfull \hbox (badness 10000) in paragraph at lines 1070--1071
 
  []
 
@@ -1313,7 +1313,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [34]
-Underfull \hbox (badness 10000) in paragraph at lines 1094--1095
+Underfull \hbox (badness 10000) in paragraph at lines 1092--1093
 
  []
 
@@ -1326,12 +1326,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [35]
-Underfull \hbox (badness 10000) in paragraph at lines 1112--1113
+Underfull \hbox (badness 10000) in paragraph at lines 1110--1111
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1117--1118
+Underfull \hbox (badness 10000) in paragraph at lines 1115--1116
 
  []
 
@@ -1344,14 +1344,14 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [36]
-Underfull \hbox (badness 10000) in paragraph at lines 1129--1130
+Underfull \hbox (badness 10000) in paragraph at lines 1127--1128
 
  []
 
 <images/trajectory.png, id=145, 863.225pt x 744.7825pt>
 File: images/trajectory.png Graphic file (type png)
 <use images/trajectory.png>
-Package pdftex.def Info: images/trajectory.png  used on input line 1135.
+Package pdftex.def Info: images/trajectory.png  used on input line 1133.
 (pdftex.def)             Requested size: 264.61333pt x 228.30046pt.
 
 Underfull \hbox (badness 10000) in paragraph at lines 1140--1141
@@ -1372,12 +1372,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1142--1143
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1144--1145
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1168--1169
+Underfull \hbox (badness 10000) in paragraph at lines 1166--1167
 
  []
 
@@ -1417,7 +1412,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [41]
-Underfull \hbox (badness 10000) in paragraph at lines 1284--1286
+Underfull \hbox (badness 10000) in paragraph at lines 1282--1284
 
  []
 
@@ -1439,12 +1434,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [43]
-Underfull \hbox (badness 10000) in paragraph at lines 1325--1327
+Underfull \hbox (badness 10000) in paragraph at lines 1323--1325
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1329--1331
+Underfull \hbox (badness 10000) in paragraph at lines 1327--1329
 
  []
 
@@ -1466,7 +1461,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [45]
-Underfull \hbox (badness 10000) in paragraph at lines 1378--1379
+Underfull \hbox (badness 10000) in paragraph at lines 1376--1377
 
  []
 
@@ -1479,7 +1474,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [46]
-Underfull \hbox (badness 10000) in paragraph at lines 1413--1414
+Underfull \hbox (badness 10000) in paragraph at lines 1411--1412
 
  []
 
@@ -1492,12 +1487,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [47]
-Underfull \hbox (badness 10000) in paragraph at lines 1420--1422
+Underfull \hbox (badness 10000) in paragraph at lines 1418--1420
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1437--1438
+Underfull \hbox (badness 10000) in paragraph at lines 1435--1436
 
  []
 
@@ -1519,22 +1514,22 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [49]
-Underfull \hbox (badness 10000) in paragraph at lines 1475--1476
+Underfull \hbox (badness 10000) in paragraph at lines 1473--1474
 
  []
 
 <images/exp0-acc.png, id=189, 602.25pt x 335.2525pt>
 File: images/exp0-acc.png Graphic file (type png)
 <use images/exp0-acc.png>
-Package pdftex.def Info: images/exp0-acc.png  used on input line 1481.
+Package pdftex.def Info: images/exp0-acc.png  used on input line 1479.
 (pdftex.def)             Requested size: 216.1011pt x 120.2969pt.
 <images/exp0-pca.png, id=190, 602.25pt x 335.2525pt>
 File: images/exp0-pca.png Graphic file (type png)
 <use images/exp0-pca.png>
-Package pdftex.def Info: images/exp0-pca.png  used on input line 1482.
+Package pdftex.def Info: images/exp0-pca.png  used on input line 1480.
 (pdftex.def)             Requested size: 216.1011pt x 120.2969pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1487--1488
+Underfull \hbox (badness 10000) in paragraph at lines 1485--1486
 
  []
 
@@ -1547,12 +1542,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [50 <./images/exp0-acc.png> <./images/exp0-pca.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1497--1498
+Underfull \hbox (badness 10000) in paragraph at lines 1495--1496
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1499--1500
+Underfull \hbox (badness 10000) in paragraph at lines 1497--1498
 
  []
 
@@ -1577,20 +1572,20 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <images/exp1-squeezenet.png, id=203, 602.25pt x 341.275pt>
 File: images/exp1-squeezenet.png Graphic file (type png)
 <use images/exp1-squeezenet.png>
-Package pdftex.def Info: images/exp1-squeezenet.png  used on input line 1551.
+Package pdftex.def Info: images/exp1-squeezenet.png  used on input line 1549.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-vgg.png, id=204, 602.25pt x 341.275pt>
 File: images/exp1-vgg.png Graphic file (type png)
 <use images/exp1-vgg.png>
-Package pdftex.def Info: images/exp1-vgg.png  used on input line 1552.
+Package pdftex.def Info: images/exp1-vgg.png  used on input line 1550.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1557--1558
+Underfull \hbox (badness 10000) in paragraph at lines 1555--1556
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1559--1560
+Underfull \hbox (badness 10000) in paragraph at lines 1557--1558
 
  []
 
@@ -1606,12 +1601,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [53 <./images/exp1-squeezenet.png> <./images/exp1-vgg.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 1592--1593
+Underfull \hbox (badness 10000) in paragraph at lines 1590--1591
 
  []
 
 
-Overfull \hbox (1.63748pt too wide) in paragraph at lines 1595--1614
+Overfull \hbox (1.63748pt too wide) in paragraph at lines 1593--1612
  [][] 
  []
 
@@ -1619,7 +1614,7 @@ Overfull \hbox (1.63748pt too wide) in paragraph at lines 1595--1614
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1616--1617
+Underfull \hbox (badness 10000) in paragraph at lines 1614--1615
 
  []
 
@@ -1641,7 +1636,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [55]
-Underfull \hbox (badness 10000) in paragraph at lines 1641--1642
+Underfull \hbox (badness 10000) in paragraph at lines 1639--1640
 
  []
 
@@ -1654,12 +1649,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [56]
-Underfull \hbox (badness 10000) in paragraph at lines 1694--1695
+Underfull \hbox (badness 10000) in paragraph at lines 1692--1693
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1717--1718
+Underfull \hbox (badness 10000) in paragraph at lines 1715--1716
 
  []
 
@@ -1672,19 +1667,19 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [57]
-Underfull \hbox (badness 10000) in paragraph at lines 1719--1721
+Underfull \hbox (badness 10000) in paragraph at lines 1717--1719
 
  []
 
 <images/exp5-accuracy.png, id=223, 602.25pt x 341.275pt>
 File: images/exp5-accuracy.png Graphic file (type png)
 <use images/exp5-accuracy.png>
-Package pdftex.def Info: images/exp5-accuracy.png  used on input line 1724.
+Package pdftex.def Info: images/exp5-accuracy.png  used on input line 1722.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp5-loss.png, id=224, 602.25pt x 341.275pt>
 File: images/exp5-loss.png Graphic file (type png)
 <use images/exp5-loss.png>
-Package pdftex.def Info: images/exp5-loss.png  used on input line 1725.
+Package pdftex.def Info: images/exp5-loss.png  used on input line 1723.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
@@ -1701,15 +1696,15 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <images/exp6-acc1.png, id=228, 602.25pt x 341.275pt>
 File: images/exp6-acc1.png Graphic file (type png)
 <use images/exp6-acc1.png>
-Package pdftex.def Info: images/exp6-acc1.png  used on input line 1733.
+Package pdftex.def Info: images/exp6-acc1.png  used on input line 1731.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp6-acc2.png, id=229, 602.25pt x 341.275pt>
 File: images/exp6-acc2.png Graphic file (type png)
 <use images/exp6-acc2.png>
-Package pdftex.def Info: images/exp6-acc2.png  used on input line 1734.
+Package pdftex.def Info: images/exp6-acc2.png  used on input line 1732.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1740--1741
+Underfull \hbox (badness 10000) in paragraph at lines 1738--1739
 
  []
 
@@ -1723,17 +1718,17 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 [59 <./images/exp5-accuracy.png> <./images/exp5-loss.png> <./images/exp6-acc1.p
 ng> <./images/exp6-acc2.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 1740--1741
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1742--1743
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1744--1745
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1748--1749
+Underfull \hbox (badness 10000) in paragraph at lines 1746--1747
 
  []
 
@@ -1749,40 +1744,40 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <images/exp7-sigma1.png, id=240, 602.25pt x 341.275pt>
 File: images/exp7-sigma1.png Graphic file (type png)
 <use images/exp7-sigma1.png>
-Package pdftex.def Info: images/exp7-sigma1.png  used on input line 1754.
+Package pdftex.def Info: images/exp7-sigma1.png  used on input line 1752.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma2.png, id=241, 602.25pt x 341.275pt>
 File: images/exp7-sigma2.png Graphic file (type png)
 <use images/exp7-sigma2.png>
-Package pdftex.def Info: images/exp7-sigma2.png  used on input line 1755.
+Package pdftex.def Info: images/exp7-sigma2.png  used on input line 1753.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma3.png, id=242, 602.25pt x 341.275pt>
 File: images/exp7-sigma3.png Graphic file (type png)
 <use images/exp7-sigma3.png>
-Package pdftex.def Info: images/exp7-sigma3.png  used on input line 1756.
+Package pdftex.def Info: images/exp7-sigma3.png  used on input line 1754.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma4.png, id=243, 602.25pt x 341.275pt>
 File: images/exp7-sigma4.png Graphic file (type png)
 <use images/exp7-sigma4.png>
-Package pdftex.def Info: images/exp7-sigma4.png  used on input line 1757.
+Package pdftex.def Info: images/exp7-sigma4.png  used on input line 1755.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma5.png, id=244, 602.25pt x 341.275pt>
 File: images/exp7-sigma5.png Graphic file (type png)
 <use images/exp7-sigma5.png>
-Package pdftex.def Info: images/exp7-sigma5.png  used on input line 1758.
+Package pdftex.def Info: images/exp7-sigma5.png  used on input line 1756.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1763--1764
+Underfull \hbox (badness 10000) in paragraph at lines 1761--1762
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1766--1792
+Underfull \hbox (badness 10000) in paragraph at lines 1764--1790
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1794--1795
+Underfull \hbox (badness 10000) in paragraph at lines 1792--1793
 
  []
 
@@ -1805,12 +1800,12 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [62]
-Underfull \hbox (badness 10000) in paragraph at lines 1796--1797
+Underfull \hbox (badness 10000) in paragraph at lines 1794--1795
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1802--1803
+Underfull \hbox (badness 10000) in paragraph at lines 1800--1801
 
  []
 
@@ -1823,6 +1818,11 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [63]
+Underfull \hbox (badness 10000) in paragraph at lines 1802--1803
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1804--1805
 
  []
@@ -1832,35 +1832,30 @@ Underfull \hbox (badness 10000) in paragraph at lines 1806--1807
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 1808--1809
-
- []
-
 <images/exp7-sigma1-app1.png, id=261, 602.25pt x 341.275pt>
 File: images/exp7-sigma1-app1.png Graphic file (type png)
 <use images/exp7-sigma1-app1.png>
-Package pdftex.def Info: images/exp7-sigma1-app1.png  used on input line 1818.
+Package pdftex.def Info: images/exp7-sigma1-app1.png  used on input line 1816.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma2-app1.png, id=262, 602.25pt x 341.275pt>
 File: images/exp7-sigma2-app1.png Graphic file (type png)
 <use images/exp7-sigma2-app1.png>
-Package pdftex.def Info: images/exp7-sigma2-app1.png  used on input line 1819.
+Package pdftex.def Info: images/exp7-sigma2-app1.png  used on input line 1817.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma3-app1.png, id=263, 602.25pt x 341.275pt>
 File: images/exp7-sigma3-app1.png Graphic file (type png)
 <use images/exp7-sigma3-app1.png>
-Package pdftex.def Info: images/exp7-sigma3-app1.png  used on input line 1820.
+Package pdftex.def Info: images/exp7-sigma3-app1.png  used on input line 1818.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma4-app1.png, id=264, 602.25pt x 341.275pt>
 File: images/exp7-sigma4-app1.png Graphic file (type png)
 <use images/exp7-sigma4-app1.png>
-Package pdftex.def Info: images/exp7-sigma4-app1.png  used on input line 1821.
+Package pdftex.def Info: images/exp7-sigma4-app1.png  used on input line 1819.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma5-app1.png, id=265, 602.25pt x 341.275pt>
 File: images/exp7-sigma5-app1.png Graphic file (type png)
 <use images/exp7-sigma5-app1.png>
-Package pdftex.def Info: images/exp7-sigma5-app1.png  used on input line 1822.
+Package pdftex.def Info: images/exp7-sigma5-app1.png  used on input line 1820.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1874,27 +1869,27 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 <images/exp7-sigma1-app2.png, id=269, 602.25pt x 341.275pt>
 File: images/exp7-sigma1-app2.png Graphic file (type png)
 <use images/exp7-sigma1-app2.png>
-Package pdftex.def Info: images/exp7-sigma1-app2.png  used on input line 1829.
+Package pdftex.def Info: images/exp7-sigma1-app2.png  used on input line 1827.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma2-app2.png, id=270, 602.25pt x 341.275pt>
 File: images/exp7-sigma2-app2.png Graphic file (type png)
 <use images/exp7-sigma2-app2.png>
-Package pdftex.def Info: images/exp7-sigma2-app2.png  used on input line 1830.
+Package pdftex.def Info: images/exp7-sigma2-app2.png  used on input line 1828.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma3-app2.png, id=271, 602.25pt x 341.275pt>
 File: images/exp7-sigma3-app2.png Graphic file (type png)
 <use images/exp7-sigma3-app2.png>
-Package pdftex.def Info: images/exp7-sigma3-app2.png  used on input line 1831.
+Package pdftex.def Info: images/exp7-sigma3-app2.png  used on input line 1829.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma4-app2.png, id=272, 602.25pt x 341.275pt>
 File: images/exp7-sigma4-app2.png Graphic file (type png)
 <use images/exp7-sigma4-app2.png>
-Package pdftex.def Info: images/exp7-sigma4-app2.png  used on input line 1832.
+Package pdftex.def Info: images/exp7-sigma4-app2.png  used on input line 1830.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 <images/exp7-sigma5-app2.png, id=273, 602.25pt x 341.275pt>
 File: images/exp7-sigma5-app2.png Graphic file (type png)
 <use images/exp7-sigma5-app2.png>
-Package pdftex.def Info: images/exp7-sigma5-app2.png  used on input line 1833.
+Package pdftex.def Info: images/exp7-sigma5-app2.png  used on input line 1831.
 (pdftex.def)             Requested size: 144.6551pt x 81.97015pt.
 
 
@@ -1913,43 +1908,43 @@ p2.png>]
 <images/exp1-shufflenet.png, id=287, 601.24625pt x 340.27126pt>
 File: images/exp1-shufflenet.png Graphic file (type png)
 <use images/exp1-shufflenet.png>
-Package pdftex.def Info: images/exp1-shufflenet.png  used on input line 1842.
+Package pdftex.def Info: images/exp1-shufflenet.png  used on input line 1840.
 (pdftex.def)             Requested size: 216.1011pt x 122.30025pt.
 <images/exp1-mobilenet.png, id=288, 602.25pt x 341.275pt>
 File: images/exp1-mobilenet.png Graphic file (type png)
 <use images/exp1-mobilenet.png>
-Package pdftex.def Info: images/exp1-mobilenet.png  used on input line 1843.
+Package pdftex.def Info: images/exp1-mobilenet.png  used on input line 1841.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-efficientnet.png, id=289, 602.25pt x 341.275pt>
 File: images/exp1-efficientnet.png Graphic file (type png)
 <use images/exp1-efficientnet.png>
-Package pdftex.def Info: images/exp1-efficientnet.png  used on input line 1844.
+Package pdftex.def Info: images/exp1-efficientnet.png  used on input line 1842.
 
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-googlenet.png, id=290, 602.25pt x 341.275pt>
 File: images/exp1-googlenet.png Graphic file (type png)
 <use images/exp1-googlenet.png>
-Package pdftex.def Info: images/exp1-googlenet.png  used on input line 1845.
+Package pdftex.def Info: images/exp1-googlenet.png  used on input line 1843.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-densenet.png, id=291, 602.25pt x 341.275pt>
 File: images/exp1-densenet.png Graphic file (type png)
 <use images/exp1-densenet.png>
-Package pdftex.def Info: images/exp1-densenet.png  used on input line 1846.
+Package pdftex.def Info: images/exp1-densenet.png  used on input line 1844.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-seresnet.png, id=292, 602.25pt x 341.275pt>
 File: images/exp1-seresnet.png Graphic file (type png)
 <use images/exp1-seresnet.png>
-Package pdftex.def Info: images/exp1-seresnet.png  used on input line 1847.
+Package pdftex.def Info: images/exp1-seresnet.png  used on input line 1845.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-xception.png, id=293, 602.25pt x 341.275pt>
 File: images/exp1-xception.png Graphic file (type png)
 <use images/exp1-xception.png>
-Package pdftex.def Info: images/exp1-xception.png  used on input line 1848.
+Package pdftex.def Info: images/exp1-xception.png  used on input line 1846.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 <images/exp1-inception.png, id=294, 602.25pt x 341.275pt>
 File: images/exp1-inception.png Graphic file (type png)
 <use images/exp1-inception.png>
-Package pdftex.def Info: images/exp1-inception.png  used on input line 1849.
+Package pdftex.def Info: images/exp1-inception.png  used on input line 1847.
 (pdftex.def)             Requested size: 216.1011pt x 122.45793pt.
 
 
@@ -1973,7 +1968,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-1.59999pt}.
 
 [67]
-Underfull \hbox (badness 1648) in paragraph at lines 1909--1910
+Underfull \hbox (badness 1648) in paragraph at lines 1907--1908
 \OT1/cmr/m/it/10.95 Scale Im-age Recog-ni-tion\OT1/cmr/m/n/10.95 . In-ter-na-ti
 onal Con-fer-ence on Learn-ing Rep-re-sen-ta-tions
  []
@@ -1992,10 +1987,10 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 8756 strings out of 478268
- 139999 string characters out of 5846347
+ 8755 strings out of 478268
+ 139981 string characters out of 5846347
  495748 words of memory out of 5000000
- 26771 multiletter control sequences out of 15000+600000
+ 26770 multiletter control sequences out of 15000+600000
  485405 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,20n,106p,1758b,494s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -2022,7 +2017,7 @@ exmf-dist/fonts/type1/public/mathabx-type1/matha8.pfb></usr/local/texlive/2022/
 texmf-dist/fonts/type1/public/mathabx-type1/mathb10.pfb></usr/local/texlive/202
 2/texmf-dist/fonts/type1/public/mathabx-type1/mathx10.pfb></usr/local/texlive/2
 022/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (68 pages, 4457626 bytes).
+Output written on thesis.pdf (68 pages, 4456737 bytes).
 PDF statistics:
  411 PDF objects out of 1000 (max. 8388607)
  222 compressed objects within 3 object streams

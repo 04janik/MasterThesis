@@ -57,7 +57,7 @@
 \pagebreak
 \section{Introduction}
 
-Deep Neural Networks usually contain a tremendous amount of parameters, leading to a lot of computational effort needed to train these models. However, due to their construction through nested layers and the training via error backpropagation, there is likely a lot of dependency and redundancy within the parameters of neural networks. As a consequence, there is a chance that deep neural networks could be trained in low-dimensional subspaces. This circumstance led to the rise of the low-dimensional trajectory hypothesis in \cite{Paper}:
+Deep neural networks usually contain a tremendous amount of parameters, leading to a lot of computational effort needed to train these models. However, due to their construction through nested layers and the training via error backpropagation, there is likely a lot of dependency and redundancy within the parameters of neural networks. As a consequence, there is a chance that deep neural networks could be trained in low-dimensional subspaces. This circumstance led to the rise of the low-dimensional trajectory hypothesis in \cite{Paper}:
 
 \begin{center}
 \textit{``For a neural network with $n$ parameters, the parameters’ trajectory over training \\can be approximately covered by a $d$-dimensional space with $d \ll n$.''}
@@ -65,7 +65,7 @@ Deep Neural Networks usually contain a tremendous amount of parameters, leading 
 
 If this hypothesis holds, it would provide a new understanding of neural networks, both from a theoretical and practical perspective. According to \cite{Paper}, this includes generalization capability, implicit regularization, efficient learning algorithms, and much more. \\
 
-The goal of this thesis is to investigate the feasibility of training deep neural networks in low-dimensional subspaces both from a theoretical and practical perspective. For the theoretical investigation, we first study the training of neural networks in function spaces and introduce the Neural Tangent Kernel, which was first analysed by Arthur Jacot, Franck Gabriel, and Cl\'{e}ment Hongler in ``Neural Tangent Kernel: Convergence and Generalization in Neural Networks'' \cite{NTK} from the year 2018. Based on the special properties of this kernel, we can theoretically motivate the existence of low-dimensional optimization trajectories in the infinite-width limit. In practical applications, however, the setting of infinite-width limit never applies. Therefore, the practical investigation is of great importance and will be conducted through various numerical experiments, indicating that the low-dimensional trajectory hypothesis could indeed hold. The practical exploration is predominantly based on the work of Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, and Xiaolin Huang in ``Low Dimensional Trajectory Hypothesis is True: DNNs can be Trained in Tiny Subspaces'' \cite{Paper} from the year 2022. The topic is thus characterized by high topicality and relevance. \\
+The goal of this thesis is to investigate the feasibility of training deep neural networks in low-dimensional subspaces both from a theoretical and practical perspective. For the theoretical investigation, we first study the training of neural networks in function spaces and introduce the Neural Tangent Kernel, which was first analysed by Arthur Jacot, Franck Gabriel, and Cl\'{e}ment Hongler in ``Neural Tangent Kernel: Convergence and Generalization in Neural Networks'' \cite{NTK} from the year 2018. Based on the special properties of this kernel, we can theoretically motivate the existence of low-dimensional optimization trajectories in the infinite width limit. In practical applications, however, the setting of infinite width limit never applies. Therefore, the practical investigation is of great importance and will be conducted through various numerical experiments, indicating that the low-dimensional trajectory hypothesis could indeed hold. The practical exploration is predominantly based on the work of Tao Li, Lei Tan, Qinghua Tao, Yipeng Liu, and Xiaolin Huang in ``Low Dimensional Trajectory Hypothesis is True: DNNs can be Trained in Tiny Subspaces'' \cite{Paper} from the year 2022. The topic is thus characterized by high topicality and relevance. \\
 
 In the following, we start by introducing the necessary notations for neural networks and proceed by presenting several algorithms for the training of neural networks in parameter spaces. To circumvent the problem of non-convexity we then analyze the kernel gradient descent algorithm, which is a theoretical approach to training neural networks in function spaces. Naturally, this leads to the definition of the Neural Tangent Kernel, which is used to theoretically motivate the existence of low-dimensional optimization trajectories. After these theoretical considerations, we move on to study the practical feasibility of training deep neural networks in low-dimensional subspaces. We introduce a method to extract appropriate subspaces and adapt widely known training techniques to these subspaces. Finally, these algorithms are extensively tested in various numerical experiments. The code is released on github\footnote{https://github.com/04janik/MasterThesis/tree/master/Experiments}. Also, detailed results of all numerical experiments are published\footnote{https://wandb.ai/04janik}.
 
@@ -129,7 +129,7 @@ A common practice to learn those functions is, to fix the number of layers, the 
 \[ n = \sum_{i=0}^{l-1} (n_i + 1) \cdot n_{i+1}. \]
 Denoting these parameters as a vector $w \in \R^n$ enables us to define a function
 \[ \tilde{f} : \R^{n_0} \times \R^n \to \R^{n_l} : (x,w) \mapsto \tilde{f}(x,w), \]
-such that for fixed $w_1, w_2 \in \R^n$ the functions $\tilde{f}(x,w_1)$ and $\tilde{f}(x,w_2)$ are neural networks matching in their number of layers, number of neurons as well as activation functions and differing only in their choice of parameters. One calls $\tilde{f}(x,w_1)$ and $\tilde{f}(x,w_2)$ realizations of the neural network architecture $\tilde{f}$. \\
+such that for fixed $w_1, w_2 \in \R^n$ the functions $\tilde{f}(\cdot,w_1)$ and $\tilde{f}(\cdot,w_2)$ are neural networks matching in their number of layers, number of neurons as well as activation functions and differing only in their choice of parameters. One calls $\tilde{f}(\cdot,w_1)$ and $\tilde{f}(\cdot,w_2)$ realizations of the neural network architecture $\tilde{f}$. \\
 
 In the following, the terms neural network and neural network architecture will be used synonymously if the meaning is clear in the context. Unless otherwise specified, $n_0 \in \N$ will denote the dimension of the input space, $n_l \in \N$ will denote the dimension of the output space and $n \in \N$ will denote the number of adjustable parameters.
 
@@ -154,7 +154,7 @@ which is called training data. Instead of working with the generalization error,
  \[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
 where $\lambda \geq 0$ is some regularization parameter used to control the complexity of $w$. \\
  
-Intuitively, minimization of the empirical error should lead to a minimization of the generalization error as well. Currently, a lot of research is being done on how these measures relate to each other. Nevertheless, this thesis will focus on how to minimize the empirical error given labeled training data. \\
+Intuitively, minimization of the empirical error should lead to a minimization of the generalization error as well. Currently, a lot of research is being done on how these measures relate to each other. Nevertheless, this thesis will focus on minimizing the empirical error given labeled training data. \\
 
 The problem of finding some parameter vector $w$ that minimizes the empirical error function is usually hard to solve as the error may have highly nonlinear dependencies on the parameters. This is why, in practice, one often aims to compare several local minima and to settle for one that provides a sufficiently small error, regardless of whether it is a global minimum or not.
 
@@ -163,7 +163,7 @@ Let $f: \R^n \to \R$ be differentiable. The gradient of $f$ is defined as
 \[ \nabla f : \R^n \to \R^n : x = (x_1, \dots, x_n) \mapsto \bigg [ \frac{\partial}{\partial x_1} f(x), \cdots, \frac{\partial}{\partial x_n} f(x) \bigg ]\tr . \]
 \end{definition}
 
-Due to the complexity of the error function, in general, there is no easy way to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first introduced by Cauchy in \cite{GD}.
+Given a differentiable loss function, it is in general hard to find an analytical solution to the problem $\nabla E(w) = 0$. Hence most of the techniques for error minimization are based on iterative approximation. One popular method is gradient descent, which was first introduced by Cauchy in \cite{GD}.
 
 \begin{algorithm}
 \caption{Gradient Descent \textcolor{white}{$\Big |$}} \ \\
@@ -249,7 +249,7 @@ f(x_{k+1})
 &= f(x_k) - \frac{1}{L} \big \| \nabla f(x_k) \big \|_2^2 + \frac{1}{2L} \big \| \nabla f(x_k) \big \|_2^2 \\\
 &= f(x_k) - \frac{1}{2L} \big \| \nabla f(x_k) \big \|_2^2.
 \end{split} \]
-Hence the gradient descent algorithm with constant step size $\eta_k = 1/L$ guarantees to make progress, unless $\nabla f(x_k) \neq 0$. The previous expression is equivalent to
+Hence the gradient descent algorithm with constant step size $\eta_k = 1/L$ guarantees to make progress, as long as $\nabla f(x_k) \neq 0$. The previous expression is equivalent to
 \[ \big \| \nabla f(x_k) \big \|_2^2 \leq 2L \big ( f(x_k) - f(x_{k+1}) \big ). \]
 Summing up both sides from $k=0$ to some $m \in \N$ and taking the average, results in
 \[ \frac{1}{m+1} \sum_{k=0}^{m} \big \| \nabla f(x_k) \big \|_2^2 \leq \frac{2L}{m+1} \sum_{k=0}^{m} f(x_k) - f(x_{k+1}) = \frac{2L}{m+1} \big ( f(x_0) - f(x_{m+1}) \big ). \]
@@ -260,7 +260,7 @@ This completes the proof since $m$ was chosen arbitrarily.
 
 The theorem can be found in equation (1.2.15) at the beginning of section 1.2.3 of \cite{ConvexOptimization}. Note that, in practice, it is inefficient to use a constant step size of $1/L$. Nevertheless, it is useful for theoretical analysis to guarantee convergence. \\
 
-Theorem \ref{thm:descent} states that in the limit as $n \to \infty$, gradient descent converges to a stationary point $x \in \R^n$ with $\nabla f(x) = 0$. Since we have seen in the proof, that $f(x_k)$ is monotonically decreasing in $k$, gradient descent converges to the next stationary point in direction of descent, which is either a local minimum, a global minimum, or a saddle point. \\
+Theorem \ref{thm:descent} states that in the limit as $k \to \infty$, gradient descent converges to a stationary point $x \in \R^n$ with $\nabla f(x) = 0$. Since we have seen in the proof, that $(f(x_k))_{k=0}^{\infty}$ is monotonically decreasing, gradient descent converges to the next stationary point in direction of descent, which is either a local minimum, a global minimum, or a saddle point. \\
 
 Next, we will define a special class of functions, having the nice property that every stationary point is a global minimum, and therefore gradient descent is an excellent tool for minimization.
 
@@ -314,7 +314,7 @@ This completes the proof since the backward direction is trivial.
 
 Thus, for lower bounded functions $f: \R^n \to \R$ that are convex and differentiable with Lipschitz continuous gradient $\nabla f$, we can guarantee the convergence of gradient descent to a global minimum due to theorem \ref{thm:descent}. In general, this does not apply to the error function used for training neural networks, but we will introduce a theoretical approach to prevent this problem in section \ref{sec:functionspace}. Next, we will provide further iterative optimization methods. \\
 
-Another approach to finding local minima of some differentiable function $f: \R^n \to \R$, is to solve the equation $\nabla f(x) = 0$. For this purpose, one can use the widely known Newton method, which is a technique to solve the problem of finding a root of a differentiable function. Hence, to apply this technique for minimization of $f$, we have to assume that $f$ is twice differentiable. To formally introduce the Newton method, we require the following definition.
+A common approach to finding local minima of some differentiable function $f: \R^n \to \R$, is to solve the equation $\nabla f(x) = 0$. For this purpose, one can use the widely known Newton method, which is a technique to solve the problem of finding a root of a differentiable function. Hence, to apply this technique for minimization of $f$, we have to assume that $f$ is twice differentiable. To formally introduce Newton's method, we require the following definition.
 
 \begin{definition}
 Let $f: \R^n \to \R$ be twice differentiable. The Hessian of $f$ is defined as
@@ -325,7 +325,7 @@ The basic idea of Newton's method consists of approximating
 \[ \nabla f(x+ \Delta x) \approx \nabla f(x) + H_f(x) \Delta x \stackrel{!}{=} 0. \]
 Based on this approximation, iterative updates $ \Delta x = - H_f^{-1}(x) \nabla f(x)$ provide the rule
 \[ x_{k+1} \leftarrow x_k - H_f^{-1}(x_k) \nabla f(x_k). \]
-According to section 1.2.4 of \cite{ConvexOptimization}, the technique's convergence rate is quadratic, such that convergence in a neighborhood of strict local minima is very fast. However, this method is cursed with two serious drawbacks. Firstly, the Hessian matrices $H(x_k)$ have to be invertible for every $k \in \N$. Secondly, the technique can diverge. To avoid possible divergence, we can slightly modify the update rule and introduce the Newton method as follows.
+According to section 1.2.4 of \cite{ConvexOptimization}, the technique's convergence rate is quadratic, such that convergence in a neighborhood of strict local minima is very fast. However, this method is cursed with two serious drawbacks. Firstly, the Hessian matrices $H_f(x_k)$ have to be invertible for every $k \in \N$. Secondly, the technique can diverge. To avoid possible divergence, we can slightly modify the update rule and introduce Newton's method as follows.
 
 \begin{algorithm}
 \caption{Newton's Method \textcolor{white}{$\Big |$}} \ \\
@@ -354,7 +354,7 @@ If $n$ is large, the Hessian matrix computation in Newton's method can become co
 \textcolor{white}{$\Big |$}8: \textbf{end while}
 \end{algorithm}
 
-With the initialization $B_0 = I_n$, the method starts with a gradient descent update and then iteratively minimizes the objective function by inverse Hessian matrix approximations $B_k$. \\
+With the initialization $B_0 = I_n$, the method starts with a gradient descent update and then iteratively minimizes the objective function using inverse Hessian matrix approximations $B_k$. \\
 
 So far, we have seen three different approaches to iteratively minimize a twice differentiable function $f: \R^n \to \R$. Concerning our objective of minimizing the empirical error
 \[ E : \R^n \to \R_+ : w \mapsto \frac{1}{m} \sum_{i=1}^{m} \ell \big ( f(x_i,w),y_i \big) + \lambda \big \| w \big \|_2^2, \]
@@ -410,7 +410,7 @@ In the following, we will introduce the kernel gradient descent algorithm, which
 Note that this approach is great for theoretical analysis due to the advantage of convexity. In practice, however, we are still in need of the explicit parameters $w \in \R^n$, that describe the objective function. Nevertheless, we can use the analysis of kernel gradient descent to get a better understanding of gradient descent in the parameter space. That is why we aim to investigate the relationship between the two optimization approaches.
 
 
-\subsection{Functional Derivative}
+\subsection{Functional Derivatives}
 
 To start things off, we need the definition of functionals, mapping each element of the function space $\F$ to a real value. The cost $C$ is an example of such a functional.
 
@@ -431,7 +431,7 @@ and call $\mu$ differentiable at $f_0$.
 
 This is similar to the definition of directional derivatives in $\R^{n_0}$. Likewise, we can motivate the functional gradient in $\F$ based on the properties of the classical gradient in $\R^{n_0}$. To clarify this, we let $f \in \F$ and $x,v \in \R^{n_0}$, such that $\| v \|_2 = 1$ and consider the directional derivative of $f$ in $x$ along the direction $v$, which is given by
 \[ D_vf(x) \coloneq \lim_{\epsilon \to 0} \frac{1}{\epsilon} \Big ( f(x + \epsilon v) - f(x) \Big ). \]
-By Taylor's Theorem, we have for any $\epsilon > 0$, that 
+By Taylor's Theorem, we have for any $\epsilon > 0$ that 
 \[ f(x+\epsilon v) = f(x) + \nabla f(x) \tr \big ((x + \epsilon v) - x \big ) + \O(\epsilon^2), \]
 which can be rewritten as
 \[ f(x + \epsilon v ) - f(x) = \epsilon \big \langle \nabla f(x), v \big \rangle + \O (\epsilon^2). \]
@@ -466,7 +466,7 @@ Let $f_1, f_2, f, g \in \F$ and $\lambda \in \R$. $\langle \cdot,\cdot \rangle_{
 (iii) $\langle f , g \rangle_{\D_x} = \langle g , f \rangle_{\D_x}$:
 \[ \langle f , g \rangle_{\D_x} = \E_{x \sim \D_x} \Big [ f(x)\tr g(x) \Big ] = \E_{x \sim \D_x} \Big [ g(x)\tr f(x) \Big ] = \langle g , f \rangle_{\D_x}. \]
 
-Furthermore, $\langle \cdot,\cdot \rangle_{\D_x}$ is positive semidefinite, since for any $f \in \F$ it holds, that
+Furthermore, $\langle \cdot,\cdot \rangle_{\D_x}$ is positive semidefinite since for any $f \in \F$ it holds that
 \[ \langle f , f \rangle_{\D_x} =  \E_{x \sim \D_x} \Big [ f(x)\tr f(x) \Big ] = \E_{x \sim \D_x} \Big [ \sum_{i=1}^{n_l} f_i(x)^2 \Big ] \geq 0. \]
 
 Thus $\| \cdot \|_{\D_x} = \sqrt{\langle \cdot , \cdot \rangle_{\D_x}}$ is a seminorm on the function space $\F$.
@@ -540,7 +540,7 @@ To prove the existence of functional gradients, we will construct a surjective m
 \[ J: \F \to \F^* : d \mapsto \langle d, \cdot \rangle_{\D_x}, \]
 such that we can conclude the existence based on $\partial_f \mu |_{f_0} \in \F^*$. For the construction of $J$, we have to translate some well-known results from functional analysis to our setting. \\
 
-Based on the completeness of $(\F, d_\F)$, we can introduce the concept of orthogonal projections, which is necessary for our goal of establishing a mapping between $\F$ and its dual space $\F^*$. The following lemma is a translation of Theorem 3.3.1 in \cite{FunctionalAnalysis} to our case, where we have a symmetric positive semidefinite bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$, instead of an inner product.
+Based on the completeness of $(\F, d_\F)$, we can introduce the concept of orthogonal projections, which is necessary for our goal of establishing a mapping between $\F$ and its dual space $\F^*$. The following lemma is a translation of theorem 3.3.1 in \cite{FunctionalAnalysis} to our case, where we have a symmetric positive semidefinite bilinear form $\langle \cdot, \cdot \rangle_{\D_x}$, instead of an inner product.
 
 \begin{lemma} \label{lem:projection}
 Let $\A \subseteq \F$ be non-empty, closed, and convex. For every $f \in \F$ there exists some $a^* \in \A$ such that 
@@ -609,9 +609,9 @@ is linear and surjective.
 \begin{proof}
 The linearity follows directly from the bilinearity of $\langle \cdot, \cdot \rangle_{\D_x}$. To prove that $J$ is indeed surjective, we let $\mu \in \F^*$ and need to find some $d \in \F$ such that $\mu = J(d)$. \\
 
-Case $\mu=0$: We can choose $d=0$, with $\mu = 0 = J(d)$. \\
+Case $\mu=0$: We can choose $d=0$ with $\mu = 0 = J(d)$. \\
 
-Case $\mu \neq 0$: Due to the linearity of $\mu$, we can normalize and find some $e \in \F$ with $\mu[e] = 1$. Let $N \coloneq \mu^{-1}(0)$ denote the kernel of $\mu$, which is non-empty, closed, and convex since $\mu$ is linear and continuous. Thus, by Lemma \ref{lem:projection}, there exists some $p_e \in N$, such that $p_e$ is an orthogonal projection of $e$ on $N$. Define $f \coloneq e - p_e$, then $f \notin N$ since
+Case $\mu \neq 0$: Due to the linearity of $\mu$, we can normalize and find some $e \in \F$ with $\mu[e] = 1$. Let $N \coloneq \mu^{-1}(0)$ denote the kernel of $\mu$, which is non-empty, closed, and convex since $\mu$ is linear and continuous. Thus, by lemma \ref{lem:projection}, there exists some $p_e \in N$, such that $p_e$ is an orthogonal projection of $e$ on $N$. Define $f \coloneq e - p_e$, then $f \notin N$ since
 \[ \mu[f] = \mu[e] - \mu[p_e] = \mu[e] - 0 = 1. \]
 Thus, we can choose any $g \in \F$, define $h \coloneq g - \mu[g]f$ and use the linearity of $\mu$ to derive
 \[ \mu[h] = \mu \big [g- \mu[g]f \big] = \mu[g] - \mu[g] \mu[f] = \mu[g] - \mu[g] \cdot 1 = 0. \]
@@ -645,7 +645,7 @@ To prove that $T$ is indeed linear, we need to show that $\partial_f \mu |_{f_0}
 \end{split} \]
 Furthermore, we have for $\phi \in \F$ and $\lambda \in \R$ that
 \[ \partial_f \mu |_{f_0} [\lambda \phi] = \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \lambda \phi ] \Big ]_{\epsilon=0} = \lambda \cdot \frac{\partial}{\partial \epsilon} \Big [ \mu[f_0+\epsilon \phi ] \Big ]_{\epsilon=0} = \lambda \cdot \partial_f \mu |_{f_0} [\phi]. \]
-Hence $T$ is linear. Using the assumption, that $\D_x$ is the empirical distribution on a finite subset of $\R^{n_0}$, we conclude, that $\F /{\sim}$ is finite-dimensional. Thus, there exists $m \coloneq \dim(F/{\sim})$ and a basis $[e_1], \dots, [e_m] \in \F / {\sim}$, such that for any $[f] = \sum_{i=1}^{m}\alpha_i[e_i] \in \F/{\sim}$ we observe, that
+Hence $T$ is linear. Using the assumption that $\D_x$ is the empirical distribution on a finite subset of $\R^{n_0}$, we conclude that $\F /{\sim}$ is finite-dimensional. Thus, there exists $m \coloneq \dim(F/{\sim})$ and a basis $[e_1], \dots, [e_m] \in \F / {\sim}$, such that for any $[f] = \sum_{i=1}^{m}\alpha_i[e_i] \in \F/{\sim}$ we observe that
 \[ \big | T[f] \big | = \Big | \sum_{i=1}^{m} \alpha_iT[e_i] \Big | \leq \sum_{i=1}^{m} \big | \alpha_i \big | \cdot \big | T[e_i] \big | \leq \max_{j=1,\dots,m} | \alpha_j | \cdot \sum_{i=1}^{m} \big | T[e_i] \big |. \]
 Since $\max_{j=1,\dots,m} | \alpha_j |$ defines a norm on $\F/{\sim}$, based on the equivalence of norms in finite-dimensional spaces, we conclude the existence of a constant $c_1 \geq 0$, such that
 \[ \forall \alpha_1, \dots, \alpha_m \in \R : \max_{j=1,\dots,m} | \alpha_j | \leq c_1 \Big \| \sum_{i=1}^{m} \alpha_i [e_i] \Big \|_{\F/{\sim}}. \]
@@ -667,7 +667,7 @@ Kernel gradient descent is a method, that addresses this problem by minimizing t
 
 \subsection{Reproducing Kernel Hilbert Space}
 
-Reproducing kernel Hilbert spaces are widely used in machine learning scenarios. In the scalar case, their main application is to reduce the computation effort needed or to simplify infinite-dimensional optimization problems to finite-dimensional ones via the kernel trick. Here, we will study a generalization of this concept to vector-valued reproducing kernel Hilbert spaces. These are based on the definition of multi-dimensional kernels from \cite{NTK}.
+Reproducing kernel Hilbert spaces are widely used in machine learning scenarios. In the scalar case, their main application is to reduce the computational effort needed or to simplify infinite-dimensional optimization problems to finite-dimensional ones via the kernel trick. Here, we will study a generalization of this concept to vector-valued reproducing kernel Hilbert spaces. These are based on the definition of multi-dimensional kernels from \cite{NTK}.
 
 \begin{definition}
 A multi-dimensional kernel over $\R^{n_0}$ is a measurable map
@@ -693,7 +693,7 @@ We call $\big (\H_K, \langle \cdot, \cdot \rangle_{\H_K} \big )$ the vector-valu
 
 \begin{proof}
 The idea of the proof is to construct an inner product on $\H_0$, and afterward complete the space by adding all limits of Cauchy sequences in $\H_0$. We will denote  $f,g,h \in \H_K$ as
-\[ f = \sum_{i} K_{x_i}y_i \quad \wedge \quad g = \sum_{j} K_{\hat{x}_j}\hat{y}_j \quad \wedge \quad h = \sum_{k} K_{\bar{x}_k}\bar{y}_k. \]
+\[ f = \sum_{i} K_{x_i}y_i, \quad g = \sum_{j} K_{\hat{x}_j}\hat{y}_j, \quad h = \sum_{k} K_{\bar{x}_k}\bar{y}_k. \]
 Based on this notation, we can define the inner product 
 \[ \langle \cdot, \cdot \rangle_{\H_0} : \H_0 \times \H_0 \to \R : (f,g) \mapsto \sum_{i,j} y_i \tr K(x_i, \hat{x}_j) \hat{y}_j. \]
 To prove that $\langle \cdot, \cdot \rangle_{\H_0}$ is indeed an inner product, we start with linearity and symmetry. \\
@@ -726,7 +726,7 @@ It remains to prove that the completion of $\H_0$ is a Hilbert space. Let $(f_n)
 for a constant $c > 0$. Since $(f_n)_{n=1}^{\infty}$ was assumed to be Cauchy with respect to $\| \cdot \|_{\H_0}$, we conclude that $(f_n(x))_{n=1}^{\infty}$ is a Cauchy sequence in $\R^{n_l}$. Hence the limit
 \[ f_\textit{lim} : \R^{n_0} \to \R^{n_l} : x \mapsto \lim_{n \to \infty} f_n(x) \]
 is well-defined. Now let $\H_K$ be the completion of $\H_0$ by adding all these limits of Cauchy sequences. Thus for any $f,g \in \H_K$ there exist sequences $(f_n)_{n=1}^{\infty}$ and $(g_n)_{n=1}^{\infty}$ in $\H_0$ with 
-\[ f = \lim_{n \to \infty} f_n \quad \wedge \quad g = \lim_{n \to \infty} g_n. \]
+\[ f = \lim_{n \to \infty} f_n \quad \text{and} \quad g = \lim_{n \to \infty} g_n. \]
 Based on the continuity of the inner product $\langle \cdot, \cdot \rangle_{\H_0}$, we are able to define the inner product
 \[ \langle \cdot, \cdot \rangle_{\H_K} : \H_K \times \H_K \to \R : (f,g) \mapsto \lim_{n \to \infty} \langle f_n, g_n \rangle_{\H_0}. \]
 To ensure that $\langle \cdot, \cdot \rangle_{\H_K}$ is well-defined, we have to prove the existence of the limit. For this, we let $n, m \in \N$ be arbitrary and apply the Cauchy-Schwarz inequality to derive 
@@ -737,14 +737,12 @@ To ensure that $\langle \cdot, \cdot \rangle_{\H_K}$ is well-defined, we have to
 &\leq \Big | \langle f_n, g_n - g_m \rangle_{\H_0} \Big | + \Big | \langle f_n - f_m, g_m \rangle_{\H_0} \Big | \\\
 \textcolor{white}{\Big |} &\leq \big \| f_n \big \|_{\H_0} \big \| g_n - g_m \big \|_{\H_0} + \big \| f_n - f_m \big \|_{\H_0} \big \| g_m \big \|_{\H_0}.
 \end{split} \]
-Furthermore, we observe that
-\[ \Big | \big \| f_n \big \|_{\H_0} - \big \| f_m \big \|_{\H_0} \Big | \leq \big \| f_n - f_m \big \|_{\H_0}. \]
 Since $(f_n)_{n=1}^\infty$ is a Cauchy sequence in $\H_0$, there exists a constant $c_f \geq 0$, such that
 \[ \lim_{n \to \infty} \| f_n \big \|_{\H_0} = c_f. \]
 Using the same argumentation for $(g_n)_{n=1}^\infty$, we conclude the existence of $c_g \geq 0$, such that 
 \[ \lim_{n \to \infty} \| g_n \big \|_{\H_0} = c_g. \] 
-%Summarizing, for any $n,m \in \N$ the previous expressions provide the inequality
-%\[ \Big | \langle f_n, g_n \rangle_{\H_0} - \langle f_m, g_m \rangle_{\H_0} \Big | \leq c_f \cdot  \big \| g_n - g_m \big \|_{\H_0} + c_g \cdot \big \| f_n - f_m \big \|_{\H_0}. \]
+Summarizing, for any $n,m \in \N$ the previous expressions provide the inequality
+\[ \Big | \langle f_n, g_n \rangle_{\H_0} - \langle f_m, g_m \rangle_{\H_0} \Big | \leq c_f \cdot  \big \| g_n - g_m \big \|_{\H_0} + c_g \cdot \big \| f_n - f_m \big \|_{\H_0}. \]
 Since $(f_n)_{n=1}^\infty$ and $(g_n)_{n=1}^\infty$ are Cauchy sequences in $\H_0$ we conclude, that $(\langle f_n, g_n \rangle_{\H_0})_{n=1}^\infty$ is a Cauchy sequence in $\R$. This implies well-definiteness of $\langle \cdot, \cdot \rangle_{\H_K}$. \\
 
 It remains to prove that $\langle \cdot, \cdot \rangle_{\H_K}$ is indeed an inner product. We verify \\
@@ -784,7 +782,7 @@ This completes the necessary background knowledge on vector-valued reproducing k
 \subsection{Kernel Gradient Descent} \label{sec:KGD}
 
 Kernel gradient descent is a generalization of gradient descent to functionals. The idea is to minimize a differentiable cost $C$ in a special subspace of $\F$, namely a vector-valued reproducing kernel Hilbert space, in which the descent direction is unique. This prevents the problem of choosing a suitable functional gradient.
-The theory in here is based on \cite{NTK}.
+The theory in this section is based on \cite{NTK}.
 
 \begin{definition}
 Let $K: \R^{n_0} \times \R^{n_0} \to \R^{n_l \times n_l}$ be a kernel. For $j=1, \dots, n_l$, one defines the partial application of $K$ as the function
@@ -916,7 +914,7 @@ where $d|_{f(t)} \in \F$ denotes a representative of $\partial_f C|_{f(t)} = \bi
 \end{lemma}
 
 \begin{proof}
-According to the chain rule for functionals in Appendix A of \cite{Functionals}, we have
+According to the chain rule for functionals in appendix A of \cite{Functionals}, we have
 \[ \partial_tC|_{f(t)} = \big \langle d|_{f(t)}, \partial_t f(t) \big \rangle_{\D_x} = \big \langle d|_{f(t)}, - \nabla_K C|_{f(t)} \big \rangle_{\D_x}, \]
 where we have used the assumption, that $f$ follows the kernel gradient descent on $C$ with respect to the kernel $K$.
 Recalling the definition of $\nabla_K C|_{f(t)}$, which was given by
@@ -1018,7 +1016,7 @@ where $d|_{f_{w(t)}} \in \F$ denotes the representative of $\partial_f C|_{f_{w(
 \end{lemma}
 
 \begin{proof}
-According to the chain rule for functionals in Appendix A of \cite{Functionals}, we have
+According to the chain rule for functionals in appendix A of \cite{Functionals}, we have
 \[ \partial_tw_i(t) = - \partial_{w_{i}} C|_{f_{w(t)}} = - \big \langle d|_{f_{w(t)}}, \partial_{w_i} f_{w(t)} \big \rangle_{\D_x} = - \big \langle d|_{f_{w(t)}}, \frac{1}{\sqrt{n}} f^{(i)} \big \rangle_{\D_x} \]
 for $i = 1, \dots, n$. Using the linearity of $\langle \cdot, \cdot \rangle_{\D_x}$ completes the proof.
 \end{proof}
@@ -1042,7 +1040,7 @@ we can write the kernel gradient of $C$ at $f_{w(t)}$ with respect to $\tilde{K}
 &= \frac{1}{m} \sum_{j=1}^{m} \frac{1}{n} \sum_{i=1}^{n}f^{(i)}(x) f^{(i)}(x_j) \tr d|_{f_{w(t)}}(x_j) \\\
 &= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \frac{1}{m} \sum_{j=1}^{m} f^{(i)}(x_j) \tr  d|_{f_{w(t)}}(x_j) \\\
 &= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \E_{x' \sim \D_x} \Big [ f^{(i)}(x')\tr  d|_{f_{w(t)}}(x') \Big ] \\\
-&= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \big \langle f^{(i)}, d|_{f_{w(t)}} \big \rangle_{\D_x},
+&= \frac{1}{n} \sum_{i=1}^{n} f^{(i)}(x) \cdot \big \langle f^{(i)}, d|_{f_{w(t)}} \big \rangle_{\D_x}.
 \end{split} \]
 A comparison of the two expressions results in
 \[ \partial_tf_{w(t)} = - \frac{1}{n} \sum_{i=1}^{n} \big \langle d|_{f_{w(t)}}, f^{(i)} \big \rangle_{\D_x} \cdot f^{(i)} = -\nabla_{\tilde{K}} C|_{f_{w(t)}}. \]
@@ -1056,8 +1054,8 @@ This motivates the definition of a constant limiting kernel $K$, such that for $
 This definition is well-defined since we assumed any $f \sim \D_\F$ to be continuous on $\R^{n_0}$. The random tangent kernel $\tilde{K}$ is therefore an approximation of the constant limiting kernel $K$. \\
 
 The training of neural networks behaves quite similarly to the kernel gradient descent with respect to the tangent kernel. We consider the realization function
-\[ F: \R^n \to \F|_{\tilde{f}} : w \mapsto f_w \coloneq \tilde{f}(\cdot,w), \]
-mapping a parameter vector $w \in \R^n$ to its corresponding network function, with regard to the architecture $\tilde{f}$. Similarly to the definition of the tangent kernel, we can introduce the Neural Tangent Kernel. Formally, it is given as follows.
+\[ F: \R^n \to \F|_{f} : w \mapsto f_w \coloneq f(\cdot,w), \]
+mapping a parameter vector $w \in \R^n$ to its corresponding network function, with regard to the architecture $f$. Similarly to the definition of the tangent kernel, we can introduce the Neural Tangent Kernel. Formally, it is given as follows.
  
 \begin{definition} \label{def:ntk}
 Given parameters $w \in \R^n$, the Neural Tangent Kernel is defined as
@@ -1137,7 +1135,7 @@ In \cite{Paper}, it is argued that based on the nested construction of deep neur
 \label{fig:trajectory}
 \end{figure}  
 
-Figure \ref{fig:trajectory} visualizes a three-dimensional space containing three variables $w(1)$, $w(2)$, $w(3)$. These refer to the optimizable parameters of a very basic neural network. By training this network for three iterations, one achieves an optimization trajectory $(w_k)_{k=0}^3$, that could be embedded in a two-dimensional hyperplane, spanned by the orthogonal vectors $e_1$ and $e_2$. \\
+Figure \ref{fig:trajectory} visualizes a three-dimensional space containing three variables $w(1)$, $w(2)$, $w(3)$. These refer to the optimizable parameters of a very basic neural network. By training this network for three iterations, one achieves an optimization trajectory $(w_k)_{k=0}^3$, that could be embedded in a two-dimensional hyperplane, spanned by the orthogonal vectors $e_1$ and $e_2$.
 
 Theoretically, this basic idea could translate to higher-dimensional models and more complex affine sets as well. Note that none of the optimizable variables could be left out to reduce the dimension, but rather one has to construct new independent variables to obtain the lower-dimensional affine set that approximately contains the optimization trajectory.  \\
 
@@ -1206,7 +1204,7 @@ Let $A \in \R^{m \times n}$ be a matrix with singular value decomposition $A= U 
 \[ \min_{\text{rank}(B)=d} \big \| A-B \big \|_2 = \big \| A - A_d \big \|_2 = \sigma_{d+1}. \]
 \end{theorem}
 
-This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will play an important in subspace extraction.
+This concludes the necessary background knowledge on singular value decompositions and low-rank approximations, which will play an important role in subspace extraction.
 
 \subsection{Low-Dimensional Trajectory Hypothesis}
 
@@ -1269,7 +1267,7 @@ By lemma \ref{lem:orthProjection}, there exists a unique orthogonal projection $
 Thus, we can define the projected low-dimensional trajectory $(s_k)_{k=0}^{t} \coloneq (Pw_k)_{k=0}^{t}$, satisfying
 \[ w_{k+1} - w_k \approx P(w_{k+1} - w_k) = s_{k+1} - s_k, \quad k=0, \dots, t-1. \]
 Given an orthonormal basis $Q \in \R^{n \times d}$ of $S$, each element of the low-dimensional trajectory can be expressed in terms of its coefficients with regard to the basis $Q$, that is
-\[ \exists \alpha_k \in \R^{d}: s_k = V\alpha_k, \quad k=0, \dots, t. \]
+\[ \exists \alpha_k \in \R^{d}: s_k = Q\alpha_k, \quad k=0, \dots, t. \]
 As a consequence, the low-dimensional trajectory hypothesis claims, that
 \[ w_{k+1} - w_k \approx s_{k+1} - s_k = Q(\alpha_{k+1} - \alpha_k), \quad k=0, \dots, t-1. \]
 To motivate the low-dimensional trajectory hypothesis from a theoretical perspective, we investigate a single output neural network
@@ -1329,7 +1327,7 @@ By the Eckart-Young-Mirsky theorem \ref{thm:eym}, the used rank-$d$ approximatio
 \[ \Big \| \nabla_wf(\X,w_0) - U_0 \tilde{U}_0 \tilde{\Sigma}_0 \tilde{V}_0\tr  V_0\tr \Big \|_2 = \sigma_{d+1}. \] 
 The approximation error in (\ref{eq:flow}) is therefore determined by the singular value decay of the matrix $\nabla_wf(\X,w_0)$, or equivalently, the eigenvalue decay of the Neural Tangent Kernel $\Theta_0$. An extensive analysis of this eigenvalue decay can be found in \cite{Decay1} and \cite{Decay2}. These papers show that in the infinite width limit, the NTK is indeed low-rank, which theoretically motivates the claim of the low-dimensional trajectory hypothesis. \\
 
-From a practical perspective, however, the previous discussion is too theoretical, since it holds true only in the infinite width limit. Of course, this pre-condition is never given in practical applications. This is why section \ref{sec:Experiments} contains various numerical experiments, that investigate the low-dimensional trajectory with regard to deep neural networks of finite width.
+From a practical perspective, however, the previous discussion is too theoretical, since it holds only in the infinite width limit. Of course, this pre-condition is never given in practical applications. This is why section \ref{sec:Experiments} contains various numerical experiments, that investigate the low-dimensional trajectory with regard to deep neural networks of finite width.
 
 \subsection{Dynamic Linear Dimensionality Reduction} \label{sec:DLDR}
 
@@ -1408,19 +1406,19 @@ In summary, we denote the following algorithm for dimensionality reduction from 
 
 Besides the parameter sampling in line 1, the complexity of the algorithm is determined by lines 5 and 7. In line 5 we calculate the matrix product $W \tr W$ which is of complexity $\O(t^2n)$ and the complexity of the spectral decomposition is $\O(t^3)$, since $W\tr W \in \R^{(t+1) \times (t+1)}$. Furthermore, line 7 contains $d$ products $Wv_i$ which is of complexity $\O(dtn)$. Using $d\leq t$ the total complexity of lines 2 to 7 is $\O(t^3 + 2t^2n)$. Since $t \ll n$ the time consumption is negligible in comparison to the complexity of training in line 1.
 
-\subsection{DLDR-based Training Algorithms}
+\subsection{Low-Dimensional Training Algorithms}
 
-Assuming that the low-dimensional trajectory hypothesis holds true, not only in the infinite width limit but also for finite wide deep neural networks, we could adopt the training algorithms from section \ref{sec:Training} to perform parameter updates in the lower-dimensional subspace. \\
+Assuming that the low-dimensional trajectory hypothesis holds true, not only in the infinite width limit but also for finite wide deep neural networks, we could adopt the training algorithms from section \ref{sec:Training} to perform parameter updates in the low-dimensional subspace. \\
 
 Recall that all of the proposed training algorithms operate in a similar manner, which consists of iterative parameter updates. This is achieved by computing a descent direction $d_k \in \R^n$, choosing a learning rate $\eta > 0$, and updating the parameters according to the rule
 \[ w_{k+1} \leftarrow w_k - \eta \cdot d_k. \]
-Note that the training algorithms differ only in determining the descent directions. The basic idea of a parameter update in the  lower-dimensional subspace $S \subset \R^n$ at step $k \in \N$, is to project the parameters $w_k$ and the descent direction $d_k$ onto $S$ and apply the update rule in the subspace $S$. Given an orthonormal basis $Q$ of $S$, the update rule translates to
+Note that the training algorithms differ only in determining the descent directions. The basic idea of a parameter update in the  low-dimensional subspace $S \subset \R^n$ at step $k \in \N$, is to project the parameters $w_k$ and the descent direction $d_k$ onto $S$ and apply the update rule in the subspace $S$. Given an orthonormal basis $Q$ of $S$, the update rule translates to
 \[ w_{k+1} \leftarrow Q \big ( Q \tr w_k - \eta \cdot Q \tr d_k \big ). \]
 Using the fact, that $S$ is a subspace, this procedure results in a parameter vector $w_{k+1} \in S$, such that an iterative application can be simplified to the update rule
 \[ w_{k+1} \leftarrow w_k - \eta \cdot Q Q \tr d_k. \]
-If the dimension of the subspace is small enough, training should happen a lot faster than in the original space. Also, since there are only a few variables to optimize, second-order methods become applicable. Another benefit is that training in the lower-dimensional space should prevent overfitting and improve robustness to label noises. \\
+If the dimension of the subspace is small enough, training should happen a lot faster than in the original space. Also, since there are only a few variables to optimize, second-order methods become applicable. Another benefit is that training in the low-dimensional space should prevent overfitting and improve robustness to label noises. \\
 
-Based on the stochastic gradient descent algorithm, we can introduce its projected version, performing the parameter updates in a lower-dimensional space as follows.
+Based on the stochastic gradient descent algorithm, we can introduce its projected version, performing the parameter updates in a low-dimensional space as follows.
 
 \begin{algorithm}
 \caption{Projected Stochastic Gradient Descent (P-SGD) \textcolor{white}{$\Big |$}} \ \\
@@ -1438,13 +1436,13 @@ The convergence of projected stochastic gradient descent will be investigated in
 
 If the dimension of the subspace covering the optimization trajectory is small enough, we could probably use second-order information for the training of deep neural networks. To clarify this, we have to recall that in Newton's method, the descent direction was defined as
 \[ d_k = - H_E^{-1}(x_k) \nabla E(x_k). \]
-As discussed, for large $n$ it is computationally impractical to determine the inverse Hessian. However, based on the low-dimensional trajectory hypothesis, for any $x_k$ there could exist some lower-dimensional version of the Hessian, call it $H_0(x_k) \in \R^{d \times d}$, such that
+As discussed, for large $n$ it is computationally impractical to determine the inverse Hessian. However, based on the low-dimensional trajectory hypothesis, for any $x_k$ there could exist some low-dimensional version of the Hessian, call it $H_0(x_k) \in \R^{d \times d}$, such that
 \[ H_E(x_k) \approx Q H_0(x_k) Q \tr. \]
 For small $d$ we could effectively compute the inverse Hessian as
 \[ H_E^{-1}(x_k) \approx ( Q H_0(x_k) Q \tr )^\dagger = Q H_0^{-1}(x_k) Q \tr, \]
-where $\dagger$ denotes the Moore-Penrose inverse. Doing so would enable us to perform the Newton update in the lower-dimensional subspace via the update rule
+where $\dagger$ denotes the Moore-Penrose inverse. Doing so would enable us to perform the Newton update in the low-dimensional subspace via the update rule
 \[ w_{k+1} \leftarrow w_k - \eta_k \cdot Q \big (H_0^{-1}(x_k) Q \tr \nabla E(x_k) \big ). \]
-The problem with that approach, however, is that we are still confronted with the determination of $H_0$. To clarify this, although we only need to optimize $d$ independent variables, this optimization is based on the gradients of parameters in the $n$-dimensional space. As a consequence, we still have to approximate the lower-dimensional inverse Hessians $H_0^{-1}$. One method for this purpose, namely BFGS was already introduced in section \ref{sec:Training}. Finally, we can denote the following algorithm, which is a slight modification of algorithm 2 in \cite{Paper}.
+The problem with that approach, however, is that we are still confronted with the determination of $H_0$. To clarify this, although we only need to optimize $d$ independent variables, this optimization is based on the gradients of parameters in the $n$-dimensional space. As a consequence, we still have to approximate the low-dimensional inverse Hessians $H_0^{-1}$. One method for this purpose, namely BFGS was already introduced in section \ref{sec:Training}. Finally, we can denote the following algorithm, which is a slight modification of algorithm 2 in \cite{Paper}.
 
 \begin{algorithm}
 \caption{Projected Broyden-Fletcher-Goldfarb-Shanno (P-BFGS) \textcolor{white}{$\Big |$}} \ \\
@@ -1461,18 +1459,18 @@ The problem with that approach, however, is that we are still confronted with th
 \textcolor{white}{$\Big |$}9: \textbf{end for}
 \end{algorithm}
 
-Note that the backtracking line search in here has to be performed with respect to the gradient in the lower-dimensional subspace. Denoting this lower-dimensional descent direction as
+Note that the backtracking line search in here has to be performed with respect to the gradient in the low-dimensional subspace. Denoting this low-dimensional descent direction as
 \[ d_k \coloneq Q^T \nabla E \big (w_k,\I_k \big), \] 
 the adopted version of backtracking line search iteratively searches for some $\eta_k > 0$ satisfying 
 \[ E \big (w_k - \eta_k \cdot Q B_k d_k, \I_k \big) \leq E \big (w_k, \I_k \big ) - c \cdot \eta_k \cdot d_k \tr B_k d_k. \]
 In this equation, we used the minor definition from section \ref{sec:Training}, namely 
 \[ E(w_k,\I_k) \coloneq \frac{1}{b} \sum_{i \in \I_k}^{}  \ell \big ( f(x_i,w_k),y_i \big) + \lambda \big \| w_k \big \|_2^2. \]
-According to \cite{Paper}, the step size choice via this adopted version of backtracking linesearch ensures $y_k \tr s_k > 0$, which guarantees the positive definiteness of the inverse Hessian approximation $B_{k+1}$. As a consequence, the proposed P-BFGS algorithm is well-defined. Similar to the choice in \cite{Paper}, we always use $c = 0.4$ and $\beta = 0.55$ to perform the backtracking line search.
+According to \cite{Paper}, the step size choice via this adopted version of backtracking line search ensures $y_k \tr s_k > 0$, which guarantees the positive definiteness of the inverse Hessian approximation $B_{k+1}$. As a consequence, the proposed P-BFGS algorithm is well-defined. 
 
 \pagebreak
 \section{Numerical Experiments} \label{sec:Experiments}
 
-This section investigates the low-dimensional trajectory hypothesis from a practical perspective. We conduct extensive numerical experiments to study the performance of DLDR-based training algorithms, especially P-SGD, on various architectures and data sets. In this context, we also analyze the computational complexity of the subspace extraction via DLDR. The experiments include a comparison of different sampling strategies and subspace dimensions. Finally, we propose and test certain ideas to design new training algorithms based on DLDR. All of the experiments are run on an NVIDIA A100 GPU using PyTorch. \\
+This section investigates the low-dimensional trajectory hypothesis from a practical perspective. We conduct extensive numerical experiments to study the performance of DLDR and P-SGD, on various architectures and data sets. In this context, we also analyze the computational complexity of the subspace extraction via DLDR. The experiments include a comparison of different sampling strategies and subspace dimensions. Finally, we propose and test certain ideas to design new training algorithms based on DLDR. All of the experiments are run on an NVIDIA A100 GPU using PyTorch. \\
 
 As a warm-up, we start with a motivational experiment, indicating that the low-dimensional trajectory hypothesis could indeed hold true. We proceed as in section 3.3 of \cite{Paper} and study the training of ResNet8 \cite{ResNet} on the CIFAR-10 data set. More precisely, we compare the performance of training in a low-dimensional subspace to the performance of training in the full parameter space of dimension 75,290. The data set is normalized by channel-wise mean and variance. Furthermore, we apply horizontal flipping with a probability of 0.5 as well as cropping and 4-pixel padding. At first, we conduct the full parameter training via SGD with a learning rate of 0.1, a batch size of 128, and a momentum of 0.9. During the first 30 epochs of that training, we save the network's parameter vector after each epoch, that is we generate a trajectory $(w_k)_{k=0}^{30}$ in $\R^{75,290}$. In a follow-up experiment, these samples are used to extract a low-dimensional subspace of dimension 15. Note that the choice of this specific dimension is arbitrary and was imitated from section 3.3 of \cite{Paper}. To investigate the low-dimensional trajectory hypothesis from a practical perspective, we then train the same network from scratch, using P-SGD in the 15-dimensional subspace. For reasons of comparability, we start from the same initialization and use the same hyperparameters as for regular SGD.
 
@@ -1508,15 +1506,15 @@ After training the models in full parameter space, we conduct further experiment
 \textcolor{white}{$\Big |$}& & 50 & 100 & 200 & 50 & 100 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
 \textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 59.52 & 58.56 & 70.29 & 69.89 & 70.60 \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.3M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
+\textcolor{white}{$\Big |$}ShuffleNet \cite{ShuffleNet} & 1.3M & 62.90 & 63.15 & 72.06 & 71.34 & 72.29 \\
 \textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.3M & 57.15 & 58.67 & 67.94 & 66.86 & 68.00 \\
 \textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 62.53 & 63.68 & 72.94 & 71.68 & 72.64 \\
 \textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.2M & 62.32 & 66.32 & 76.88 & 75.66 & 77.27 \\
 \textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.0M & 65.39 & 64.57 & 76.76 & 74.25 & 76.34 \\
 \textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.4M & 64.74 & 64.68 & 74.95 & 74.33 & 75.09 \\
 \textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.0M & 64.57 & 65.81 & 75.47 & 75.68 & 75.56 \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.3M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.5M & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
+\textcolor{white}{$\Big |$}Inception \cite{Inception} & 22.3M & 61.68 & 64.00 & 76.25 & 75.15 & 76.83 \\
+\textcolor{white}{$\Big |$}VGG11 \cite{VGG} & 28.5M & 58.38 & 59.90 & 68.87 & 68.72 & 70.18 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering Test accuracy on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces. Source: Table 2 in \cite{Paper}.}\label{tab:psgd-1}}
@@ -1530,21 +1528,21 @@ After training the models in full parameter space, we conduct further experiment
 \textcolor{white}{$\Big |$}& & 50 & 100 & 200 & 50 & 100 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
 \textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 60.96 & 62.49 & 71.14 & 69.45 & 71.70 \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M & 63.84 & 64.53 & 72.57 & 72.13 & 73.54 \\
+\textcolor{white}{$\Big |$}ShuffleNet \cite{ShuffleNet} & 1.36M & 63.84 & 64.53 & 72.57 & 72.13 & 73.54 \\
 \textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M & 58.69 & 59.84 & 67.94 & 67.01 & 68.76 \\
 \textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 62.53 & 63.44 & 73.21 & 71.52 & 73.47 \\
 \textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M & 66.20 & 67.78 & 77.09 & 75.67 & 77.22 \\
 \textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M & 66.02 & 67.12 & 77.01 & 74.62 & 74.71 \\
 \textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M & 65.64 & 66.97 & 74.82 & 74.94 & 75.59 \\
 \textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M & 66.51 & 67.45 & 75.81 & 75.35 & 75.55 \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M & 64.69 & 65.80 & 75.57 & 73.78 & 75.89 \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M & 60.88 & 61.14 & 68.94 & 69.94 & 71.14 \\
+\textcolor{white}{$\Big |$}Inception \cite{Inception} & 22.32M & 64.69 & 65.80 & 75.57 & 73.78 & 75.89 \\
+\textcolor{white}{$\Big |$}VGG11 \cite{VGG} & 28.52M & 60.88 & 61.14 & 68.94 & 69.94 & 71.14 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering Maximal test accuracy on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}\label{tab:psgd-2}}
 \end{table}
 
-Clearly, the experiments indicate a comparable performance of training in a 40-dimensional subspace to training in the full parameter space. These findings are empirically verified for 10 different architectures of various complexity, which strongly supports the existence of low-dimensional optimization trajectories. Comparing the performance of P-SGD for subspaces extracted based on 50 and 100 sampling epochs yields another finding. Generally, the performance of P-SGD seems to be better if the subspace extraction method has access to a longer piece of the regular optimization trajectory. A fact that is not directly visible in the table is the fast convergence of P-SGD. Note that we have used an initial learning rate of 1 which is usually too large for regular SGD training. In the low-dimensional subspace, however, there are just a few optimizable variables, such that a larger learning rate seems to be applicable. Exemplary, the fast convergence is visualized for the smallest model (SqueezeNet) and the largest model (VGG11) in figure \ref{fig:exp1}. P-SGD quickly surpasses the performance of SGD and needs just 10 to 20 epochs to almost reaching its peak. These observations also apply to the other eight models. Their corresponding charts can be found in figure \ref{fig:exp1-app} in the appendix.
+Clearly, the experiments indicate a comparable performance of training in a 40-dimensional subspace to training in the full parameter space. These findings are empirically verified for 10 different architectures of various complexity, which strongly supports the existence of low-dimensional optimization trajectories. Comparing the performance of P-SGD for subspaces extracted based on 50 and 100 sampling epochs yields another finding. Generally, the performance of P-SGD seems to be better if the subspace extraction method has access to a longer piece of the regular optimization trajectory. A fact that is not directly visible in the table is the fast convergence of P-SGD. Note that we have used an initial learning rate of 1 which is usually too large for regular SGD training. In the low-dimensional subspace, however, there are just a few optimizable variables, such that a larger learning rate seems to be applicable. Exemplary, the fast convergence is visualized for the smallest model (SqueezeNet) and the largest model (VGG11) in figure \ref{fig:exp1}. P-SGD quickly surpasses the performance of SGD and needs just 10 to 20 epochs to almost reaching its peak. These observations also apply to the other 8 models. Their corresponding charts can be found in figure \ref{fig:exp1-app} in the appendix.
 
 \begin{figure}[!h]
 \centering
@@ -1556,7 +1554,7 @@ Clearly, the experiments indicate a comparable performance of training in a 40-d
 
 Having verified the possible existence of low-dimensional optimization trajectories, we now focus on using these findings to design powerful optimization methods. As of now, training in low-dimensional subspaces was always preceded by a heavy sampling stage based on regular SGD training. As illustrated in figure \ref{fig:exp1}, the actual training in the low-dimensional subspace seems to happen pretty fast. Thus, to design a cost-efficient but powerful low-dimensional optimization method, it is key to minimize the computational effort spent on subspace extraction. Recall that the subspace extraction is achieved by the DLDR algorithm in which the key challenge consists of finding a suitable dimension, generating meaningful samples, and extracting an orthonormal basis via principal component analysis. \\
 
-To empirically investigate the complexity of DLDR, we compare the wall-clock time spent on sampling the parameters to the time spent on performing PCA on these samples. Note that generating one sample corresponds to training for one epoch of SGD. For the PCA we analyze the extraction of 40-dimensional subspaces based on $t=50, 100, 150, 200$ samples which include singular value decomposition of $(t+1) \times (t+1)$ matrices. Both, the parameter sampling and the PCA are performed on the GPU. The results are reported in table \ref{tab:dldr}. \\
+To empirically investigate the complexity of DLDR, we compare the time spent on sampling the parameters to the time spent on performing PCA on these samples. Note that generating one sample corresponds to training for one epoch of SGD. For the PCA we analyze the extraction of 40-dimensional subspaces based on $t=50, 100, 150, 200$ samples which include singular value decomposition of $(t+1) \times (t+1)$ matrices. Both, the parameter sampling and the PCA are performed on the GPU. The results are reported in table \ref{tab:dldr}. \\
 
 \begin{table}[!h]
 \begin{tabu} to \textwidth { l | r | c | X[c] X[c] X[c] X[c] }
@@ -1565,15 +1563,15 @@ To empirically investigate the complexity of DLDR, we compare the wall-clock tim
 & & \textcolor{white}{$\Big |$} per epoch \textcolor{white}{$\Big |$} &50 & 100 & 150 & 200 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \multicolumn{7}{c}{} \\ [-2.5ex]
 \textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 0.78M & 16.830 & 0.016 & 0.020 & 0.023 & 0.043 \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 1.36M & 20.707 & 0.012 & 0.020 & 0.018 & 0.022 \\
+\textcolor{white}{$\Big |$}ShuffleNet \cite{ShuffleNet} & 1.36M & 20.707 & 0.012 & 0.020 & 0.018 & 0.022 \\
 \textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 3.32M & 16.237 & 0.020 & 0.023 & 0.030 & 0.104 \\
 \textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 4.14M & 23.132 & 0.018 & 0.028 & 0.051 & 0.190 \\
 \textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 6.40M & 28.068 & 0.025 & 0.030 & 0.048 & 0.051 \\
 \textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 7.05M & 43.932 & 0.027 & 0.033 & 0.245 & 0.226 \\
 \textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 11.31M & 18.377 & 0.027 & 0.250 & 0.219 & 0.081 \\
 \textcolor{white}{$\Big |$}Xception \cite{Xception} & 21.01M & 31.819 & 0.412 & 0.759 & 0.473 & 0.634 \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 22.32M & 68.253 & 0.050 & 0.584 & 0.513 & 0.677 \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 28.52M & 14.528 & 0.049 & 0.076 & 0.647 & 0.654 \\
+\textcolor{white}{$\Big |$}Inception \cite{Inception} & 22.32M & 68.253 & 0.050 & 0.584 & 0.513 & 0.677 \\
+\textcolor{white}{$\Big |$}VGG11 \cite{VGG} & 28.52M & 14.528 & 0.049 & 0.076 & 0.647 & 0.654 \\
 \multicolumn{7}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering DLDR time consumption in seconds (s) to extract 40-dimensional subspaces for training on CIFAR-100.}
@@ -1594,20 +1592,20 @@ Sampling once after each epoch of SGD as in \cite{Paper} is a very basic strateg
 \begin{table} [!h]
 \begin{tabu} to \textwidth { l | X[c] X[c] | X[c] X[c] X[c] X[c] X[c] }
 \hline \hline \multicolumn{8}{c}{} \\ [-2.5ex]
-\textcolor{white}{$\Big |$}& \multicolumn{2}{c|}{Discrete} & \multicolumn{5}{c}{Average} \\
+\textcolor{white}{$\Big |$}& \multicolumn{2}{c|}{discrete} & \multicolumn{5}{c}{average} \\
 \textcolor{white}{$\Big |$} model & \multicolumn{2}{c|}{\#sampling epochs} & \multicolumn{5}{c}{\#sampling epochs} \\
 \textcolor{white}{$\Big |$}& 50 & 100 & 50 & 75 & 100 & 125 & 150 \\
 \multicolumn{8}{c}{} \\ [-2.5ex] \hline \multicolumn{8}{c}{} \\ [-2.5ex]
 \textcolor{white}{$\Big |$}SqueezeNet \cite{SqueezeNet} & 69.45 & 71.70 & 70.19 & 71.55 & 71.99 & 72.36 & 72.52 \\
-\textcolor{white}{$\Big |$}ShuffleNetv2 \cite{ShuffleNet} & 72.13 & 73.54 & 72.27 & 72.98 & 73.42 & 73.33 & 73.35 \\
+\textcolor{white}{$\Big |$}ShuffleNet \cite{ShuffleNet} & 72.13 & 73.54 & 72.27 & 72.98 & 73.42 & 73.33 & 73.35 \\
 \textcolor{white}{$\Big |$}MobileNet \cite{MobileNet} & 67.01 & 68.76 & 67.81 & 68.60 & 68.63 & 68.89 & 68.92 \\
 \textcolor{white}{$\Big |$}EfficientNet \cite{EfficientNet} & 71.52 & 73.47 & 72.15 & 72.90 & 73.66 & 74.05 & 74.15 \\
 \textcolor{white}{$\Big |$}GoogLeNet \cite{GoogLeNet} & 75.67 & 77.22 & 75.85 & 76.65 & 77.16 & 77.19 & 77.13 \\
 \textcolor{white}{$\Big |$}DenseNet121 \cite{DenseNet} & 74.62 & 74.71 & 74.54 & 74.55 & 74.48 & 74.52 & 74.49  \\
 \textcolor{white}{$\Big |$}SEResNet18 \cite{SEResNet} & 74.94 & 75.59 & 74.99 & 75.58 & 75.59 & 75.70 & 75.79 \\
 \textcolor{white}{$\Big |$}Xception \cite{Xception} & 75.35 & 75.55 & 75.66 & 75.54 & 75.59 & 75.64 & 75.58 \\
-\textcolor{white}{$\Big |$}Inceptionv3 \cite{Inception} & 73.78 & 75.89 & 74.72 & 75.88 & 75.98 & 75.91 & 75.86 \\
-\textcolor{white}{$\Big |$}VGG11\_bn \cite{VGG} & 69.94 & 71.14 & 69.98 & 70.91 & 71.22 & 71.21 & 71.24 \\
+\textcolor{white}{$\Big |$}Inception \cite{Inception} & 73.78 & 75.89 & 74.72 & 75.88 & 75.98 & 75.91 & 75.86 \\
+\textcolor{white}{$\Big |$}VGG11 \cite{VGG} & 69.94 & 71.14 & 69.98 & 70.91 & 71.22 & 71.21 & 71.24 \\
 \multicolumn{8}{c}{} \\ [-2.5ex] \hline \hline
 \end{tabu}
 \centering \parbox{12cm}{\caption{\centering Maximal test accuracy on CIFAR-100 using 40 epochs of P-SGD training in 40-dimensional subspaces.}\label{tab:avg}}
@@ -1615,7 +1613,7 @@ Sampling once after each epoch of SGD as in \cite{Paper} is a very basic strateg
 
 Generally, the performance of training in subspaces extracted based on 50 samples seems to be better when using the average sampling technique rather than the discrete one. For 100 samples, however, there seems to be no big difference at all. Presumably, the averaging effect indirectly occurs for the discrete sampling strategy too, due to the larger number of samples. Anyways, for the upcoming experiments, we will always use the average sampling technique. Another finding is, that the number of samples needed to extract the subspace differs from model to model. For example, the performance of SqueezeNet is significantly better, the more samples are used for the subspace extraction whereas 50 or even fewer samples seem to be sufficient for the DenseNet121. Therefore, in order to minimize the number of SGD epochs trained, it would be useful to have a criterium to decide how many samples are needed for the subspace extraction. Let us keep this idea in mind for later purposes, but first investigate further sampling strategies and analyze different choices of subspace dimensions. \\
 
-To address the two main questions, we compare the performance of training in subspaces of various dimensions using several sampling strategies. We step back to the setting in the motivational experiment, which is training a ResNet8 on CIFAR-10. Hyperparameters are also adopted. For reasons of comparability, in all of these experiments, we sample based on the same optimization trajectory of 30 epochs length. However, to allow for larger subspaces and to investigate several sampling strategies, we vary the frequency of samples per epoch from 1 to 50. This enables us to generate up to 1500 samples during the first 30 epochs of regular SGD training. Note that with a batch size of 128, one epoch consists of 391 batches, such that a frequency of 50 samples per epoch roughly translates to sampling after 8 batches each. To sample even more frequently makes no sense, since the distance between samples would become too small. Similar to the motivational experiment, we use these samples to extract the lower-dimensional subspaces. The detailed approach is to test all sampling strategies for training in spaces of various dimensions, ranging from 2 up to 1000. We apply the average sampling technique and report the results after 40 epochs of training with P-SGD in table \ref{tab:dim_avg}.
+To address the two main questions, we compare the performance of training in subspaces of various dimensions using several sampling strategies. We step back to the setting in the motivational experiment, which is training a ResNet8 on CIFAR-10. Hyperparameters are also adopted. For reasons of comparability, in all of these experiments, we sample based on the same optimization trajectory of 30 epochs length. However, to allow for larger subspaces and to investigate several sampling strategies, we vary the frequency of samples per epoch from 1 to 50. This enables us to generate up to 1500 samples during the first 30 epochs of regular SGD training. Note that with a batch size of 128, one epoch consists of 391 batches, such that a frequency of 50 samples per epoch roughly translates to sampling after 8 batches each. To sample even more frequently makes no sense, since the distance between samples would become too small. Similar to the motivational experiment, we use these samples to extract the low-dimensional subspaces. The detailed approach is to test all sampling strategies for training in spaces of various dimensions, ranging from 2 up to 1000. We apply the average sampling technique and report the results after 40 epochs of training with P-SGD in table \ref{tab:dim_avg}.
 
 \begin{table}[!h]
 \begin{tabu} to \textwidth { l r | X[c] X[c] X[c] X[c] X[c] X[c] X[c] X[c] | r }
@@ -1726,7 +1724,7 @@ Therefore, we train a SqueezeNet for 10 epochs with SGD to generate 10 samples. 
 \parbox{12cm}{\centering \caption{\centering Training performance of SqueezeNet using 1 intermediate epoch of P-SGD after each 10 epochs of SGD. \label{fig:refinement}}}
 \end{figure}
 
-Figure \ref{fig:refinement} illustrates the performance of this procedure. As expected, once the P-SGD training starts, both test accuracy and loss experience a jump due to the faster convergence in the subspace. Unfortunately, however, when falling back to regular SGD training, we lose the progress made during the P-SGD phase and the performance decreases to its level prior to the P-SGD phase. One explanation for this could be the following. Casually speaking, when training in an approximation of the true subspace, we are optimizing in the wrong direction, so once we fall back to regular SGD training we have to adapt the training direction and lose the progress made. To ensure that we don't optimize too far in the wrong direction, the same experiment is re-run, but the P-SGD phase is shortened to just three batches. Also, since the PCA computation costs almost nothing, we conduct another experiment where 10 initial SGD epochs are trained to get rid of the initial randomness. After that, we train three intermediate batches of P-SGD after each epoch of regular SGD.
+Figure \ref{fig:refinement} illustrates the performance of this procedure. As expected, once the P-SGD training starts, both test accuracy and loss experience a jump due to the faster convergence in the subspace. Unfortunately, however, when falling back to regular SGD training, we lose the progress made during the P-SGD phase and the performance decreases to its level prior to the P-SGD phase. One explanation for this could be the following. Casually speaking, when training in an approximation of the true subspace, we are optimizing in the wrong direction, so once we fall back to regular SGD training we have to adapt the training direction and lose the progress made. To ensure that we don't optimize too far in the wrong direction, the same experiment is re-run, but the P-SGD phase is shortened to just 3 batches. Also, since the PCA computation costs almost nothing, we conduct another experiment where 10 initial SGD epochs are trained to get rid of the initial randomness. After that, we train 3 intermediate batches of P-SGD after each epoch of regular SGD.
 
 \begin{figure}[!h]
 \centering
@@ -1768,7 +1766,7 @@ Based on these charts it is hard to decide the number of samples that are suffic
 \textcolor{white}{$\Big |0$}1: Train 10 epochs of SGD and sample parameters $w_1, \dots, w_{10} \in \R^n$; \\
 \textcolor{white}{$\Big |0$}2: Initialize $k \leftarrow 11$, $W \leftarrow [ w_0, \dots, w_{10} ]$, $\tilde{\Sigma} \leftarrow [ \ ]$, $\tilde{V} \leftarrow [ \ ]$; \\
 \textcolor{white}{$\Big |0$}3: \textbf{while} $k\leq N$ \textbf{do}: \\
-\textcolor{white}{$\Big |0$}4: \quad Train one epoch of SGD and sample parameters $w_k \in \R^n$; \\
+\textcolor{white}{$\Big |0$}4: \quad Train 1 epoch of SGD and sample parameters $w_k \in \R^n$; \\
 \textcolor{white}{$\Big |0$}5: \quad Set $W \leftarrow W + [w_k]$; \\
 \textcolor{white}{$\Big |0$}6: \quad Compute the mean $\overline{w}_5 \coloneq \frac{1}{5} \big ( w_{k-4} + \dots + w_k \big )$; \\
 \textcolor{white}{$\Big |0$}7: \quad Define the recent 5 centralized samples as $W_5 \coloneq [w_{k-4} - \overline{w}_5, \dots, w_k - \overline{w}_5] \in \R^{n \times 5}$; \\
@@ -1801,9 +1799,9 @@ Finally, it should be repeated that this is just an outline of a future low-dime
 
 This thesis aimed to investigate the feasibility of training deep neural networks in low-dimensional subspaces both from a theoretical and practical perspective. The key assumption for training in low-dimensional subspaces was, that the parameter sequence generated by some kind of gradient descent method, for example SGD, can be approximately covered by a low-dimensional affine set. This assumption is also known as the low-dimensional trajectory hypothesis, which was first risen in \cite{Paper}. \\
 
-For the theoretical investigation, we studied the training of neural networks in function spaces. We analyzed the kernel gradient descent algorithm and proved its convergence to a global minimum, under the condition of a convex cost and a positive definite kernel. Furthermore, for the training of neural networks, we established a relationship between gradient descent and kernel gradient descent with respect to the Neural Tangent Kernel. Here the problem was, that this kernel is random at initialization and varies during training. In the infinite-width limit, however, the Neural Tangent Kernel converges in probability to an explicit deterministic limiting kernel and stays asymptotically constant during training. The key observation, namely that this limiting kernel is low-rank, theoretically motivated the existence of low-dimensional optimization trajectories under the assumption of infinite-width limit. \\
+For the theoretical investigation, we studied the training of neural networks in function spaces. We analyzed the kernel gradient descent algorithm and proved its convergence to a global minimum, under the condition of a convex cost and a positive definite kernel. Furthermore, for the training of neural networks, we established a relationship between gradient descent and kernel gradient descent with respect to the Neural Tangent Kernel. Here the problem was, that this kernel is random at initialization and varies during training. In the infinite width limit, however, the Neural Tangent Kernel converges in probability to an explicit deterministic limiting kernel and stays asymptotically constant during training. The key observation, namely that this limiting kernel is low-rank, theoretically motivated the existence of low-dimensional optimization trajectories under the assumption of infinite width limit. \\
 
-Of course, the setting of infinite-width limit never applies in real applications. Therefore, we also studied the practical feasibility of training deep neural networks in low-dimensional subspaces. We introduced the Dynamic Linear Dimensionality Reduction method from \cite{Paper}, which is an effective technique to extract low-dimensional subspaces. Also, an adoption of the SGD optimizer to these subspaces, called P-SGD, was provided. These two algorithms were extensively tested in various numerical experiments. We have seen, that many widely known architectures can be well-trained using P-SGD in just a 40-dimensional subspace extracted via DLDR. The key problem of extracting these low-dimensional subspaces consists in generating meaningful samples. In this thesis, the sample generation was realized by training the neural networks via regular SGD, which comes with the drawback of a lot of computational effort. Having generated these samples, the time spent on subspace extraction is negligible in comparison to the total training time. Also, the low-dimensional training itself converges pretty fast and needs just a few epochs of P-SGD. As a consequence, we focused on keeping the sampling stage short. Concerning this approach, we analyzed several sampling strategies and came to the conclusion, that samples should be generated once per epoch using the average sampling technique. Moreover, we compared the performance of training in subspaces of various dimensions and found that the specific choice of dimension does not matter so much as long as it is chosen not too small. \\
+Of course, the setting of infinite width limit never applies in real applications. Therefore, we also studied the practical feasibility of training deep neural networks in low-dimensional subspaces. We introduced the Dynamic Linear Dimensionality Reduction method from \cite{Paper}, which is an effective technique to extract low-dimensional subspaces. Also, an adoption of the SGD optimizer to these subspaces, called P-SGD, was provided. These two algorithms were extensively tested in various numerical experiments. We have seen, that many widely known architectures can be well-trained using P-SGD in just a 40-dimensional subspace extracted via DLDR. The key problem of extracting these low-dimensional subspaces consists in generating meaningful samples. In this thesis, the sample generation was realized by training the neural networks via regular SGD, which comes with the drawback of a lot of computational effort. Having generated these samples, the time spent on subspace extraction is negligible in comparison to the total training time. Also, the low-dimensional training itself converges pretty fast and needs just a few epochs of P-SGD. As a consequence, we focused on keeping the sampling stage short. Concerning this approach, we analyzed several sampling strategies and came to the conclusion, that samples should be generated once per epoch using the average sampling technique. Moreover, we compared the performance of training in subspaces of various dimensions and found that the specific choice of dimension does not matter so much as long as it is chosen not too small. \\
 
 Finally, we turned these discoveries into designing powerful low-dimensional optimization algorithms. For this, two approaches were tested. The first one aimed to speed up the evolution of the optimization trajectory by iterative space refinements. Unfortunately, this approach did not work, at least not in the proposed manner. The second approach was to determine the minimal length of the optimization trajectory needed for a sufficient subspace extraction. These ideas were summarized by sketching a future low-dimensional training algorithm. \\
 
@@ -1839,14 +1837,14 @@ Possibilities for future works include the design of a criterium to decide once 
 
 \begin{figure}[!h]
 \centering
-\subfigure[ShuffleNetv2] {\includegraphics[width=0.49\textwidth]{images/exp1-shufflenet.png}}
+\subfigure[ShuffleNet] {\includegraphics[width=0.49\textwidth]{images/exp1-shufflenet.png}}
 \subfigure[MobileNet] {\includegraphics[width=0.49\textwidth]{images/exp1-mobilenet.png}}
 \subfigure[EfficientNet] {\includegraphics[width=0.49\textwidth]{images/exp1-efficientnet.png}}
 \subfigure[GoogleNet] {\includegraphics[width=0.49\textwidth]{images/exp1-googlenet.png}}
 \subfigure[DenseNet121] {\includegraphics[width=0.49\textwidth]{images/exp1-densenet.png}}
 \subfigure[SEResNet18] {\includegraphics[width=0.49\textwidth]{images/exp1-seresnet.png}}
 \subfigure[Xception] {\includegraphics[width=0.49\textwidth]{images/exp1-xception.png}}
-\subfigure[Inceptionv3] {\includegraphics[width=0.49\textwidth]{images/exp1-inception.png}}
+\subfigure[Inception] {\includegraphics[width=0.49\textwidth]{images/exp1-inception.png}}
 \caption{\centering Training performance on CIFAR-100 using regular SGD training and P-SGD training in 40-dimensional subspaces.}
 \label{fig:exp1-app}
 \end{figure}
